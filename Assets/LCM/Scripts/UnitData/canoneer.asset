@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: clubman
+  m_Name: canoneer
   m_EditorClassIdentifier: 
-  unitName: ClubMan
-  health: 55
-  attackDamage: 16
+  unitName: Canoneer
+  health: 600
+  attackDamage: 120
   rangedDamage: 0
-  MeleeRange: 20
+  MeleeRange: 25
   rangedrange: 0
   attackSpeed: 1
   moveSpeed: 1
-  goldCost: 15
+  goldCost: 1000
   unitSprite: {fileID: 0}
-  description: StoneAgeDefaultUnit
+  description: IndustrialCaoneer
   unitType: 0
-  eraType: 0
+  eraType: 2

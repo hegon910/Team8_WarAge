@@ -8,9 +8,12 @@ public class Unit : ScriptableObject
     public string unitName;
     public int health;
     public int attackDamage;
-    public float attackRange;
+    public int rangedDamage;
+    public float MeleeRange;
+    public float rangedrange;
     public float attackSpeed;
-    public float moveSpeed;
+
+    public float moveSpeed = 1f;
     public int goldCost;
     public Sprite unitSprite;
     public string description;

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: clubman
+  m_Name: slingshotman
   m_EditorClassIdentifier: 
-  unitName: ClubMan
-  health: 55
-  attackDamage: 16
-  rangedDamage: 0
+  unitName: slingshotman
+  health: 42
+  attackDamage: 10
+  rangedDamage: 8
   MeleeRange: 20
-  rangedrange: 0
+  rangedrange: 100
   attackSpeed: 1
   moveSpeed: 1
-  goldCost: 15
+  goldCost: 25
   unitSprite: {fileID: 0}
-  description: StoneAgeDefaultUnit
-  unitType: 0
+  description: StoneAgeSlingshotMan
+  unitType: 1
   eraType: 0
