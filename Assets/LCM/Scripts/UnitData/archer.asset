@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
+  m_Name: archer
+  m_EditorClassIdentifier: 
+  unitName: Archer
+  health: 80
+  attackDamage: 80
+  rangedDamage: 14
+  MeleeRange: 20
+  rangedrange: 130
+  attackSpeed: 1
+  moveSpeed: 1
+  goldCost: 75
+  unitSprite: {fileID: 0}
+  description: MedievalArcher
+  unitType: 1
+  eraType: 1
