@@ -11,6 +11,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     private string testloginScene = "JWH_LoginScene";
     private string testlobbyScene = "JWH_LobbyScene";
     private string testgameScene = "JWH_GameScene";
+    private string testroomSceene = "JWH_RoomScene";
 
     void Awake()
     {
@@ -54,12 +55,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("πÊ ¿‘¿Â");
-
-
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.LoadLevel(testgameScene);
-        }
+        SceneManager.LoadScene("JWH_RoomScene");
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
