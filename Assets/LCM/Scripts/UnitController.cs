@@ -5,13 +5,15 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     [SerializeField] Unit unitdata;
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Rigidbody2D rb;
 
     private int currentHealth;
     private Transform currentTarget;
     private float attackCooldownTimer;
 
     public float meleeSwitchRange = 1.5f;
+    public LayerMask unitLayer;
+    public float stopDistance = 1f;
 
     public Vector3 moveDirection = Vector3.right;
 
@@ -19,9 +21,18 @@ public class UnitController : MonoBehaviour
     {
         currentHealth = unitdata.health;
 
-        if(rb == null)
+        if (CompareTag("P1"))
         {
-            rb = GetComponent<Rigidbody>();
+            moveDirection = Vector3.right;
+        }
+        else if (CompareTag("P2"))
+        {
+            moveDirection = Vector3.left;
+        }
+
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody2D>();
         }
     }
 
@@ -29,14 +40,22 @@ public class UnitController : MonoBehaviour
     {
         if(attackCooldownTimer > 0)
         {
-            attackCooldownTimer = Time.deltaTime;
+            attackCooldownTimer -= Time.deltaTime;
         }
 
-        if (currentTarget == null || !CanAttack())
+        if (currentTarget == null || !IsTargetInRange()) 
         {
-            Move();
+            FindTarget();
+            if (currentTarget == null || !IsTargetInRange())
+            {
+                Move();
+            }
+            else 
+            {
+                Attack(currentTarget);
+            }
         }
-        else
+        else 
         {
             Attack(currentTarget);
         }
@@ -47,6 +66,26 @@ public class UnitController : MonoBehaviour
     private void Move()
     {
         if (!CanMove()) return;
+
+        Vector2 checkDirection = moveDirection;
+
+        Collider2D myCollider = GetComponent<Collider2D>();
+        Vector2 raycastOrigin = (Vector2)transform.position;
+        if (myCollider != null)
+        {
+            raycastOrigin += checkDirection * (myCollider.bounds.extents.x + 0.05f);
+        }
+
+        //앞의 유닛이 있을때 멈추는 거리 표현
+        //Debug.DrawRay(raycastOrigin, checkDirection * stopDistance, Color.red, 0.1f);
+
+        RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, checkDirection, stopDistance, unitLayer);
+
+        if (hit.collider != null && hit.collider.gameObject != gameObject)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
 
         rb.MovePosition(transform.position + moveDirection * unitdata.moveSpeed * Time.deltaTime);
     }
@@ -60,6 +99,43 @@ public class UnitController : MonoBehaviour
 
 
     //----------- 공격 ------------------
+
+    private void FindTarget()
+    {
+        string targetTag = CompareTag("P1") ? "P2" : "P1";
+
+        GameObject[] potentialTargets = GameObject.FindGameObjectsWithTag(targetTag);
+
+        Transform closestTarget = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (GameObject go in potentialTargets)
+        {
+            float distance = Vector3.Distance(transform.position, go.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestTarget = go.transform;
+            }
+        }
+        SetTarget(closestTarget);
+    }
+    private bool IsTargetInRange()
+    {
+        if (currentTarget == null) return false;
+
+        float distanceToTarget = Vector3.Distance(transform.position, currentTarget.position);
+
+        if (unitdata.unitType == UnitType.Melee)
+        {
+            return distanceToTarget <= unitdata.MeleeRange;
+        }
+        else if (unitdata.unitType == UnitType.Ranged)
+        {
+            return distanceToTarget <= meleeSwitchRange || distanceToTarget <= unitdata.rangedrange;
+        }
+        return false;
+    }
     private void SetTarget(Transform target)
     {
         currentTarget = target;
@@ -73,6 +149,7 @@ public class UnitController : MonoBehaviour
         {
             if (distanceToTarget <= unitdata.MeleeRange)
             {
+                rb.velocity = Vector2.zero;
                 // 공격 쿨다운이 끝났을 때만 공격
                 if (attackCooldownTimer <= 0)
                 {
@@ -86,6 +163,7 @@ public class UnitController : MonoBehaviour
         }
         else if(unitdata.unitType == UnitType.Ranged)
         {
+            rb.velocity = Vector2.zero;
             //가까이 왔을때 근접 공격
             if(distanceToTarget <= meleeSwitchRange && unitdata.attackDamage > 0)
             {
