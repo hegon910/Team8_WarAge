@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +19,9 @@ public class InGameUIManager : MonoBehaviour
     public TextMeshProUGUI expText; //경험치 표시 텍스트
     public Slider baseHpSlider; //기지 체력 표시
 
+    [Header("유닛 생산 큐")]
+    public Slider productionSlider;
+    public Toggle[] queueSlots = new Toggle[5];
 
 
 
@@ -29,8 +34,21 @@ public class InGameUIManager : MonoBehaviour
     {
         //게임 시작 시에는 정보 텍스트 보이지 않도록
         HideInfoText();
-    }
 
+        //SpawnManager 받을 시 이부분 주석 해제
+        // SpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
+        // SpawnManager.Instance.OnProductionProgress += UpdateProductionSlider;
+        // SpawnManager.Instance.OnProductionStatusChanged += ToggleProductionSliderVisibility;
+        if (productionSlider != null) productionSlider.value = 0;
+        if(queueSlots != null)
+        {
+            foreach(var slot in queueSlots)
+            {
+                if(slot != null) slot.SetIsOnWithoutNotify(false);
+            }
+        }
+    }
+   
     //유닛 정보를 받아 정보 텍스트 UI에 골드 비용 표시
     public void ShowUnitGoldCost(Unit unitData)
     {
@@ -70,5 +88,47 @@ public class InGameUIManager : MonoBehaviour
             baseHpSlider.value = (float)currentHp / maxHp;
         }
     }
+    private void OnDisable()
+    {
+        //  SpawnManager.cs를 받으면 이 부분의 주석을 해제
+
+        // if (SpawnManager.Instance != null)
+        // {
+        //     SpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
+        //     SpawnManager.Instance.OnProductionProgress -= UpdateProductionSlider;
+        //     SpawnManager.Instance.OnProductionStatusChanged -= ToggleProductionSliderVisibility;
+        // }
+
+    }
+    //SpawnManager로부터 유닛 큐데이터를 받아와 UI 갱신
+    private void UpdateQueueUI(Queue<Unit> currentQueue)
+    {
+        //현재 큐에 있는 유닛의 개수를 가져옴
+        int queuedCount = currentQueue.Count;
+        //5개의 모든 토글 슬롯을 순회
+        for (int i = 0; i < queueSlots.Length; i++)
+        {
+            //현재 인덱스(i)가 큐에 있는 유닛 수 보다 작으면 해당 슬롯은 사용중
+            if(i < queuedCount)
+            {
+                //토글을 on 상태로 만든다.
+                queueSlots[i].SetIsOnWithoutNotify(true);
+            }
+            else
+            {
+                //해당 슬롯은 비어있으므로 토글을 off
+                queueSlots[i].SetIsOnWithoutNotify(false);
+            }
+        }
+
+    }
+    private void UpdateProductionSlider(float progress)
+    {
+        if(productionSlider != null)
+        {
+            productionSlider.value = progress;
+        }
+    }
+
 
 }
