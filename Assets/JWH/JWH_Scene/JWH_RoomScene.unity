@@ -1208,11 +1208,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d271c5d6d622096439c3938357e6248c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftPlayerNameText: {fileID: 0}
-  rightPlayerNameText: {fileID: 0}
-  readyButton: {fileID: 0}
-  readyText: {fileID: 0}
-  startButton: {fileID: 0}
+  leftPlayerNameText: {fileID: 94959897}
+  rightPlayerNameText: {fileID: 31076999}
+  readyButton: {fileID: 1685957060}
+  readyText: {fileID: 552540307}
+  startButton: {fileID: 2116824003}
 --- !u!4 &1881050374
 Transform:
   m_ObjectHideFlags: 0

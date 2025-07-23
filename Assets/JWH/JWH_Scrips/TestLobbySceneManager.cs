@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class TestLobbyManager : MonoBehaviour
+public class TestLobbySceneManager : MonoBehaviour
 {
     [SerializeField] private Button joinButton;
    

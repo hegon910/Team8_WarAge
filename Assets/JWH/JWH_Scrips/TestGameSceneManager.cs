@@ -3,7 +3,7 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class GameManager : MonoBehaviour
+public class testGameSceneManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI leftPlayerText;
     [SerializeField] private TextMeshProUGUI rightPlayerText;

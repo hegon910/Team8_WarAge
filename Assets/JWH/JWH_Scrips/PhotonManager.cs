@@ -15,20 +15,24 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     void Awake()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else Destroy(gameObject);
-        {
-            Destroy(gameObject);
-        }
+       
     }
 
 
     public void ConnectToServer(string nickname)//닉네임받아서시작
     {
+        Debug.Log("닉네임 입력됨: " + nickname);
+        if (PhotonNetwork.IsConnected)
+        {
+            Debug.Log("이미 연결됨");
+            return;
+        }
         PhotonNetwork.NickName = nickname;
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -60,10 +64,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.LoadLevel(testgameScene);
-        }
+        //if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
+        //{
+        //    PhotonNetwork.LoadLevel(testgameScene);
+        //}
+        //자동시작해서 지워둠
     }
 
 

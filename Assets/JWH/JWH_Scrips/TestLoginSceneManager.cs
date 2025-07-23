@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class LoginManager : MonoBehaviour
+public class TestLoginSceneManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField nicknameField;
     [SerializeField] private Button connectButton;

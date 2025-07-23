@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-public class RoomManager : MonoBehaviourPunCallbacks
+public class testRoomManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] private TextMeshProUGUI leftPlayerNameText;
     [SerializeField] private TextMeshProUGUI rightPlayerNameText;
@@ -40,6 +40,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         });
 
         UpdatePlayerNames();
+        startButton.interactable = PhotonNetwork.IsMasterClient && AllPlayersReady();
     }
 
     void UpdatePlayerNames()
@@ -71,14 +72,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         UpdatePlayerNames();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startButton.interactable = AllPlayersReady();
+        }
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerNames();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startButton.interactable = AllPlayersReady();
+        }
     }
 
-    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    public override void OnPlayerPropertiesUpdate(Player target, Hashtable changedProps)
     {
         if (PhotonNetwork.IsMasterClient)
         {
