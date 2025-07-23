@@ -12,7 +12,7 @@ public class Unit : ScriptableObject
     public float MeleeRange;
     public float rangedrange;
     public float attackSpeed;
-
+    public float SpawnTime;
     public float moveSpeed = 1f;
     public int goldCost;
     public Sprite unitSprite;

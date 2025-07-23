@@ -12,6 +12,8 @@ public class UnitController : MonoBehaviour
     private float attackCooldownTimer;
 
     public float meleeSwitchRange = 1.5f;
+    public LayerMask unitLayer;
+    public float stopDistance = 1f;
 
     public Vector3 moveDirection = Vector3.right;
 
@@ -43,8 +45,8 @@ public class UnitController : MonoBehaviour
 
         if (currentTarget == null || !IsTargetInRange()) 
         {
-            FindTarget(); 
-            if (currentTarget == null || !IsTargetInRange()) 
+            FindTarget();
+            if (currentTarget == null || !IsTargetInRange())
             {
                 Move();
             }
@@ -64,8 +66,27 @@ public class UnitController : MonoBehaviour
     private void Move()
     {
         if (!CanMove()) return;
-        Debug.Log($"{gameObject.name}");
-        Debug.Log("이동중");
+
+        Vector2 checkDirection = moveDirection;
+
+        Collider2D myCollider = GetComponent<Collider2D>();
+        Vector2 raycastOrigin = (Vector2)transform.position;
+        if (myCollider != null)
+        {
+            raycastOrigin += checkDirection * (myCollider.bounds.extents.x + 0.05f);
+        }
+
+        //앞의 유닛이 있을때 멈추는 거리 표현
+        //Debug.DrawRay(raycastOrigin, checkDirection * stopDistance, Color.red, 0.1f);
+
+        RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, checkDirection, stopDistance, unitLayer);
+
+        if (hit.collider != null && hit.collider.gameObject != gameObject)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
+
         rb.MovePosition(transform.position + moveDirection * unitdata.moveSpeed * Time.deltaTime);
     }
 
