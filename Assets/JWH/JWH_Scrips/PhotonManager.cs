@@ -1,7 +1,8 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using static UnityEditor.Progress;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
@@ -19,12 +20,15 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             DontDestroyOnLoad(gameObject);
         }
         else Destroy(gameObject);
+        {
+            Destroy(gameObject);
+        }
     }
 
-    
-    public void ConnectToServer()
+
+    public void ConnectToServer(string nickname)//닉네임받아서시작
     {
-        PhotonNetwork.NickName = "Player";
+        PhotonNetwork.NickName = nickname;
         PhotonNetwork.ConnectUsingSettings();
     }
 
@@ -43,18 +47,18 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public void CreateOrJoinRoom()
     {
         string roomName = "TestRoom";
-        PhotonNetwork.JoinOrCreateRoom(roomName, new RoomOptions { MaxPlayers = 2 }, TypedLobby.Default);
+        RoomOptions options = new RoomOptions { MaxPlayers = 2 };
+        PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
         Debug.Log("방 입장");
 
-        
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
         {
-            if (PhotonNetwork.IsMasterClient)
-                PhotonNetwork.LoadLevel(testgameScene);
+            PhotonNetwork.LoadLevel(testgameScene);
         }
     }
 
