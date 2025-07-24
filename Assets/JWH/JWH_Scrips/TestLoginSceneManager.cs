@@ -6,7 +6,7 @@ public class TestLoginSceneManager : MonoBehaviour
 {
     [SerializeField] private TMP_InputField nicknameField;
     [SerializeField] private Button connectButton;
-    
+
 
     private void Start()
     {
@@ -19,11 +19,11 @@ public class TestLoginSceneManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(nickname))
         {
-            
+
             return;
         }
 
-       
+
         PhotonManager.Instance.ConnectToServer(nickname);
     }
 }
