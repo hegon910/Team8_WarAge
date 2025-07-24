@@ -1,10 +1,11 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitController : MonoBehaviour
+public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 {
-    [SerializeField] Unit unitdata;
+    [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
 
     private int currentHealth;
@@ -17,18 +18,11 @@ public class UnitController : MonoBehaviour
 
     public Vector3 moveDirection = Vector3.right;
 
+    public bool IsMine => photonView.IsMine;
+
     private void Awake()
     {
         currentHealth = unitdata.health;
-
-        if (CompareTag("P1"))
-        {
-            moveDirection = Vector3.right;
-        }
-        else if (CompareTag("P2"))
-        {
-            moveDirection = Vector3.left;
-        }
 
         if (rb == null)
         {
@@ -60,6 +54,57 @@ public class UnitController : MonoBehaviour
             Attack(currentTarget);
         }
     }
+
+    // ---------- 네트워크 구현 -------------
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(currentHealth);
+            if (currentTarget != null)
+            {
+                PhotonView targetPV = currentTarget.GetComponent<PhotonView>();
+                stream.SendNext(targetPV != null ? targetPV.ViewID : -1);
+            }
+            else
+            {
+                stream.SendNext(-1); 
+            }
+        }
+        else
+        {
+            currentHealth = (int)stream.ReceiveNext();
+            int targetViewID = (int)stream.ReceiveNext();
+
+            if (targetViewID != -1)
+            {
+                PhotonView targetPV = PhotonNetwork.GetPhotonView(targetViewID);
+                if (targetPV != null)
+                {
+                    currentTarget = targetPV.transform;
+                }
+                else
+                {
+                    currentTarget = null; 
+                }
+            }
+            else
+            {
+                currentTarget = null;
+            }
+        }
+    }
+
+    [PunRPC]
+    public void RpcSetPlayerProps(string playerTag, Vector3 initialMoveDirection)
+    {
+        gameObject.tag = playerTag; 
+        moveDirection = initialMoveDirection; 
+
+        Debug.Log($"{gameObject.name}의 태그가 {playerTag}로 설정되고, 방향은 {moveDirection}입니다.");
+    }
+
+    // --------------------------------------------------------
 
 
     //---------- 이동 -----------------
@@ -153,6 +198,12 @@ public class UnitController : MonoBehaviour
                 // 공격 쿨다운이 끝났을 때만 공격
                 if (attackCooldownTimer <= 0)
                 {
+                    UnitController targetUnit = target.GetComponent<UnitController>();
+                    if (targetUnit != null)
+                    {
+                        targetUnit.TakeDamage(unitdata.attackDamage); 
+                        Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
+                    }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
             }
@@ -169,6 +220,12 @@ public class UnitController : MonoBehaviour
             {
                 if(attackCooldownTimer <= 0)
                 {
+                    UnitController targetUnit = target.GetComponent<UnitController>();
+                    if (targetUnit != null)
+                    {
+                        targetUnit.TakeDamage(unitdata.attackDamage); // 목표에게 데미지 적용
+                        Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
+                    }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
             }
@@ -176,6 +233,7 @@ public class UnitController : MonoBehaviour
             {
                 if(attackCooldownTimer <= 0)
                 {
+                    //TODO: 원거리 공격 구현
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
                 }
             }
@@ -195,6 +253,8 @@ public class UnitController : MonoBehaviour
     //--------- 체력 및 사망 --------------
     private void TakeDamage(int amount)
     {
+        if (!IsMine) return;
+
         currentHealth -= amount;
 
         if(currentHealth < 0)
