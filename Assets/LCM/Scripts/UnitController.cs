@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UnitController : MonoBehaviour
 {
-    [SerializeField] Unit unitdata;
+    [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
 
     private int currentHealth;

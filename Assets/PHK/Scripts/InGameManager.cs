@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 /// <summary>
 /// 게임의 전반적인 상태와 핵심 로직을 관리하는 싱글턴 메니저 클래스
@@ -19,13 +20,24 @@ public class InGameManager : MonoBehaviour
     [Tooltip("시대 발전에 필요한 누적 경험치")]
     [SerializeField] private int[] expForEvolve;
 
+    [Header("유닛 생성 관련")]
+    [SerializeField] Transform p1_spawnPoint;
+    [SerializeField] Transform p2_spawnPoint;
+    //대기열
+    private Queue<(GameObject prefab, string ownerTag)> productionQueue = new Queue<(GameObject prefab, string ownerTag)>();  
+    //현재 생산 라인이 가동 중인지
+    private bool isProducing = false;
+
+
+    public event Action<int> OnQueueChanged;
+    public event Action<float> OnProductionProgress;
+    public event Action<bool> OnProductionStatusChanged;
+
     //현재 게임 상태 변수
     private int currentGold;
     private int currentEXP;
     private int currentBaseHealth;
 
-    //참조
-    readonly Unit unit;
 
     private void Awake()
     {
@@ -55,6 +67,15 @@ public class InGameManager : MonoBehaviour
         {
             unitPanelManager.evolveButton.interactable = false;
         }
+
+        if (unitPanelManager != null && unitPanelManager.evolveButton != null)
+        {
+            unitPanelManager.evolveButton.interactable = false;
+        }
+        if (p1_spawnPoint == null || p2_spawnPoint == null)
+        {
+            Debug.LogError("P1 또는 P2 스폰 포인트가 Inspector에 할당되지 않았습니다!");
+        }
     }
 
     #region 자원 및 체력 관리 함수
@@ -70,8 +91,9 @@ public class InGameManager : MonoBehaviour
     ///<summary>
     ///골드 소모(유닛 및 터렛 생성 시)
     /// </summary>
-    public bool SpenGold(int amount)
+    public bool SpendGold(Unit unitToPurchase)
     {
+        int amount = unitToPurchase.goldCost;
         if(currentGold>=amount)
         {
             currentGold -= amount;
@@ -84,7 +106,7 @@ public class InGameManager : MonoBehaviour
         {
             Debug.Log("골드가 부족합니다.");
             //UIManager, InGameInfoText에서 알림 로직 추가
-            InGameUIManager.Instance.inGameInfoText.text = $"Can't Spawn {unit.unitName} !! Not Enough Gold!";
+            InGameUIManager.Instance.inGameInfoText.text = $"Can't Spawn {unitToPurchase.unitName} !! Not Enough Gold!";
             InGameUIManager.Instance.inGameInfoText.gameObject.SetActive(true);
             return false;
         }        
@@ -161,6 +183,98 @@ public class InGameManager : MonoBehaviour
     }
     #endregion
 
+    #region 유닛 생산 로직
+    ///<summary>
+    ///프리팹을 생산 큐에 추가하는 함수
+    /// </summary>
+    /// 
+    public void RequestUnitProduction(GameObject unitPrefab, string ownerTag)
+    {
+        // 현재 유닛이 생산 중인지 아닌지에 따라 로직을 분리
+        if (isProducing)
+        {
+            // --- 이미 다른 유닛이 생산 중일 경우: 대기열(Queue)에 추가 ---
+            if (productionQueue.Count < 5) // 큐는 5칸
+            {
+                Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+                if (SpendGold(unitData))
+                {
+                    productionQueue.Enqueue((unitPrefab, ownerTag));
+                    // 대기열 UI 업데이트 (현재 대기중인 유닛 수만 전달)
+                    OnQueueChanged?.Invoke(productionQueue.Count);
+                }
+            }
+            else
+            {
+                // 대기열이 꽉 찼을 때의 처리 (메시지 등)
+            }
+        }
+        else
+        {
+            // --- 생산 라인이 비어있을 경우: 바로 생산 시작 ---
+            Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+            if (SpendGold(unitData))
+            {
+                // 이 유닛은 큐를 거치지 않고 바로 생산 코루틴으로 전달
+                StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 유닛 '한 개'를 생산하고, 완료되면 대기열에서 다음 유닛을 가져와 다시 이 코루틴을 실행
+    /// </summary>
+    private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag)
+    {
+        // --- 생산 시작 처리 ---
+        isProducing = true;
+        OnProductionStatusChanged?.Invoke(true); // 슬라이더 활성화
+        OnProductionProgress?.Invoke(0f);      // 슬라이더 0%에서 시작
+
+        Unit unitData = prefabToProduce.GetComponent<UnitController>().unitdata;
+
+        // --- 생산 시간 동안 대기 ---
+        if (unitData.SpawnTime > 0)
+        {
+            float timer = 0f;
+            while (timer < unitData.SpawnTime)
+            {
+                timer += Time.deltaTime;
+                OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
+                yield return null;
+            }
+        }
+        OnProductionProgress?.Invoke(1f); // 100% 채우기
+
+        // --- 유닛 생성 ---
+        Transform spawnPoint = (ownerTag == "P1") ? p1_spawnPoint : p2_spawnPoint;
+        if (spawnPoint != null)
+        {
+            Instantiate(prefabToProduce, spawnPoint.position, spawnPoint.rotation);
+        }
+
+        // --- 후속 처리: 대기열에 다음 유닛이 있는지 확인 ---
+        if (productionQueue.Count > 0)
+        {
+            // 대기열에서 다음 유닛을 꺼내옴
+            var nextUnit = productionQueue.Dequeue();
+            // 대기열 UI 업데이트 (1개 줄었으므로)
+            OnQueueChanged?.Invoke(productionQueue.Count);
+            // 다음 유닛 생산을 위해 자기 자신을 다시 호출 (재귀적 호출)
+            StartCoroutine(ProcessSingleUnit(nextUnit.prefab, nextUnit.ownerTag));
+        }
+        else
+        {
+            // 대기열이 비어있으면 생산을 완전히 종료
+            isProducing = false;
+            OnProductionStatusChanged?.Invoke(false); // 슬라이더 비활성화
+            OnProductionProgress?.Invoke(0f);         // 슬라이더 0%로 리셋
+        }
+    }
+
+    #endregion
+
+   
 
     ///<summary>
     ///게임 오버 처리
