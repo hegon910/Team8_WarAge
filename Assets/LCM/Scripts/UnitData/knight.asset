@@ -19,6 +19,7 @@ MonoBehaviour:
   MeleeRange: 20
   rangedrange: 0
   attackSpeed: 1
+  SpawnTime: 3
   moveSpeed: 1
   goldCost: 500
   unitSprite: {fileID: 0}
