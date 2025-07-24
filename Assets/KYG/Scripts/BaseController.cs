@@ -136,13 +136,33 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
         PhotonNetwork.Instantiate(prefabToSpawn.name, spawnerPoint.position, Quaternion.identity);
         // 네트워크 상에서 유닛 생성 Quaternion.identity로 회전없이 정방향으로만 생성
     }
-    
-    // TODO 업그래이드
-    
-    
-    // TODO 터렛 설치
-    
-    
-    
+
+    /// <summary>
+    /// 일정 경험치가 충족되면 기지 업그레이드 가능
+    /// 기지가 업그레이드 되면 최대 체력 증가 및 체력 회복
+    /// 추후 시대 변화 시스템과 연동 하여 시대가 변화 할때 기지도 변화
+    /// 기지는 부모 해당 시대의 기지는 자식관계로 놓고 해당 시대가 되면 SetActive?
+    /// </summary>
+    public void UpgradeBase()
+    {
+        // TODO 업그래이드    
+    }
+
+    /// <summary>
+    /// 유닛과 마찬가지로 터렛 프리펩을 받아
+    /// 터렛을 설치 할수있는 위치에 설치
+    /// 터렛 설치 할수있는 장소는 총 4곳
+    /// 첫번째 장소는 기지에 설치
+    /// 수직으로 설치하며 터렛 설치 UI버튼 눌리면 자동으로 터렛 설치 장소 생성
+    /// 터렛 설지 가능 장소 미리 구현하고 UI버튼으로 구매 확인후 SetActive?
+    /// 설치 장소에만 터렛 설치 가능
+    /// </summary>
+
+    public void SpawnTurret(GameObject prefabToSpawn)
+    {
+        // TODO 터렛 설치 장소 구현
+    }
+
+
 }
 }
