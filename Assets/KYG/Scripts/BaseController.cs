@@ -114,12 +114,22 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     }
 
     /// <summary>
+    /// PhotonNetwork를 사용하여 멀티플레이에 대응
     /// UI 버튼이 클릭 되면 해당 버튼에 연결된 유닛이
     /// 지정한 스폰 포인트에 생성
     /// </summary>
     public void SpawnUnit()
     {
+        if(!pv.IsMine)return; // 포톤뷰 사용하여 내 소유 기지에서만 생성가능하게 제한
+
+        if (unitPrefab == null)
+        {
+            Debug.LogError("Unit prefab is null");
+            return;
+        }
         
+        GameObject unit = PhotonNetwork.Instantiate(unitPrefab.name, spawnerPoint.position, Quaternion.identity);
+        // 네트워크 상에서 유닛 생성 Quaternion.identity로 회전없이 정방향으로만 생성
     }
     
     // TODO 업그래이드
