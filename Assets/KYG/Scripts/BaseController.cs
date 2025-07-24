@@ -47,9 +47,14 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
         pv = GetComponent<PhotonView>(); // PhotonView 함수 초기화
     }
 
+    /*
+     비동기 초기화 순서에서 늦게 호출될 가능성 있음
+     OnEnable() 또는 Awake()에서 초기화하는 방식도 추후 테스트 후 고려
+    */
     public void Start() // 게임 시작시 
     {
         InitBase(); // 기지 초기화
+        
     }
 
     public void InitBase()
@@ -65,14 +70,14 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     /// 데미지를 받아 현재 체력이 0이 되면 게임 매니저에 게임 오버 연동
     /// 체력이 0이 될시 파괴되는 에니메이션은 추가 과제
     /// </summary>
-    public void TakeDamage(int damege)
+    public void TakeDamage(int damage)
     {
-        if(damege <= 0) return; // Damege 0일때 무시
+        if(damage <= 0) return; // Damege 0일때 무시
 
         if (pv != null && PhotonNetwork.IsConnected && !pv.IsMine) return; // 내 기지가 아니면 처리 x 
         
         
-        currentHP = Mathf.Max(0, currentHP - damege); // 체력 감소 최대 0까지
+        currentHP = Mathf.Max(0, currentHP - damage); // 체력 감소 최대 0까지
         
         OnHpChanged?.Invoke(currentHP, maxHP); // UI 갱신
         InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI 갱신
@@ -118,17 +123,17 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     /// UI 버튼이 클릭 되면 해당 버튼에 연결된 유닛이
     /// 지정한 스폰 포인트에 생성
     /// </summary>
-    public void SpawnUnit()
+    public void SpawnUnit(GameObject prefabToSpawn) // 향후 유닛 확장성 가능성 고려 파라미터로 받을수 있게 수정
     {
         if(!pv.IsMine)return; // 포톤뷰 사용하여 내 소유 기지에서만 생성가능하게 제한
 
-        if (unitPrefab == null)
+        if (prefabToSpawn == null)
         {
             Debug.LogError("Unit prefab is null");
             return;
         }
         
-        GameObject unit = PhotonNetwork.Instantiate(unitPrefab.name, spawnerPoint.position, Quaternion.identity);
+        PhotonNetwork.Instantiate(prefabToSpawn.name, spawnerPoint.position, Quaternion.identity);
         // 네트워크 상에서 유닛 생성 Quaternion.identity로 회전없이 정방향으로만 생성
     }
     
@@ -136,6 +141,8 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     
     
     // TODO 터렛 설치
+    
+    
     
 }
 }
