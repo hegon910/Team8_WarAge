@@ -6,6 +6,13 @@ using Photon.Pun; // 네트워크 연동을 위한 using
 
 namespace KYG
 {
+    /// <summary>
+    /// 팀 타입을 위한 열거형 임의 지정 추후 네트워크 담당자와 협의후 수정
+    /// </summary>
+    /*public enum TeamType
+    {
+        Player1,Player2
+    }*/
     
 public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 PhotonView 사용 가능
 {
@@ -15,22 +22,25 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     /// 네트워크 담당자와 초기 스텟 존재 유무 논의 필요 초기 스텟만 받아오면 될지도
     /// 네트워크와 동기화 로직 필요
     /// </summary>
+    
+    [Header("Base")]
     [SerializeField] private int maxHP; // 최대 체력
 
     private int currentHP; // 임의로 수정 불가능한 현재 체력
 
     // 프로퍼티로 외부 접근 캡슐화
-    public int MaxHP => maxHP; 
+    public int MaxHP => maxHP; // 최대 체력 접근용 프로퍼티
     
-    public int CurrentHP => currentHP; 
-    
-    
+    public int CurrentHP => currentHP; // 현재 체력 접근용 프로퍼티
 
+    // [SerializeField] private TeamType teamType; // 팀 정보 
+    
     [Header("Spawner")] public Transform spawnerPoint; // 유닛 생성 위치
+    [SerializeField] private GameObject unitPrefab; // 생성할 유닛 프리팹
 
     public event Action<int, int> OnHpChanged; //HP 변동시 이벤트 발생 (최대 체력, 현재 체력) 
 
-    private PhotonView pv; 
+    private PhotonView pv; // 네트워크 식별용 포톤 뷰
 
     private void Awake()
     {
@@ -55,9 +65,52 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     /// 데미지를 받아 현재 체력이 0이 되면 게임 매니저에 게임 오버 연동
     /// 체력이 0이 될시 파괴되는 에니메이션은 추가 과제
     /// </summary>
-    public void TakeDamageBase()
+    public void TakeDamage(int damege)
     {
+        if(damege <= 0) return; // Damege 0일때 무시
+
+        if (pv != null && PhotonNetwork.IsConnected && !pv.IsMine) return; // 내 기지가 아니면 처리 x 
         
+        
+        currentHP = Mathf.Max(0, currentHP - damege); // 체력 감소 최대 0까지
+        
+        OnHpChanged?.Invoke(currentHP, maxHP); // UI 갱신
+        InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI 갱신
+        
+        if(pv != null && PhotonNetwork.IsConnected)
+            pv.RPC(nameof(RPC_UpdateHP), RpcTarget.Others, currentHP); // 네트워크 전체 체력 및 데미지 반영
+
+        if (currentHP <= 0)
+        {
+            BaseDestroyed();
+        }
+    }
+
+    /// <summary>
+    /// RPC 다른 클라이언트에서 체력 동기화 호출
+    /// </summary>
+    /// <param name="newHp"></param>
+    [PunRPC]
+    void RPC_UpdateHP(int newHp)
+    {
+        currentHP = newHp;
+        OnHpChanged?.Invoke(currentHP, maxHP); // UI 갱신
+        InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP);
+        if (currentHP <= 0)
+        {
+            BaseDestroyed();
+        }
+    }
+
+    /// <summary>
+    /// 기지 체력 0일때 호출
+    /// 게임 매니져 게임오버랑 연동
+    /// </summary>
+
+    private void BaseDestroyed()
+    {
+        Debug.Log("Base destroyed");
+        //GameManager.Instance?.GameOver(teamType);
     }
 
     /// <summary>
