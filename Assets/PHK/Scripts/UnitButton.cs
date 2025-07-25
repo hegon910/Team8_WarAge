@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Photon.Pun;
 
 namespace PHK
 {
@@ -11,10 +12,6 @@ namespace PHK
         [Header("유닛데이터")]
         public GameObject unitPrefab;
 
-        [Header("소유자 태그")]
-        //public string OwnerTag;
-        private bool isHost = true;
-        
         
         private Unit unitData; // 유닛 스크립터블 오브젝트 데이터
 
@@ -47,21 +44,20 @@ namespace PHK
         //SpawnManager.cs 스크립트 받았을 때 클릭 시 유닛 생성요청을 SpawnManager로 보내는 onclick 이벤트 함수
         public void SpawnUnit()
         {
-            // 이 버튼이 호스트(P1)의 소유일 때만 로직을 실행합니다.
-            if (isHost)
+            if (unitPrefab == null) return;
+
+            //현재 클라이언트가 마스터 클라이언트인지 확인
+            string ownerTag = PhotonNetwork.IsMasterClient ? "P1" : "P2";
+            if (InGameManager.Instance.isDebugMode)
             {
-                if (unitPrefab != null)
-                {
-                    // 자동으로 "P1" 태그를 붙여 생성을 요청합니다.
-                    InGameManager.Instance.RequestUnitProduction(unitPrefab, "P1");
-                }
+                // isDebugHost 값에 따라 P1 또는 P2로 태그를 설정
+                ownerTag = InGameManager.Instance.isDebugHost ? "P1" : "P2";
             }
-            else
+            else // 실제 네트워크 환경일 경우
             {
-                // 클라이언트(참가자)일 경우, 여기에서 호스트에게 유닛 생성을 요청하는
-                // 네트워크 명령(RPC)을 보내야 합니다. 지금은 아무것도 하지 않습니다.
-                Debug.Log("클라이언트에서는 유닛 생성 RPC를 호출해야 합니다.");
+                ownerTag = PhotonNetwork.IsMasterClient ? "P1" : "P2";
             }
+            InGameManager.Instance.RequestUnitProduction(unitPrefab, ownerTag);
         }
     }
 }

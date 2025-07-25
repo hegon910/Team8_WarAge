@@ -44,7 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b9976a1acc6b5a4ab111ff44567ac1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDebugMode: 1
+  isDebugHost: 0
   unitPanelManager: {fileID: 0}
-  startingGold: 175
+  startingGold: 15000
   maxBaseHealth: 1000
   expForEvolve: f4010000dc050000b80b0000
+  p1_spawnPoint: {fileID: 0}
+  p2_spawnPoint: {fileID: 0}

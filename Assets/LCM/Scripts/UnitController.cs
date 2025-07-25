@@ -7,6 +7,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 {
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer; // 추가됨 스프라이트를 뒤집기 위해 SpriteRenderer 참조
 
     private int currentHealth;
     private Transform currentTarget;
@@ -28,10 +29,33 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         {
             rb = GetComponent<Rigidbody2D>();
         }
+        // --- 추가된 코드 ---
+        if (spriteRenderer == null)
+        {
+            // 자식 오브젝트에 SpriteRenderer가 있을 수도 있으므로 GetComponentInChildren 사용게
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        }
+
+        PhotonView photonView = GetComponent<PhotonView>();
+        if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
+        {
+            this.gameObject.tag = (string)photonView.InstantiationData[0];
+            this.moveDirection = (Vector3)photonView.InstantiationData[1];
+           
+        }
+    }
+    private void Start()
+    {
+        if (gameObject.tag == "P2")
+        {
+            spriteRenderer.flipX = !spriteRenderer.flipX; // P2 유닛은 스프라이트를 뒤집음
+        }
     }
 
     private void Update()
     {
+
         if(attackCooldownTimer > 0)
         {
             attackCooldownTimer -= Time.deltaTime;
