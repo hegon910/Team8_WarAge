@@ -2,78 +2,110 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEditor.Progress;
-
-//public class PhotonManager : MonoBehaviourPunCallbacks
-//{
-//    public static PhotonManager Instance;
-
-//    private string testloginScene = "JWH_LoginScene";
-//    private string testlobbyScene = "JWH_LobbyScene";
-//    private string testgameScene = "JWH_GameScene";
-//    private string testroomSceene = "JWH_RoomScene";
-
-//    void Awake()
-//    {
-//        PhotonNetwork.AutomaticallySyncScene = true;
-//        if (Instance == null)
-//        {
-//            Instance = this;
-//            DontDestroyOnLoad(gameObject);
-//        }
-       
-//    }
+using ExitGames.Client.Photon;
 
 
-//    public void ConnectToServer(string nickname)//닉네임받아서시작
-//    {
-//        Debug.Log("닉네임 입력됨: " + nickname);
-//        if (PhotonNetwork.IsConnected)
-//        {
-//            Debug.Log("이미 연결됨");
-//            return;
-//        }
-//        PhotonNetwork.NickName = nickname;
-//        PhotonNetwork.ConnectUsingSettings();
-//    }
+    public class PhotonManager : MonoBehaviourPunCallbacks
+    {
+        public static PhotonManager Instance;
 
-//    public override void OnConnectedToMaster()
-//    {
-//        PhotonNetwork.JoinLobby();
-//    }
+        [SerializeField] private string loginSceneName = "JWH_LoginScene";
+        [SerializeField] private string lobbySceneName = "JWH_LobbyScene";
+        [SerializeField] private string roomSceneName = "JWH_RoomScene";
+        [SerializeField] private string gameSceneName = "JWH_GameScene";
 
-//    public override void OnJoinedLobby()
-//    {
-//        Debug.Log("로비");
-//        SceneManager.LoadScene(testlobbyScene);
-//    }
+        void Awake()
+        {
+            PhotonNetwork.AutomaticallySyncScene = true;
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (Instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
 
-   
-//    public void CreateOrJoinRoom()
-//    {
-//        string roomName = "TestRoom";
-//        RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-//        PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
-//    }
+        public void ConnectToServer(string nickname)
+        {
+            if (PhotonNetwork.IsConnected)
+            {
+                OnConnectedToMaster();
+                return;
+            }
+            PhotonNetwork.NickName = nickname;
+            PhotonNetwork.ConnectUsingSettings();
+        }
 
-//    public override void OnJoinedRoom()
-//    {
-//        Debug.Log("방 입장");
-//        SceneManager.LoadScene("JWH_RoomScene");
-//    }
+        public override void OnConnectedToMaster()
+        {
+            PhotonNetwork.JoinLobby();
+        }
 
-//    public override void OnPlayerEnteredRoom(Player newPlayer)
-//    {
-//        //if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
-//        //{
-//        //    PhotonNetwork.LoadLevel(testgameScene);
-//        //}
-//        //자동시작해서 지워둠
-//    }
+        public override void OnJoinedLobby()
+        {
+            SceneManager.LoadScene(lobbySceneName);
+        }
 
+        public void CreateOrJoinRoom()// 방 만든 사람이 마스터
+        {
+            string roomName = "TestRoom";
+            RoomOptions options = new RoomOptions { MaxPlayers = 2 };
+            PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
+        }
 
-//    public override void OnLeftRoom()
-//    {
-//        SceneManager.LoadScene(testlobbyScene);
-//    }
-//}
+        public override void OnJoinedRoom()
+        {
+            SceneManager.LoadScene(roomSceneName);
+        }
+
+        public void SetLocalPlayerReady(bool ready)
+        {
+            Hashtable props = new Hashtable { { "Ready", ready } };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        }
+
+        public bool AreAllPlayersReady()
+        {
+            foreach (Player p in PhotonNetwork.PlayerList)
+            {
+                if (!p.CustomProperties.TryGetValue("Ready", out object value) || !(bool)value)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void StartGame()
+        {
+            if (PhotonNetwork.IsMasterClient && AreAllPlayersReady())
+            {
+                PhotonNetwork.LoadLevel(gameSceneName);
+            }
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+        }
+
+        public override void OnPlayerLeftRoom(Player otherPlayer)
+        {
+        }
+
+        public override void OnPlayerPropertiesUpdate(Player target, Hashtable changedProps)
+        {
+        }
+
+        public override void OnLeftRoom()
+        {
+            SceneManager.LoadScene(lobbySceneName);
+        }
+
+        public Player[] GetCurrentRoomPlayers()
+        {
+            return PhotonNetwork.PlayerList;
+        }
+    }
