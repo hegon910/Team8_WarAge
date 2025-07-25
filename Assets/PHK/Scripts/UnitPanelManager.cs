@@ -45,7 +45,7 @@ namespace PHK
         public GameObject modernUnitPanel;
         public GameObject futureUnitPanel; //만일 쓴다면
 
-        [Header("시대별 터렛 패널(추후 추가 예정)")]
+        [Header("시대별 터렛 패널")]
         public GameObject ancientTurretPanel;
         public GameObject middleAgeTurretPanel;
         public GameObject modernTurretPanel;
@@ -143,10 +143,22 @@ namespace PHK
             UpdateUnitPanelVisibility();
         }
 
+        // 시대를 다음 단계로 넘기는 대신, 특정 시대로 직접 설정하는 함수
+        public void SetAge(Age newAge)
+        {
+            // 마지막 시대보다 높은 값으로 설정되지 않도록 방지
+            if (newAge <= Age.Future) // Age enum의 마지막 값
+            {
+                currentAge = newAge;
+                UpdateUnitPanelVisibility(); // 해당 시점에 맞는 패널을 보여줌
+                Debug.Log($"시대가 {newAge}로 직접 설정되었습니다.");
+            }
+        }
 
         // 시대 발전 버튼에 연결할 공용 함수, 다음 시대로 발전시키는 역할
         public void EvolveToNextAge()
         {
+            Debug.Log($"EvolveToNextAge() 실행됨. 실제 UnitPanelManager ID: <color=lime>{GetInstanceID()}</color>");
             //마지막 시대가 아닐 경우에만 시대를 발전
             if (currentAge < Age.Future)
             {

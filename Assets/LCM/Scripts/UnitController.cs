@@ -7,6 +7,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 {
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
+
     [SerializeField] private SpriteRenderer spriteRenderer;
 
     private int currentHealth;
@@ -30,6 +31,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             rb = GetComponent<Rigidbody2D>();
         }
 
+
         if (spriteRenderer == null) 
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -41,18 +43,20 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             this.gameObject.tag = (string)photonView.InstantiationData[0];
             this.moveDirection = (Vector3)photonView.InstantiationData[1];
 
+
         }
     }
     private void Start()
     {
         if (gameObject.tag == "P2")
         {
-            spriteRenderer.flipX = !spriteRenderer.flipX; // P2 À¯´ÖÀº ½ºÇÁ¶óÀÌÆ®¸¦ µÚÁıÀ½
+            spriteRenderer.flipX = !spriteRenderer.flipX; // P2 ìœ ë‹›ì€ ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ë’¤ì§‘ìŒ
         }
     }
 
     private void Update()
     {
+
         if(attackCooldownTimer > 0)
         {
             attackCooldownTimer -= Time.deltaTime;
@@ -76,7 +80,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    // ---------- ³×Æ®¿öÅ© ±¸Çö -------------
+    // ---------- ë„¤íŠ¸ì›Œí¬ êµ¬í˜„ -------------
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -122,22 +126,22 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     //    gameObject.tag = playerTag; 
     //    moveDirection = initialMoveDirection; 
 
-    //    Debug.Log($"{gameObject.name}ÀÇ ÅÂ±×°¡ {playerTag}·Î ¼³Á¤µÇ°í, ¹æÇâÀº {moveDirection}ÀÔ´Ï´Ù.");
+    //    Debug.Log($"{gameObject.name}ì˜ íƒœê·¸ê°€ {playerTag}ë¡œ ì„¤ì •ë˜ê³ , ë°©í–¥ì€ {moveDirection}ì…ë‹ˆë‹¤.");
 
     //    if (spriteRenderer != null)
     //    {
     //        if (playerTag == "P1")
     //        {
-    //            spriteRenderer.flipX = true; // P1Àº ±âº» ¹æÇâ (¿À¸¥ÂÊ)
+    //            spriteRenderer.flipX = true; // P1ì€ ê¸°ë³¸ ë°©í–¥ (ì˜¤ë¥¸ìª½)
     //        }
     //        else if (playerTag == "P2")
     //        {
-    //            spriteRenderer.flipX = false; // P2´Â ÀÌ¹ÌÁö ÇÃ¸³ (¿ŞÂÊ)
+    //            spriteRenderer.flipX = false; // P2ëŠ” ì´ë¯¸ì§€ í”Œë¦½ (ì™¼ìª½)
     //        }
     //    }
     //    else
     //    {
-    //        Debug.LogWarning($"{gameObject.name}¿¡ SpriteRenderer°¡ ¾ø½À´Ï´Ù. ÀÌ¹ÌÁö¸¦ ÇÃ¸³ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+    //        Debug.LogWarning($"{gameObject.name}ì— SpriteRendererê°€ ì—†ìŠµë‹ˆë‹¤. ì´ë¯¸ì§€ë¥¼ í”Œë¦½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
     //    }
 
     //}
@@ -145,7 +149,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     // --------------------------------------------------------
 
 
-    //---------- ÀÌµ¿ -----------------
+    //---------- ì´ë™ -----------------
     private void Move()
     {
         if (!CanMove()) return;
@@ -159,7 +163,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             raycastOrigin += checkDirection * (myCollider.bounds.extents.x + 0.05f);
         }
 
-        //¾ÕÀÇ À¯´ÖÀÌ ÀÖÀ»¶§ ¸ØÃß´Â °Å¸® Ç¥Çö
+        //ì•ì˜ ìœ ë‹›ì´ ìˆì„ë•Œ ë©ˆì¶”ëŠ” ê±°ë¦¬ í‘œí˜„
         Debug.DrawRay(raycastOrigin, checkDirection * stopDistance, Color.red, 0.1f);
 
         RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, checkDirection, stopDistance, unitLayer);
@@ -181,7 +185,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     //-----------------------------------
 
 
-    //----------- °ø°İ ------------------
+    //----------- ê³µê²© ------------------
 
     private void FindTarget()
     {
@@ -233,14 +237,14 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             if (distanceToTarget <= unitdata.MeleeRange)
             {
                 rb.velocity = Vector2.zero;
-                // °ø°İ Äğ´Ù¿îÀÌ ³¡³µÀ» ¶§¸¸ °ø°İ
+                // ê³µê²© ì¿¨ë‹¤ìš´ì´ ëë‚¬ì„ ë•Œë§Œ ê³µê²©
                 if (attackCooldownTimer <= 0)
                 {
                     UnitController targetUnit = target.GetComponent<UnitController>();
                     if (targetUnit != null)
                     {
                         targetUnit.TakeDamage(unitdata.attackDamage); 
-                        Debug.Log($"{gameObject.name}ÀÌ {target.name}¿¡°Ô {unitdata.attackDamage} µ¥¹ÌÁö¸¦ ÁÖ¾ú½À´Ï´Ù.");
+                        Debug.Log($"{gameObject.name}ì´ {target.name}ì—ê²Œ {unitdata.attackDamage} ë°ë¯¸ì§€ë¥¼ ì£¼ì—ˆìŠµë‹ˆë‹¤.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
@@ -253,7 +257,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         else if(unitdata.unitType == UnitType.Ranged)
         {
             rb.velocity = Vector2.zero;
-            //°¡±îÀÌ ¿ÔÀ»¶§ ±ÙÁ¢ °ø°İ
+            //ê°€ê¹Œì´ ì™”ì„ë•Œ ê·¼ì ‘ ê³µê²©
             if(distanceToTarget <= meleeSwitchRange && unitdata.attackDamage > 0)
             {
                 if(attackCooldownTimer <= 0)
@@ -261,8 +265,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     UnitController targetUnit = target.GetComponent<UnitController>();
                     if (targetUnit != null)
                     {
-                        targetUnit.TakeDamage(unitdata.attackDamage); // ¸ñÇ¥¿¡°Ô µ¥¹ÌÁö Àû¿ë
-                        Debug.Log($"{gameObject.name}ÀÌ {target.name}¿¡°Ô {unitdata.attackDamage} µ¥¹ÌÁö¸¦ ÁÖ¾ú½À´Ï´Ù.");
+                        targetUnit.TakeDamage(unitdata.attackDamage); // ëª©í‘œì—ê²Œ ë°ë¯¸ì§€ ì ìš©
+                        Debug.Log($"{gameObject.name}ì´ {target.name}ì—ê²Œ {unitdata.attackDamage} ë°ë¯¸ì§€ë¥¼ ì£¼ì—ˆìŠµë‹ˆë‹¤.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
@@ -281,7 +285,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     {
                         arrow.photonView.RPC("InitializeProjectile", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage);
                     }
-                    Debug.Log($"{gameObject.name}ÀÌ ¿ø°Å¸® °ø°İÀ» ½ÃÀÛÇÕ´Ï´Ù. ¹ß»ç À¯´Ö ÅÂ±×: {spawnerTag}");
+                    Debug.Log($"{gameObject.name}ì´ ì›ê±°ë¦¬ ê³µê²©ì„ ì‹œì‘í•©ë‹ˆë‹¤. ë°œì‚¬ ìœ ë‹› íƒœê·¸: {spawnerTag}");
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
                 }
             }
@@ -298,7 +302,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
     //-------------------------------------
 
-    //--------- Ã¼·Â ¹× »ç¸Á --------------
+    //--------- ì²´ë ¥ ë° ì‚¬ë§ --------------
     public void TakeDamage(int amount)
     {
         if (!IsMine) return;

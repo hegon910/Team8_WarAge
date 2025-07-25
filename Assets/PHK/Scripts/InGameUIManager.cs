@@ -1,7 +1,9 @@
+using PHK;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 //인게임의 전반적인 UI를 관리하는 스크립트(골드, 기지 체력, 정보 텍스트 등)
 
@@ -10,9 +12,11 @@ public class InGameUIManager : MonoBehaviour
     //싱글턴 패턴 : 다른 스크립트에서 참조할 수 있도록 함.
 
     public static InGameUIManager Instance { get; private set; }
+    private Button button;
 
     [Header("UI요소")]
     public TextMeshProUGUI inGameInfoText; //인게임 정보 텍스트
+    public TextMeshProUGUI UnitInfoText; //유닛 상황 정보 텍스트
 
     [Header("자원 및 기지 상태(구현 예정")]
     public TextMeshProUGUI goldText; //골드 텍스트
@@ -69,7 +73,10 @@ public class InGameUIManager : MonoBehaviour
         {
             inGameInfoText.gameObject.SetActive(false);
         }
+
     }
+
+
 
     //구현 예정 기능 함수
     //골드와 EXP 반영

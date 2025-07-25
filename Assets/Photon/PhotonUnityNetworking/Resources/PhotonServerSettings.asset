@@ -41,6 +41,9 @@ MonoBehaviour:
   - RespawnSpaceship
   - RpcSetPlayerProps
   - RPC_UpdateHP
+  - RPC_SetUnitTag
+  - RPC_ConfirmEvolve
+  - RPC_RequestEvolve
   - RpcDie
   - InitializeArrow
   DisableAutoOpenWizard: 1

@@ -709,9 +709,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1048854677640475878}
-        m_TargetAssemblyTypeName: PHK.UnitPanelManager, Assembly-CSharp
-        m_MethodName: EvolveToNextAge
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: InGameManager, Assembly-CSharp
+        m_MethodName: AttemptEvolve
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1587,8 +1587,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 0}
-  unitData: {fileID: 0}
-  contoller: {fileID: 0}
 --- !u!1 &1564026996725121392
 GameObject:
   m_ObjectHideFlags: 0
@@ -1845,8 +1843,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: 13824e732138cb74487775d91e0c7fd3, type: 2}
-  contoller: {fileID: 0}
 --- !u!1 &1791508440047268295
 GameObject:
   m_ObjectHideFlags: 0
@@ -1981,9 +1977,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96fd6c3c063d22446b9f046de2e4a41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: b34f081eb733ea84f879701ace973b28, type: 2}
-  contoller: {fileID: 0}
+  unitPrefab: {fileID: 7880611672624073045, guid: d996f83ae9c361a4a8b1c3e81bae1d0f, type: 3}
 --- !u!1 &1811689226351836028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3744,6 +3738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inGameInfoText: {fileID: 6177351604914216502}
+  UnitInfoText: {fileID: 0}
   goldText: {fileID: 2756815095880303610}
   expText: {fileID: 7248746171568772530}
   baseHpSlider: {fileID: 7049741597331479624}
@@ -5649,7 +5644,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 483.75, y: 380}
+  m_AnchoredPosition: {x: 524.5, y: 380}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5832145514467367308
@@ -5849,8 +5844,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: f8e8dfaa2ffe2244c98ad358b7028d3d, type: 2}
-  contoller: {fileID: 0}
 --- !u!1 &3419195165340022790
 GameObject:
   m_ObjectHideFlags: 0
@@ -8873,7 +8866,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2238036903825962805}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1972450076903826644}
+        m_TargetAssemblyTypeName: PHK.UnitButton, Assembly-CSharp
+        m_MethodName: SpawnUnit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1972450076903826644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8886,9 +8891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96fd6c3c063d22446b9f046de2e4a41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: 7b2b6a3169e340249b839d8a16ee7f3e, type: 2}
-  contoller: {fileID: 0}
+  unitPrefab: {fileID: 7729183574821180569, guid: 6b2e836d184580a4487e551cb400c85d, type: 3}
 --- !u!1 &5169517085665638815
 GameObject:
   m_ObjectHideFlags: 0
@@ -10617,9 +10620,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96fd6c3c063d22446b9f046de2e4a41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: 6edc6b6d7b3d25442be1a3511fdb933c, type: 2}
-  contoller: {fileID: 0}
+  unitPrefab: {fileID: 4894062003126303280, guid: e685be98b3bc40242a4a5c1af1b1c880, type: 3}
 --- !u!1 &6721493086185190429
 GameObject:
   m_ObjectHideFlags: 0
@@ -11797,8 +11798,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 0}
-  unitData: {fileID: 11400000, guid: 2c894bc8a657f3a45831c5460a4acb47, type: 2}
-  contoller: {fileID: 0}
 --- !u!1 &7529408634792492002
 GameObject:
   m_ObjectHideFlags: 0
@@ -13779,9 +13778,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5398504600718134395}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 100
+  m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 100
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

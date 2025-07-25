@@ -20,7 +20,7 @@ MonoBehaviour:
   rangedrange: 100
   attackSpeed: 1
   SpawnTime: 3
-  moveSpeed: 1
+  moveSpeed: 3
   goldCost: 25
   unitSprite: {fileID: 0}
   description: StoneAgeSlingshotMan
