@@ -54,14 +54,16 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     public void Start() // 게임 시작시 
     {
         InitBase(); // 기지 초기화
-        
+
+        AgeManager.Instance.OnAgeChanged += UpgradeBaseByAge(); // 시대 변경 이벤트 받아 자동 업그레이드 처리
+
     }
 
     public void InitBase()
     {
         currentHP = maxHP; // 현재 체력 = 최대 체력으로 초기화
         OnHpChanged?.Invoke(currentHP, maxHP); // 이벤트 발생
-        //InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI연동
+        InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI연동
     }
     
     /// <summary>
@@ -143,9 +145,16 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     /// 추후 시대 변화 시스템과 연동 하여 시대가 변화 할때 기지도 변화
     /// 기지는 부모 해당 시대의 기지는 자식관계로 놓고 해당 시대가 되면 SetActive?
     /// </summary>
-    public void UpgradeBase()
+    private void UpgradeBaseByAge(AgeData nextAgeData)
     {
-        // TODO 업그래이드    
+        // TODO 업그래이드 기능 구현
+        this.maxHP = nextAgeData.maxHP; // 최대 체력 업그레이드
+        this.currentHP = maxHP; // 현재 체력 업그레이드 및 회복
+        
+        OnHpChanged?.Invoke(currentHP, maxHP); // UI 갱신
+        InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI 갱신
+        
+        // TODO : newAgeData.baseModelPrefab 적용하여 외형 변경 가능하도록 기능 구현
     }
 
     /// <summary>
