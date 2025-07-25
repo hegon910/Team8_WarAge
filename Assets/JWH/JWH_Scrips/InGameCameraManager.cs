@@ -76,36 +76,45 @@ public class InGameCameraManager : MonoBehaviourPunCallbacks
     private void EnableOnlyMyCamera()//내카메라켜고 다른 카메가 끄기
     {
         Camera[] allNetworkCameras = FindObjectsOfType<Camera>();//내 카메라 찾기
+        bool hasMyAudioListener = false;
+
+
         foreach (Camera cam in allNetworkCameras)
         {
             PhotonView pv = cam.GetComponent<PhotonView>();
-            if (pv != null)
+            AudioListener audioListener = cam.GetComponent<AudioListener>();
+            if (pv != null && pv.IsMine)//카메라 소유권
             {
-                if (pv.IsMine) //현재 클라이언트의 카메라 소유권
+                cam.enabled = true;
+                if (audioListener != null)
                 {
-                    cam.enabled = true; // 카메라활성화
-                    AudioListener audioListener = cam.GetComponent<AudioListener>();
-                    if (audioListener != null)
-                    {
-                        audioListener.enabled = true;
-                    }
-                    Debug.Log($"자신의 카메라가 활성화(View ID: {pv.ViewID})");
+                    audioListener.enabled = true;
+                    hasMyAudioListener = true;
                 }
-                else // 다른 클라이언트의 카메라
+            }
+            else
+            {
+                cam.enabled = false;
+                if (audioListener != null)
                 {
-                    cam.enabled = false; // 카메라비활성화
-                    AudioListener audioListener = cam.GetComponent<AudioListener>();
-                    if (audioListener != null)
-                    {
-                        audioListener.enabled = false;
-                    }
-                    Debug.Log($"다른 플레이어의 카메라가 비활성화 (Name: {cam.gameObject.name}, View ID: {pv.ViewID})");
+                    audioListener.enabled = false;
                 }
+            }
+        }
+
+        if (!hasMyAudioListener)
+        {
+            Camera myCam = Camera.main;
+            if (myCam != null && myCam.GetComponent<AudioListener>() == null)
+            {
+                myCam.gameObject.AddComponent<AudioListener>();
+                Debug.LogWarning("AudioListener자동추가");
             }
         }
     }
 
-    
+
+
     private Vector3 GetCameraSpawnMasterClient()
     {
         if (PhotonNetwork.IsMasterClient) //마스터클라이언트의 경우
