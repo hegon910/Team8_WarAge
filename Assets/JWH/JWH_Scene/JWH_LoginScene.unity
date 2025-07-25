@@ -509,7 +509,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 737277719}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc433f626bac06f46a4754a0ab09b462, type: 3}
+  m_Script: {fileID: 11500000, guid: 23e2b8689c2810b4790c4443a2afdb2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   loginSceneName: JWH_LoginScene
