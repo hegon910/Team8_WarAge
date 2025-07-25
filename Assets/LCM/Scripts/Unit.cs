@@ -17,6 +17,7 @@ public class Unit : ScriptableObject
     public int goldCost;
     public Sprite unitSprite;
     public string description;
+    public GameObject ArrowPrefab;
     public UnitType unitType;
     public EraType eraType;
 }
