@@ -3,12 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 게임의 전반적인 상태와 핵심 로직을 관리하는 싱글턴 메니저 클래스
 /// </summary>
 public class InGameManager : MonoBehaviourPunCallbacks
 {
+    #region 변수
     //디버그 옵션 제거시 전부 제거
     [Header("디버그 옵션")]
     [Tooltip("체크하면 네트워크 연결 없이 P1(호스트)로 간주하고 테스트")]
@@ -21,6 +23,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
     [Header("관리대상")]
 
     public PHK.UnitPanelManager unitPanelManager;
+    public KYG.BaseController p1_Base;
+    public KYG.BaseController p2_Base;
 
     [Header("게임 기본 설정")]
     [SerializeField] private int startingGold = 175; //게임 시작시 보유 골드
@@ -47,6 +51,16 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private int currentEXP;
     private int currentBaseHealth;
     private PhotonView photonView;
+    public enum PlayerActionState
+    {
+        None,
+        PlacingTurret,
+        SellingTurret
+    }
+    [Header("플레이어 행동 상태")]
+    public PlayerActionState currentState = PlayerActionState.None;
+    private GameObject turretPrefabToPlace;
+    #endregion
 
     private void Awake()
     {
@@ -86,6 +100,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("P1 또는 P2 스폰 포인트가 Inspector에 할당되지 않았습니다!");
         }
+
+        InGameUIManager.Instance.UnitInfoText.text = "Game Started!"; // 게임 시작 메시지 표시
     }
 
     private void Update()
@@ -104,6 +120,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
                 CheckForAgeUp();
             }
         }
+        HandleTurretActions();
     }
     #region 자원 및 체력 관리 함수
     ///<summary>
@@ -118,9 +135,9 @@ public class InGameManager : MonoBehaviourPunCallbacks
     ///<summary>
     ///골드 소모(유닛 및 터렛 생성 시)
     /// </summary>
-    public bool SpendGold(Unit unitToPurchase)
+    public bool SpendGold(int amount)
     {
-        int amount = unitToPurchase.goldCost;
+        
         if (currentGold >= amount)
         {
             currentGold -= amount;
@@ -133,7 +150,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             Debug.Log("골드가 부족합니다.");
             //UIManager, InGameInfoText에서 알림 로직 추가
-            InGameUIManager.Instance.inGameInfoText.text = $"Can't Spawn {unitToPurchase.unitName} !! Not Enough Gold!";
+            InGameUIManager.Instance.inGameInfoText.text = $"Can't Spawn!! Not Enough Gold!";
             InGameUIManager.Instance.inGameInfoText.gameObject.SetActive(true);
             return false;
         }
@@ -157,6 +174,12 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
 
     }
+
+    public bool CanAfford(int amount)
+    {
+        return currentGold >= amount;
+    }
+
     ///<summary>
     ///기지 체력 감소(공격 받았을 시)
     /// </summary>
@@ -169,6 +192,10 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
         if (currentBaseHealth <= 0) GameOver();
     }
+    /// <summary>
+    /// 현재 보유한 골드로 특정 비용을 감당할 수 있는지 확인합니다.
+    /// </summary>
+
     #endregion
 
     #region 시대 발전 관련
@@ -250,16 +277,21 @@ public class InGameManager : MonoBehaviourPunCallbacks
         if (newAgeIndex.HasValue)
         {
             evolvedAge = (PHK.UnitPanelManager.Age)newAgeIndex.Value;
-            unitPanelManager.SetAge((PHK.UnitPanelManager.Age)newAgeIndex.Value);
+            unitPanelManager.SetAge(evolvedAge); // SetAge로 직접 설정
         }
         else // 기존의 로컬 로직 (다음 시대로 순차 발전)
         {
+            // [수정] EvolveToNextAge()를 한번만 호출하도록 수정
             int currentAgeIndex = (int)unitPanelManager.currentAge;
             if (currentAgeIndex < expForEvolve.Length && currentEXP >= expForEvolve[currentAgeIndex])
             {
-                unitPanelManager.EvolveToNextAge();
+                unitPanelManager.EvolveToNextAge(); // 여기서만 호출
             }
-            unitPanelManager.EvolveToNextAge();
+            else
+            {
+                // 진화 조건이 안되면 아무것도 하지 않음 (또는 알림 메시지)
+                return; // 함수를 그냥 종료
+            }
             evolvedAge = unitPanelManager.currentAge;
         }
 
@@ -297,14 +329,19 @@ public class InGameManager : MonoBehaviourPunCallbacks
     /// 
     public void RequestUnitProduction(GameObject unitPrefab, string ownerTag)
     {
+
+
+        InGameUIManager.Instance.UnitInfoText.text = $"Producing {unitPrefab.name}..."; 
         // 현재 유닛이 생산 중인지 아닌지에 따라 로직을 분리
         if (isProducing)
         {
             // --- 이미 다른 유닛이 생산 중일 경우: 대기열(Queue)에 추가 ---
             if (productionQueue.Count < 5) // 큐는 5칸
             {
+
+                InGameUIManager.Instance.UnitInfoText.text = $"{unitPrefab.name} is Ready to Spawn...";
                 Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
-                if (SpendGold(unitData))
+                if (SpendGold(unitData.goldCost))
                 {
                     productionQueue.Enqueue((unitPrefab, ownerTag));
                     // 대기열 UI 업데이트 (현재 대기중인 유닛 수만 전달)
@@ -313,14 +350,14 @@ public class InGameManager : MonoBehaviourPunCallbacks
             }
             else
             {
-                // 대기열이 꽉 찼을 때의 처리 (메시지 등)
+                InGameUIManager.Instance.inGameInfoText.text = "Production Queue is Full!"; // 대기열이 가득 찼을 때 알림
             }
         }
         else
         {
             // --- 생산 라인이 비어있을 경우: 바로 생산 시작 ---
             Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
-            if (SpendGold(unitData))
+            if (SpendGold(unitData.goldCost))
             {
                 // 이 유닛은 큐를 거치지 않고 바로 생산 코루틴으로 전달
                 StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag));
@@ -333,6 +370,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
     /// </summary>
     private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag)
     {
+
+       
         Vector3 initialMoveDirection = (ownerTag == "P1") ? Vector3.right : Vector3.left;
         // --- 생산 시작 처리 ---
         isProducing = true;
@@ -349,6 +388,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
             {
                 timer += Time.deltaTime;
                 OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
+                int percent = (int)((timer / unitData.SpawnTime) * 100f);
+                InGameUIManager.Instance.UnitInfoText.text = $" Spawning : {prefabToProduce.name}. . . .{percent}%";
                 yield return null;
             }
         }
@@ -400,6 +441,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
             OnProductionStatusChanged?.Invoke(false); // 슬라이더 비활성화
             OnProductionProgress?.Invoke(0f);         // 슬라이더 0%로 리셋
         }
+
+        InGameUIManager.Instance.UnitInfoText.text = $"{prefabToProduce.name} has Spawned!!";
     }
 
     ///<summary>
@@ -429,7 +472,187 @@ public class InGameManager : MonoBehaviourPunCallbacks
     }
     #endregion
 
+    #region /// 터렛 관리 로직 (연동할 준비만, 언제든 변경 및 제거 가능) ///
+    /// <summary>
+    /// [UI 버튼 연결용] 터렛 건설 모드로 진입.
+    /// </summary>
+    /// <param name="turretPrefab">건설할 터렛의 프리팹. 비용 정보를 얻기 위해 사용.</param>
+    public void EnterTurretPlaceMode(GameObject turretPrefab)
+    {
+        currentState = PlayerActionState.PlacingTurret;
+        turretPrefabToPlace = turretPrefab;
+        Debug.Log($"<color=cyan>건설 모드 시작:</color> {turretPrefab.name}. 건설할 위치를 클릭하세요.");
+        InGameUIManager.Instance.inGameInfoText.text = "Click on a turret slot to build.";
+        InGameUIManager.Instance.inGameInfoText.gameObject.SetActive(true);
+    }
 
+    /// <summary>
+    /// [UI 버튼 연결용] 터렛 판매 모드로 진입. (이 함수는 변경 없음)
+    /// </summary>
+    public void EnterTurretSellMode()
+    {
+        currentState = PlayerActionState.SellingTurret;
+        Debug.Log("<color=yellow>판매 모드 시작:</color> 판매할 터렛을 클릭하세요.");
+        InGameUIManager.Instance.inGameInfoText.text = "Select a turret to sell.";
+        InGameUIManager.Instance.inGameInfoText.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// 모든 행동(건설/판매)을 취소하고 기본 상태로. (이 함수는 변경 없음)
+    /// </summary>
+    public void CancelPlayerAction()
+    {
+        currentState = PlayerActionState.None;
+        turretPrefabToPlace = null;
+        if (InGameUIManager.Instance != null)
+        {
+            InGameUIManager.Instance.HideInfoText();
+        }
+        Debug.Log("행동이 취소되었습니다.");
+    }
+
+
+    /// <summary>
+    /// Update 함수에서 호출되어 터렛 관련 입력을 처리.
+    /// </summary>
+    private void HandleTurretActions()
+    {
+        if (currentState == PlayerActionState.None) return;
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            CancelPlayerAction();
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (currentState == PlayerActionState.PlacingTurret)
+            {
+                TryPlaceTurretInSlot();
+            }
+            else if (currentState == PlayerActionState.SellingTurret)
+            {
+                TrySellTurretFromBase();
+            }
+        }
+    }
+
+    /// <summary>
+    /// [UI 버튼 연결용] 베이스에 터렛을 건설할 수 있는 새로운 공간(슬롯)을 추가하도록 요청합니다.
+    /// </summary>
+    public void OnClick_RequestAddTurretSlot()
+    {
+        // 여기서 '터렛 슬롯'을 구매하는 비용을 정의합니다.
+        int slotCost = 100; // 예시 비용
+
+        Debug.Log($"<color=green>터렛 설치 공간 추가 시도.</color> 필요 골드: {slotCost}");
+
+        // 1. InGameManager가 비용을 처리합니다.
+        if (SpendGold(slotCost))
+        {
+            Debug.Log("비용 지불 성공. 베이스 컨트롤러에 슬롯 생성을 요청합니다.");
+            // 2. 비용 지불에 성공하면, '베이스 담당자'가 만들 스크립트에 슬롯 생성을 요청합니다.
+            // 이 로직은 현재 플레이어의 베이스를 찾아 해당 베이스의 컨트롤러 스크립트를 호출해야 합니다.
+
+            /* --- 아래는 베이스 담당자가 참고할 수도코드 예시입니다 --- */
+            //
+            // BaseController playerBase = GetPlayerBase(); // 현재 플레이어의 베이스를 찾는 함수 (구현 필요)
+            // if (playerBase != null)
+            // {
+            //     // 베이스 컨트롤러에 있는 'CreateNewTurretSlot' 함수를 호출합니다.
+            //     // 이 함수는 베이스 위에 새로운 터렛 설치 공간을 시각적으로 생성하고 활성화하는 역할을 합니다.
+            //     playerBase.CreateNewTurretSlot(); 
+            // }
+            // else
+            // {
+            //     Debug.LogError("현재 플레이어의 베이스를 찾을 수 없습니다!");
+            // }
+            /* --- 수도코드 예시 끝 --- */
+
+        }
+        else
+        {
+            Debug.Log("골드가 부족하여 터렛 설치 공간을 추가할 수 없습니다.");
+        }
+    }
+
+
+    // 'TryPlaceTurretOnBase' 함수의 이름을 'TryPlaceTurretInSlot'으로 변경하고 내용을 수정합니다.
+    // 이제 베이스가 아닌, 베이스 위의 '슬롯'을 클릭했을 때 반응합니다.
+    /// <summary>
+    /// 터렛을 '슬롯' 위에 건설하는 것을 시도합니다.
+    /// </summary>
+    private void TryPlaceTurretInSlot()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            // 1. 클릭한 곳이 '터렛 슬롯'인지 확인합니다. (담당자가 TurretSlot 스크립트 또는 태그를 만들어야 함)
+            // var slot = hit.collider.GetComponent<TurretSlot>();
+            // if (slot == null || slot.isOccupied) 
+            // {
+            //     Debug.Log("터렛을 지을 수 없는 공간이거나 이미 다른 터렛이 있습니다.");
+            //     return; 
+            // }
+
+            // 2. 해당 슬롯이 현재 플레이어의 것인지 확인 (베이스 담당자가 구현)
+            // if (!slot.IsOwnedByLocalPlayer()) return;
+
+            // --- 여기서부터가 InGameManager의 핵심 역할 ---
+            // 3. 비용 가져오기 (터렛 프리팹에 TurretController 같은 스크립트가 있고 비용 정보가 있다고 가정)
+            // int turretCost = turretPrefabToPlace.GetComponent<TurretController>().goldCost;
+
+            // 4. 골드 차감 시도
+            // if (SpendGold(turretCost))
+            // {
+            //    // 5. 골드 차감에 성공하면, 해당 슬롯에 터렛을 설치하라고 '요청'
+            //    Debug.Log($"골드 차감 성공. {slot.name}에 터렛 설치를 요청합니다.");
+            //    // slot.PlaceTurret(turretPrefabToPlace); // 실제 설치는 슬롯이 담당
+            // }
+
+            // 6. 작업이 성공했든 실패했든, 건설 모드는 종료
+            Debug.Log("터렛 슬롯 담당자가 만들 PlaceTurret 함수를 호출할 준비가 되었습니다.");
+            CancelPlayerAction();
+        }
+    }
+
+    /// <summary>
+    /// '베이스' 위의 터렛을 판매하는 것을 시도.
+    /// </summary>
+    private void TrySellTurretFromBase()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            // 터렛 담당자가 만들 스크립트 (예: TurretController)를 가져옴.
+            // var turretController = hit.collider.GetComponent<TurretController>();
+            // if (turretController == null) return; // 터렛이 아니면 무시
+
+            // 이 클라이언트가 해당 터렛의 주인인지 확인하는 로직 (담당자가 구현)
+            // if (!turretController.IsOwnedByLocalPlayer())
+            // {
+            //     Debug.Log("자신의 터렛만 판매할 수 있습니다.");
+            //     return;
+            // }
+
+            // --- 여기부터가 InGameManager의 핵심 역할 ---
+            // 1. 판매 가격 가져오기
+            // int refund = turretController.sellPrice;
+
+            // 2. 골드 반환
+            // AddGold(refund);
+
+            // 3. 베이스 컨트롤러에게 터렛이 제거되었음을 알리고, 터렛 파괴 '요청'
+            // turretController.GetOwnerBase().RemoveTurret(turretController.gameObject);
+
+            // 4. 작업 완료 후 판매 모드 종료
+            Debug.Log("터렛 판매 및 골드 환불 함수를 호출할 준비가 되었습니다.");
+            CancelPlayerAction();
+        }
+    }
+    #endregion
 
     ///<summary>
     ///게임 오버 처리

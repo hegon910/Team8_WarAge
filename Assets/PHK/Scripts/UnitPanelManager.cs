@@ -45,7 +45,7 @@ namespace PHK
         public GameObject modernUnitPanel;
         public GameObject futureUnitPanel; //만일 쓴다면
 
-        [Header("시대별 터렛 패널(추후 추가 예정)")]
+        [Header("시대별 터렛 패널")]
         public GameObject ancientTurretPanel;
         public GameObject middleAgeTurretPanel;
         public GameObject modernTurretPanel;

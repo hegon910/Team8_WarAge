@@ -47,8 +47,11 @@ MonoBehaviour:
   isDebugMode: 1
   isDebugHost: 0
   unitPanelManager: {fileID: 0}
+  p1_Base: {fileID: 8421895251984258709, guid: ca304959f6f018f40ac798ec916296f6, type: 3}
+  p2_Base: {fileID: -7982181458623366182, guid: 3e7575f34e841b74e8c11b3d3dde5f40, type: 3}
   startingGold: 15000
   maxBaseHealth: 1000
   expForEvolve: f4010000dc050000b80b0000
   p1_spawnPoint: {fileID: 0}
   p2_spawnPoint: {fileID: 0}
+  currentState: 0
