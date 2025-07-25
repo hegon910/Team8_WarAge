@@ -46,14 +46,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         SceneManager.LoadScene(lobbySceneName);
-        CreateOrJoinRoom();
+        CreateOrJoinLobby();
     }
 
-    public void CreateOrJoinRoom()// 방 만든 사람이 마스터
+    public void CreateOrJoinLobby()// 방 만든 사람이 마스터
     {
-        string roomName = "TestRoom";
+        string LobbyName = "TestLobby";
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom(LobbyName, options, TypedLobby.Default);
     }
 
     public void SetLocalPlayerReady(bool ready)
@@ -93,9 +93,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     }
 
 
-    public Player[] GetCurrentRoomPlayers()
+    public Player[] GetCurrentLobbyPlayers()
     {
-        if (PhotonNetwork.InRoom)
+        if (PhotonNetwork.InLobby)
         {
             return PhotonNetwork.PlayerList;
         }

@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 
-public class RoomSceneUIController : MonoBehaviourPunCallbacks
+public class TestLobbyController : MonoBehaviourPunCallbacks
 {
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI leftPlayerNameText;
@@ -34,29 +34,29 @@ public class RoomSceneUIController : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        UpdateAllRoomUI();
+        UpdateAllLobbyUI();
     }
 
     
-    public override void OnJoinedRoom()
+    public override void OnJoinedLobby()
     {
         LoadLocalPlayerReadyState();
-        UpdateAllRoomUI();
+        UpdateAllLobbyUI();
     }
 
-    public override void OnLeftRoom()
+    public override void OnLeftLobby()
     {
-        UpdateAllRoomUI();
+        UpdateAllLobbyUI();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        UpdateAllRoomUI(); // 플레이어 입장
+        UpdateAllLobbyUI(); // 플레이어 입장
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        UpdateAllRoomUI(); // 플레이어 퇴장
+        UpdateAllLobbyUI(); // 플레이어 퇴장
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -79,12 +79,12 @@ public class RoomSceneUIController : MonoBehaviourPunCallbacks
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
-        UpdateAllRoomUI(); // 마스터 클라이언트 변경 시 UI 전체 업데이트
+        UpdateAllLobbyUI(); // 마스터 클라이언트 변경 시 UI 전체 업데이트
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        UpdateAllRoomUI(); // 연결 해제 시 UI 초기화
+        UpdateAllLobbyUI(); // 연결 해제 시 UI 초기화
     }
 
     private void LoadLocalPlayerReadyState()
@@ -100,7 +100,7 @@ public class RoomSceneUIController : MonoBehaviourPunCallbacks
         UpdateReadyUI(isLocalPlayerReady);
     }
 
-    private void UpdateAllRoomUI()
+    private void UpdateAllLobbyUI()
     {
         bool inRoom = PhotonNetwork.InRoom;
         bool isMaster = PhotonNetwork.IsMasterClient;
