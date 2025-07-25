@@ -40,15 +40,14 @@ public class TestUnitSpawner : MonoBehaviour
 
         if (PhotonNetwork.IsMasterClient)
         {
-            // 마스터 클라이언트 (P1) 설정
             playerTag = "P1";
-            initialMoveDirection = Vector3.right; // P1 유닛은 오른쪽으로 이동
+            initialMoveDirection = Vector3.right; 
             pointToSpawn = spawnPointP1;
         }
-        else // 일반 클라이언트 (P2) 설정
+        else
         {
             playerTag = "P2";
-            initialMoveDirection = Vector3.left; // P2 유닛은 왼쪽으로 이동
+            initialMoveDirection = Vector3.left;
             pointToSpawn = spawnPointP2;
         }
 

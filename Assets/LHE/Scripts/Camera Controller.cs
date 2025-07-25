@@ -1,4 +1,5 @@
 using UnityEngine;
+using Photon.Pun;
 
 namespace LHE
 {
@@ -11,10 +12,12 @@ namespace LHE
         [SerializeField] private float acceleration = 8f;     // 초당 가속도
 
         [Header("카메라 이동 제한")]
+        [SerializeField] private Transform spawnPointP1;
+        [SerializeField] private Transform spawnPointP2;
         [SerializeField] private float minX = -20f;
         [SerializeField] private float maxX = 20f;
 
-        private Camera mainCamera;
+
         private float currentSpeed = 0f;
         private float holdTime = 0f; // 접근된 시간 체크
         private int moveDirection = 0; // -1: 왼쪽, 1: 오른쪽, 0: 정지
@@ -24,7 +27,17 @@ namespace LHE
             // 마우스 화면 가두기
             Cursor.lockState = CursorLockMode.Confined;
 
-            mainCamera = Camera.main;
+            if (PhotonNetwork.IsMasterClient)
+            {
+                transform.position = spawnPointP1.position;
+            }
+            else
+            {
+                transform.position = spawnPointP2.position;
+            }
+
+            // 화면 제한 설정
+            SetXLimits(minX, maxX);
         }
 
         private void Update()
@@ -46,15 +59,14 @@ namespace LHE
                 moveDirection = 0;
             }
 
+            // 이동 속도 가속
             if (moveDirection != 0)
             {
-                // 시간 누적과 가속 적용
                 holdTime += Time.deltaTime;
                 currentSpeed = Mathf.Min(moveSpeed + holdTime * acceleration, maxSpeed);
             }
             else
             {
-                // 방향 해제 시 초기화
                 holdTime = 0f;
                 currentSpeed = 0f;
             }
