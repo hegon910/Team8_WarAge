@@ -363,6 +363,14 @@ public class InGameManager : MonoBehaviourPunCallbacks
                 // --- 디버그 모드: 일반 Instantiate 사용 ---
                 GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, spawnPoint.rotation);
                 newUnit.tag = ownerTag;
+                if (ownerTag == "P1")
+                {
+                    newUnit.layer = LayerMask.NameToLayer("P1Unit");
+                }
+                else if (ownerTag == "P2")
+                {
+                    newUnit.layer = LayerMask.NameToLayer("P2Unit");
+                }
                 // UnitController의 public 변수에 직접 접근하여 방향을 설정
                 UnitController controller = newUnit.GetComponent<UnitController>();
                 if (controller != null)
@@ -404,6 +412,15 @@ public class InGameManager : MonoBehaviourPunCallbacks
         if (targetPV != null)
         {
             targetPV.gameObject.tag = tag;
+            // *** START: 요청에 따른 레이어 설정 추가 ***
+            if (tag == "P1")
+            {
+                targetPV.gameObject.layer = LayerMask.NameToLayer("P1Unit");
+            }
+            else if (tag == "P2")
+            {
+                targetPV.gameObject.layer = LayerMask.NameToLayer("P2Unit");
+            }
         }
         else
         {
