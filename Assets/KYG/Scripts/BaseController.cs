@@ -55,7 +55,7 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
     {
         InitBase(); // 기지 초기화
 
-        AgeManager.Instance.OnAgeChanged += UpgradeBaseByAge(); // 시대 변경 이벤트 받아 자동 업그레이드 처리
+        AgeManager.Instance.OnAgeChanged += UpgradeBaseByAge; // 시대 변경 이벤트 받아 자동 업그레이드 처리
 
     }
 
