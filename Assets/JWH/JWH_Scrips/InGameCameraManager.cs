@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class InGameCameraManager : MonoBehaviourPunCallbacks
 {
-    [Header("카메라 프리팹 (Inspector에서 할당)")]
+    [Header("카메라 프리팹 (Inspector에서 할당")]
     public GameObject playerCameraPrefab;
 
     public override void OnEnable()
