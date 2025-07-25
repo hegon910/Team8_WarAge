@@ -18,12 +18,12 @@ namespace KYG.Editor
         [MenuItem("Tools/Create/AgeData")]
         public static void CreateAgeData()
         {
-            string folderPath = "Assete/Resources/AgeData";
+            string folderPath = "Assets/Resources/AgeData";
 
             if (!Directory.Exists(folderPath)) // 해당 폴더 없으면 생성
             {
                 Directory.CreateDirectory(folderPath);
-                AssetDatabase.Refresh();
+                
             }
 
             foreach (AgeType age in System.Enum.GetValues(typeof(AgeType))) // 모든 시대 타입에 해당하는 에셋생성
