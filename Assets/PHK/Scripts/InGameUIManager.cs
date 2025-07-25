@@ -35,10 +35,10 @@ public class InGameUIManager : MonoBehaviour
         //게임 시작 시에는 정보 텍스트 보이지 않도록
         HideInfoText();
 
-        //SpawnManager 받을 시 이부분 주석 해제
-        // SpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
-        // SpawnManager.Instance.OnProductionProgress += UpdateProductionSlider;
-        // SpawnManager.Instance.OnProductionStatusChanged += ToggleProductionSliderVisibility;
+        InGameManager.Instance.OnQueueChanged += UpdateQueueUI;
+        InGameManager.Instance.OnProductionProgress += UpdateProductionSlider;
+        InGameManager.Instance.OnProductionStatusChanged += ToggleProductionSliderVisibility; 
+
         if (productionSlider != null) productionSlider.value = 0;
         if(queueSlots != null)
         {
@@ -90,21 +90,22 @@ public class InGameUIManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        //  SpawnManager.cs를 받으면 이 부분의 주석을 해제
-
-        // if (SpawnManager.Instance != null)
-        // {
-        //     SpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
-        //     SpawnManager.Instance.OnProductionProgress -= UpdateProductionSlider;
-        //     SpawnManager.Instance.OnProductionStatusChanged -= ToggleProductionSliderVisibility;
-        // }
+        InGameManager.Instance.OnQueueChanged -= UpdateQueueUI;
+        InGameManager.Instance.OnProductionProgress -= UpdateProductionSlider;
+        InGameManager.Instance.OnProductionStatusChanged -= ToggleProductionSliderVisibility;
 
     }
-    //SpawnManager로부터 유닛 큐데이터를 받아와 UI 갱신
-    private void UpdateQueueUI(Queue<Unit> currentQueue)
+    private void ToggleProductionSliderVisibility(bool isVisible)
     {
-        //현재 큐에 있는 유닛의 개수를 가져옴
-        int queuedCount = currentQueue.Count;
+        if (productionSlider != null)
+        {
+            productionSlider.gameObject.SetActive(isVisible);
+        }
+    }
+
+    //SpawnManager로부터 유닛 큐데이터를 받아와 UI 갱신
+    private void UpdateQueueUI(int queuedCount)
+    {
         //5개의 모든 토글 슬롯을 순회
         for (int i = 0; i < queueSlots.Length; i++)
         {
