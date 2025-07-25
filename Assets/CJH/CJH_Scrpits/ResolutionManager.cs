@@ -30,8 +30,7 @@ public class ResolutionManager : MonoBehaviour
         for (int i = 0; i < resolutions.Count; i++)
         {
             string option = resolutions[i].width + " x " + resolutions[i].height;
-            // 가장 적합한 해상도에 별표를 표기합니다.
-            // 만약 현재 모니터랑 동일한 해상도라면 * 표기
+            // 가장 적합한 해상도에 * 를 표기합니다.
             if (resolutions[i].width == Screen.currentResolution.width &&
                 resolutions[i].height == Screen.currentResolution.height)
             {
