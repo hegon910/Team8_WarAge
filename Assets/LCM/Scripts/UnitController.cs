@@ -7,6 +7,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 {
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private int currentHealth;
     private Transform currentTarget;
@@ -27,6 +28,11 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (rb == null)
         {
             rb = GetComponent<Rigidbody2D>();
+        }
+
+        if (spriteRenderer == null) 
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
         }
     }
 
@@ -102,6 +108,23 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         moveDirection = initialMoveDirection; 
 
         Debug.Log($"{gameObject.name}의 태그가 {playerTag}로 설정되고, 방향은 {moveDirection}입니다.");
+
+        if (spriteRenderer != null)
+        {
+            if (playerTag == "P1")
+            {
+                spriteRenderer.flipX = true; // P1은 기본 방향 (오른쪽)
+            }
+            else if (playerTag == "P2")
+            {
+                spriteRenderer.flipX = false; // P2는 이미지 플립 (왼쪽)
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name}에 SpriteRenderer가 없습니다. 이미지를 플립할 수 없습니다.");
+        }
+
     }
 
     // --------------------------------------------------------
@@ -122,7 +145,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         //앞의 유닛이 있을때 멈추는 거리 표현
-        //Debug.DrawRay(raycastOrigin, checkDirection * stopDistance, Color.red, 0.1f);
+        Debug.DrawRay(raycastOrigin, checkDirection * stopDistance, Color.red, 0.1f);
 
         RaycastHit2D hit = Physics2D.Raycast(raycastOrigin, checkDirection, stopDistance, unitLayer);
 
@@ -259,11 +282,13 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         if(currentHealth < 0)
         {
-            Die();
+            photonView.RPC("RpcDie", RpcTarget.All);
         }
     }
 
-    private void Die()
+
+    [PunRPC]
+    private void RpcDie()
     {
         Destroy(gameObject, 2f);
     }
