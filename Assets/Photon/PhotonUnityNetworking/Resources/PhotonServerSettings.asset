@@ -41,6 +41,8 @@ MonoBehaviour:
   - RespawnSpaceship
   - RpcSetPlayerProps
   - RPC_UpdateHP
+  - RpcDie
+  - InitializeArrow
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

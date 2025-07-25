@@ -44,10 +44,10 @@ public class TestUnitSpawner : MonoBehaviour
             initialMoveDirection = Vector3.right; 
             pointToSpawn = spawnPointP1;
         }
-        else 
+        else
         {
             playerTag = "P2";
-            initialMoveDirection = Vector3.left; 
+            initialMoveDirection = Vector3.left;
             pointToSpawn = spawnPointP2;
         }
 

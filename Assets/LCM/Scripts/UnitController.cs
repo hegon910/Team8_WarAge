@@ -34,6 +34,21 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
         }
+
+        PhotonView photonView = GetComponent<PhotonView>();
+        if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
+        {
+            this.gameObject.tag = (string)photonView.InstantiationData[0];
+            this.moveDirection = (Vector3)photonView.InstantiationData[1];
+
+        }
+    }
+    private void Start()
+    {
+        if (gameObject.tag == "P2")
+        {
+            spriteRenderer.flipX = !spriteRenderer.flipX; // P2 유닛은 스프라이트를 뒤집음
+        }
     }
 
     private void Update()
@@ -91,7 +106,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 }
                 else
                 {
-                    currentTarget = null; 
+                    currentTarget = null;
                 }
             }
             else
@@ -101,31 +116,31 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    [PunRPC]
-    public void RpcSetPlayerProps(string playerTag, Vector3 initialMoveDirection)
-    {
-        gameObject.tag = playerTag; 
-        moveDirection = initialMoveDirection; 
+    //[PunRPC]
+    //public void RpcSetPlayerProps(string playerTag, Vector3 initialMoveDirection)
+    //{
+    //    gameObject.tag = playerTag; 
+    //    moveDirection = initialMoveDirection; 
 
-        Debug.Log($"{gameObject.name}의 태그가 {playerTag}로 설정되고, 방향은 {moveDirection}입니다.");
+    //    Debug.Log($"{gameObject.name}의 태그가 {playerTag}로 설정되고, 방향은 {moveDirection}입니다.");
 
-        if (spriteRenderer != null)
-        {
-            if (playerTag == "P1")
-            {
-                spriteRenderer.flipX = true; // P1은 기본 방향 (오른쪽)
-            }
-            else if (playerTag == "P2")
-            {
-                spriteRenderer.flipX = false; // P2는 이미지 플립 (왼쪽)
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"{gameObject.name}에 SpriteRenderer가 없습니다. 이미지를 플립할 수 없습니다.");
-        }
+    //    if (spriteRenderer != null)
+    //    {
+    //        if (playerTag == "P1")
+    //        {
+    //            spriteRenderer.flipX = true; // P1은 기본 방향 (오른쪽)
+    //        }
+    //        else if (playerTag == "P2")
+    //        {
+    //            spriteRenderer.flipX = false; // P2는 이미지 플립 (왼쪽)
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning($"{gameObject.name}에 SpriteRenderer가 없습니다. 이미지를 플립할 수 없습니다.");
+    //    }
 
-    }
+    //}
 
     // --------------------------------------------------------
 
@@ -256,7 +271,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if(attackCooldownTimer <= 0)
                 {
-                    //TODO: 원거리 공격 구현
+                    string spawnerTag = gameObject.tag;
+                    Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
+
+                    GameObject ArrowGo = PhotonNetwork.Instantiate("Arrow", ArrowSpawnPos, Quaternion.identity);
+
+                    Arrow arrow = ArrowGo.GetComponent<Arrow>();
+                    if (arrow != null)
+                    {
+                        arrow.photonView.RPC("InitializeProjectile", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage);
+                    }
+                    Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
                 }
             }
@@ -274,7 +299,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     //-------------------------------------
 
     //--------- 체력 및 사망 --------------
-    private void TakeDamage(int amount)
+    public void TakeDamage(int amount)
     {
         if (!IsMine) return;
 
