@@ -80,8 +80,14 @@ namespace KYG
 
         }
 
+        public int GetRequiredExpForNextAge()
+        {
+            AgeData nextAgeData = GetNextAgeData();
+            return nextAgeData != null ? nextAgeData.requiredExp : -1; //다음 시대 없으면 - 1 반환
+        }
 
-        private AgeData GetNextAgeData() // 현재 시대의 다음 시대 데이터를 반환
+
+        public AgeData GetNextAgeData() // 현재 시대의 다음 시대 데이터를 반환
         {
             var ordered = ageDataArray.OrderBy(d => d.ageType).ToArray();
             int index = Array.IndexOf(ordered, CurrentAgeData);

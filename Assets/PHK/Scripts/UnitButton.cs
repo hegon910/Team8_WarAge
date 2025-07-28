@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; 
 using UnityEngine.EventSystems;
 using Photon.Pun;
 
@@ -11,17 +10,23 @@ namespace PHK
     {
         [Header("유닛데이터")]
         public GameObject unitPrefab;
-
-        
         private Unit unitData; // 유닛 스크립터블 오브젝트 데이터
-
 
         private void Awake()
         {
-            //프리팹이 할당 되어 있으면 UnitContorller에서 데이터를 가져옴
-            if(unitPrefab != null)
+            GetComponent<Button>().onClick.AddListener(SpawnUnit);
+        }
+        public void Init(GameObject prefab)
+        {
+            unitPrefab = prefab;
+            if (unitPrefab != null)
             {
                 unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+                gameObject.SetActive(true); // 유닛 프리팹이 설정되면 버튼 활성화
+            }
+            else
+            {
+                gameObject.SetActive(false); // 유닛 프리팹이 없으면 버튼 비활성화
             }
         }
 
@@ -30,8 +35,9 @@ namespace PHK
         {
             if (unitData != null)
             {
+                string info = $"{unitData.unitName} Cost : {unitData.goldCost}";
                 //인게임 UI 매니저를 통해 유닛 정보 표시
-                InGameUIManager.Instance.ShowUnitGoldCost(unitData);
+                InGameUIManager.Instance.ShowInfoText(info);
             }
         }
         //마우스 커서가 버튼 위에서 벗어 났을 때 호출
@@ -57,7 +63,7 @@ namespace PHK
             {
                 ownerTag = PhotonNetwork.IsMasterClient ? "P1" : "P2";
             }
-            InGameManager.Instance.RequestUnitProduction(unitPrefab, ownerTag);
+            UnitSpawnManager.Instance.RequestUnitProduction(unitPrefab, ownerTag);
         }
     }
 }
