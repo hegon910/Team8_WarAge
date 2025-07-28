@@ -15,5 +15,8 @@ namespace KYG
         public float attackDelay; // 공격 속도
         public int attackDamage; // 공격 데미지
         public Sprite icon; // UI 표시 아이콘
+
+        public GameObject projectilePrefab; // 투사체 프리펩
+        public float projectileSpeed; // 투사체 발사 속도
     }
 }
