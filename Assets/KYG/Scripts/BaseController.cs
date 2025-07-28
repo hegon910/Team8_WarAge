@@ -35,10 +35,19 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
 
     // [SerializeField] private TeamType teamType; // 팀 정보 
     
-    [Header("Spawner")] public Transform spawnerPoint; // 유닛 생성 위치
+    [Header("Spawner")]
+    public Transform spawnerPoint; // 유닛 생성 위치
     [SerializeField] private GameObject currentBaseModel;
     [SerializeField] private GameObject defaultUnitPrefab; // 생성할 유닛 프리팹
 
+    [Header("Turret Slot")] 
+    [SerializeField] private GameObject turretSlotPrefab;
+
+    [SerializeField] private Transform turretSlotParent;
+
+    [SerializeField] private int maxTurretSlots = 4;
+    private List<TurretSlot> turretSlots = new List<TurretSlot>();
+    
     public event Action<int, int> OnHpChanged; //HP 변동시 이벤트 발생 (최대 체력, 현재 체력) 
 
     private PhotonView pv; // 네트워크 식별용 포톤 뷰
@@ -65,6 +74,55 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
         currentHP = maxHP; // 현재 체력 = 최대 체력으로 초기화
         OnHpChanged?.Invoke(currentHP, maxHP); // 이벤트 발생
         InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI연동
+    }
+    
+    /// <summary>
+    /// 유닛과 마찬가지로 터렛 프리펩을 받아
+    /// 터렛을 설치 할수있는 위치에 설치
+    /// 터렛 설치 할수있는 장소는 총 4곳
+    /// 첫번째 장소는 기지에 설치
+    /// 수직으로 설치하며 터렛 설치 UI버튼 눌리면 자동으로 터렛 설치 장소 생성
+    /// 터렛 설지 가능 장소 미리 구현하고 UI버튼으로 구매 확인후 SetActive?
+    /// 설치 장소에만 터렛 설치 가능
+    /// </summary>
+    
+    /// <summary>
+    /// 슬롯 추가: Base 위에 새로운 터렛 설치 공간 생성
+    /// </summary>
+    public void CreateNewTurretSlot()
+    {
+        if (turretSlots.Count >= maxTurretSlots)
+        {
+            Debug.LogWarning("최대 슬롯 수 초과!");
+            return;
+        }
+
+        if (turretSlotPrefab == null)
+        {
+            Debug.LogError("Turret Slot Prefab이 지정 되지 않았습니다");
+            return;
+        }
+        
+        GameObject newSlotObj = PhotonNetwork.Instantiate(turretSlotPrefab.name, turretSlotParent.position, Quaternion.identity);
+        newSlotObj.transform.SetParent(turretSlotParent, true);
+
+        TurretSlot slot = newSlotObj.GetComponent<TurretSlot>();
+        turretSlots.Add(slot);
+
+        RepositionTurretSlots();
+    }
+    
+    /// <summary>
+    /// 슬롯 위치를 정렬 (일렬 배치)
+    /// </summary>
+    private void RepositionTurretSlots()
+    {
+        float spacing = 1.5f;
+        for (int i = 0; i < turretSlots.Count; i++)
+        {
+            Vector3 localPos = new Vector3(i * spacing, 0, 0);
+            turretSlots[i].transform.localPosition = localPos;
+        }
     }
     
     /// <summary>
@@ -165,20 +223,9 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
         
     }
 
-    /// <summary>
-    /// 유닛과 마찬가지로 터렛 프리펩을 받아
-    /// 터렛을 설치 할수있는 위치에 설치
-    /// 터렛 설치 할수있는 장소는 총 4곳
-    /// 첫번째 장소는 기지에 설치
-    /// 수직으로 설치하며 터렛 설치 UI버튼 눌리면 자동으로 터렛 설치 장소 생성
-    /// 터렛 설지 가능 장소 미리 구현하고 UI버튼으로 구매 확인후 SetActive?
-    /// 설치 장소에만 터렛 설치 가능
-    /// </summary>
+    
 
-    public void SpawnTurret(GameObject prefabToSpawn)
-    {
-        // TODO 터렛 설치 장소 구현
-    }
+    
 
 
 }

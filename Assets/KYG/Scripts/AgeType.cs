@@ -10,8 +10,8 @@ namespace KYG
     /// </summary>
     public enum AgeType
     {
-        Ancient = 0,
-        Medieval = 1,
-        Modern = 2
+        Ancient = 0, // 고대
+        Medieval = 1, // 중세
+        Modern = 2 // 현대
     }
 }
