@@ -6,6 +6,7 @@ using UnityEngine;
 public class Unit : ScriptableObject
 {
     public string unitName;
+    public int unitExp;
     public int health;
     public int attackDamage;
     public int rangedDamage;

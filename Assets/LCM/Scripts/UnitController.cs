@@ -22,9 +22,12 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
     public bool IsMine => photonView.IsMine;
 
+    private InGameManager gm;
+
     private void Awake()
     {
         currentHealth = unitdata.health;
+        gm = InGameManager.Instance;
 
         if (rb == null)
         {
@@ -38,12 +41,11 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         PhotonView photonView = GetComponent<PhotonView>();
+        
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
             this.gameObject.tag = (string)photonView.InstantiationData[0];
             this.moveDirection = (Vector3)photonView.InstantiationData[1];
-
-
         }
     }
     private void Start()
@@ -51,6 +53,19 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (gameObject.tag == "P2")
         {
             spriteRenderer.flipX = !spriteRenderer.flipX; // P2 유닛은 스프라이트를 뒤집음
+        }
+
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        {
+
+            if (gameObject.CompareTag("P1"))
+            {
+                unitLayer = LayerMask.GetMask("P1Unit");
+            }
+            else if (gameObject.CompareTag("P2"))
+            {
+                unitLayer = LayerMask.GetMask("P2Unit");
+            }
         }
     }
 
@@ -245,6 +260,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     {
                         targetUnit.TakeDamage(unitdata.attackDamage); 
                         Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
+                        Debug.Log($"남은 체력은 {currentHealth}");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
@@ -279,11 +295,12 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
 
                     GameObject ArrowGo = PhotonNetwork.Instantiate("Arrow", ArrowSpawnPos, Quaternion.identity);
+                    Debug.Log("화살생성됨");
 
                     Arrow arrow = ArrowGo.GetComponent<Arrow>();
                     if (arrow != null)
                     {
-                        arrow.photonView.RPC("InitializeProjectile", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage);
+                        arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
                     }
                     Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
@@ -305,13 +322,35 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     //--------- 체력 및 사망 --------------
     public void TakeDamage(int amount)
     {
-        if (!IsMine) return;
-
-        currentHealth -= amount;
-
-        if(currentHealth < 0)
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
         {
-            photonView.RPC("RpcDie", RpcTarget.All);
+            // 디버그 모드에서는 소유권 검사 없이 바로 데미지 적용
+            currentHealth -= amount;
+            Debug.Log($"[DebugMode] {gameObject.name}의 체력 감소: {amount}, 현재 체력: {currentHealth}");
+        }
+        else // 실제 네트워크 모드에서는 기존의 소유권 검사를 유지하거나 RPC 방식으로 전환
+        {
+            if (!IsMine) return; // 유닛의 소유자만 체력 감소 가능
+            currentHealth -= amount;
+            Debug.Log($"[NetworkMode] {gameObject.name}의 체력 감소: {amount}, 현재 체력: {currentHealth}");
+        }
+
+        if (currentHealth < 0)
+        {
+            if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+            {
+                if (gm != null)
+                {
+                    gm.AddExp(unitdata.unitExp);
+                }
+                Destroy(gameObject, 1f);
+                Debug.Log($"[DebugMode] {gameObject.name} 사망 처리");
+            }
+            else
+            {
+                // 네트워크 모드에서는 RPC 호출
+                photonView.RPC("RpcDie", RpcTarget.All);
+            }
         }
     }
 
@@ -319,6 +358,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void RpcDie()
     {
+        gm.AddExp(unitdata.unitExp);
+        Debug.Log($"유닛 경험치 추가{unitdata.unitExp}");
         Destroy(gameObject, 2f);
     }
 
