@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "844402756250",
+    "project_id": "waraget8",
+    "storage_bucket": "waraget8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844402756250:android:62b84ad48f35c495356d23",
+        "android_client_info": {
+          "package_name": "com.KGATeam8.WarAge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNdDpba3HcLVhxFVAOoD0iz-edf3rPveo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844402756250:android:20fa910bb91e949a356d23",
+        "android_client_info": {
+          "package_name": "com.Team8.WarAge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNdDpba3HcLVhxFVAOoD0iz-edf3rPveo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
