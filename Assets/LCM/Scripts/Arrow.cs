@@ -23,6 +23,7 @@ public class Arrow : MonoBehaviourPun
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;
+        this.maxRange = maxRange;
         startPosition = transform.position;
 
         rb.velocity = moveDirection.normalized * speed;
@@ -51,27 +52,31 @@ public class Arrow : MonoBehaviourPun
             {
                 Debug.Log($"{gameObject.name}이 최대 사거리 ({maxRange})에 도달하여 파괴됩니다.");
                 PhotonNetwork.Destroy(gameObject);
-                return; 
+                return;
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!photonView.IsMine) return;
+        Debug.Log("충돌발생");
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        {
+
+        }
+        else 
+        {
+            if (!photonView.IsMine) return; 
+        }
 
 
         UnitController targetUnit = other.GetComponent<UnitController>();
 
-
-        if (targetUnit != null)
-        {
             if(other.CompareTag(ownerTag) == false)
             {
                 targetUnit.TakeDamage(damage);
                 Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
-                PhotonNetwork.Destroy(gameObject);
+                PhotonNetwork.Destroy(gameObject); 
             }
-        }
     }
 }
