@@ -75,6 +75,7 @@ public class UserAuthService : MonoBehaviour
                 {
                     Debug.Log("로그인 성공");
                     callback?.Invoke(true, task.Result.User);
+                    UIManager.Instance.OnClickedLogin();
                 }
             });
     }
@@ -142,6 +143,7 @@ public class UserAuthService : MonoBehaviour
                 {
                     Debug.Log("닉네임 설정 성공");
                     callback?.Invoke(true);
+                    UIManager.Instance.OnClickedNicknameConfirm();
                 }
             });
     }
