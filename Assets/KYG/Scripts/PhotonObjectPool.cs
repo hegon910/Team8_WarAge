@@ -11,7 +11,7 @@ namespace KYG
     /// </summary>
     public class PhotonObjectPool : MonoBehaviour
     {
-    
+        
     }
 }
 

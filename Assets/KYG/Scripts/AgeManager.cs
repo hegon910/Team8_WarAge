@@ -35,7 +35,7 @@ namespace KYG
         public AgeData CurrentAgeData => ageDataDict[CurrentAge];
 
         // 시대 변경시 호출될 이벤트 타 시스템에서 반응가능하도록 연결
-        public event Action<AgeData> OnAgeChanged;
+        public event Action<string,AgeData> OnAgeChangedByTeam;
 
         private void Awake()
         {
@@ -63,14 +63,14 @@ namespace KYG
 
         }
 
-        public bool TryUpgradeAge(int currentEXP) // 시대 업그레이드 시도
+        public bool TryUpgradeAge(string teamTag, int currentEXP) // 시대 업그레이드 시도
         {
             if (!CanUpgrade(currentEXP)) return false;
 
             var next = GetNextAgeData(); // AgeData에서 다음 시대 데이터 가져오기
             
             CurrentAge = next.ageType; // 시대 변경
-            OnAgeChanged?.Invoke(next); // 이벤트 발송
+            OnAgeChangedByTeam?.Invoke(teamTag,next); // 이벤트 발송
             
             return true;
 

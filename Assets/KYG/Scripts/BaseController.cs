@@ -39,8 +39,8 @@ namespace KYG
         [SerializeField] private GameObject currentBaseModel;
         [SerializeField] private GameObject defaultUnitPrefab; // 생성할 유닛 프리팹
 
-        [Header("Turret Slot")] [SerializeField]
-        private GameObject turretSlotPrefab;
+        [Header("Turret Slot")]
+        [SerializeField] private GameObject turretSlotPrefab;
 
         [SerializeField] private Transform turretSlotParent;
 
@@ -77,7 +77,11 @@ namespace KYG
         {
             InitBase(); // 기지 초기화
             if (AgeManager.Instance != null)
-                AgeManager.Instance.OnAgeChanged += UpgradeBaseByAge; // 시대 변경 이벤트 받아 자동 업그레이드 처리
+                AgeManager.Instance.OnAgeChangedByTeam += (teamTag, nextAgeData) =>
+                {
+                    if (teamTag == TeamTag)
+                        UpgradeBaseByAge(nextAgeData); // 시대 변경 이벤트 받아 자동 업그레이드 처리
+                };
 
         }
 
@@ -207,25 +211,36 @@ namespace KYG
 
             var slotObj =
                 PhotonNetwork.Instantiate(turretSlotPrefab.name, turretSlotParent.position, Quaternion.identity);
-            slotObj.transform.SetParent(turretSlotParent, true);
+            
 
             TurretSlot slot = slotObj.GetComponent<TurretSlot>();
             slot.Init(TeamTag);   // 팀 정보 전달
             turretSlots.Add(slot);
             
-            RepositionTurretSlots();
+            if (PhotonNetwork.IsConnected)
+                pv.RPC(nameof(RPC_RepositionTurretSlots), RpcTarget.All);
+            else
+            {
+                RepositionTurretSlots();
+            }
         }
 
         /// <summary>
         /// 슬롯 위치를 정렬 (일렬 배치)
         /// </summary>
+
+        [PunRPC]
+        private void RPC_RepositionTurretSlots()
+        {
+            RepositionTurretSlots();
+        }
         private void RepositionTurretSlots()
         {
             float spacing = 1.5f;
             for (int i = 0; i < turretSlots.Count; i++)
             {
-                Vector3 localPos = new Vector3(i * spacing, 0, 0);
-                turretSlots[i].transform.localPosition = localPos;
+                turretSlots[i].transform.SetParent(turretSlotParent, false);
+                turretSlots[i].transform.localPosition = new Vector3(i * spacing, 0, 0);
             }
         }
     }
