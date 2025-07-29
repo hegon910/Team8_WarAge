@@ -26,8 +26,7 @@ public class LoginPanel : MonoBehaviour
 
     private void SignUp()
     {
-        signUpPanel.SetActive(true);
-        gameObject.SetActive(false);
+        UIManager.Instance.OnClickedSignup();
     }
 
     private void Login()
@@ -41,14 +40,13 @@ public class LoginPanel : MonoBehaviour
                 if (string.IsNullOrEmpty(user.DisplayName))
                     nicknamePanel.SetActive(true);
                 else
-                    lobbyPanel.SetActive(true);
+                    UIManager.Instance.OnClickedNicknameConfirm();
             }
             else
             {
                 emailPanel.SetActive(true);
             }
 
-            gameObject.SetActive(false);
         });
     }
 

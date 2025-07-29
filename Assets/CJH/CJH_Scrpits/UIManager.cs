@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Firebase.Auth;
 
 public class UIManager : MonoBehaviour
 {
@@ -8,11 +9,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Option Panels")]
     public GameObject mainPanel;
-    public GameObject loadingPanel;
     public GameObject loginPanel;
+    public GameObject nicknamePanel;
     public GameObject signUpPanel;
+    public GameObject emailPanel;
     public GameObject lobbyPanel;
     public GameObject roomPanel;
+
+
 
 
 
@@ -40,7 +44,7 @@ public class UIManager : MonoBehaviour
     public void OnClickedStart()
     {
         mainPanel.SetActive(false);
-        loadingPanel.SetActive(true);
+        loginPanel.SetActive(true);
     }
 
     #endregion
@@ -50,19 +54,40 @@ public class UIManager : MonoBehaviour
     ///<summary>
 
     #region 함수
-    public void OnClickedLogin()
+    public void OnClickedLoginFirst()
     {
-        //TODO 파이어베이스 로그인 함수 호출
-
-        lobbyPanel.SetActive(true);
+        emailPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
+    public void OnClickedLogin()
+    {
+        lobbyPanel.SetActive(true);
+        loginPanel.SetActive(false);
+    }
+     
     public void OnClickedCancelBackMain()
     {
 
         mainPanel.SetActive(true);
         loginPanel.SetActive(false);
+    }
+
+    public void OnClickedEmailBack()
+    {
+        signUpPanel.SetActive(true);
+        emailPanel.SetActive(false);
+    }
+
+    public void OnClickedNicknameConfirm()
+    {
+        lobbyPanel.SetActive(true);
+        loginPanel.SetActive(false);
+    }
+    public void OnClickedNicknameBack()
+    {
+        loginPanel.SetActive(true);
+        nicknamePanel.SetActive(false);
     }
 
     public void OnClickedSignup()
@@ -74,10 +99,8 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedSignupConfrim()
     {
-        //TODO 파이어베이스 회원가입 함수 호출
-
-        //signUpPanel.SetActive(true);
-        //loginPanel.SetActive(false);
+        loginPanel.SetActive(true);
+        signUpPanel.SetActive(false);
     }
 
     public void OnClickedSignupCancel()
@@ -85,26 +108,17 @@ public class UIManager : MonoBehaviour
         loginPanel.SetActive(true);
         signUpPanel.SetActive(false);
     }
-
-
-    public void OnClickedLoginConfirm()
-    {
-        loginPanel.SetActive(true);
-        signUpPanel.SetActive(false);
-    }
-
-
+ 
     public void OnClickedCreatRoom()
     {
-
         roomPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
 
     public void OnClickedLobbyCancel()
     {
-        lobbyPanel.SetActive(false);
         loginPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
     }    
 
     public void OnClickedStartInGame()
