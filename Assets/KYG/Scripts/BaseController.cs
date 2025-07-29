@@ -139,6 +139,8 @@ public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 Photon
         
         
         currentHP = Mathf.Max(0, currentHP - damage); // 체력 감소 최대 0까지
+            
+        Debug.Log($"{currentHP}");
         
         OnHpChanged?.Invoke(currentHP, maxHP); // UI 갱신
         InGameUIManager.Instance?.UpdateBaseHpUI(currentHP, maxHP); // UI 갱신
