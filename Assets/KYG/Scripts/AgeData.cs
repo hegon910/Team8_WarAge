@@ -27,7 +27,7 @@ namespace KYG
         public GameObject baseModelPrefab;  // 기지 프리팹
         
         [Header("시대별 유닛")]
-        public List<GameObject> spawnableUnits; // 해당 시대의 유닛 리스트
+        public List<GameObject> spawnableUnits = new(); // 해당 시대의 유닛 리스트
 
     }
 }

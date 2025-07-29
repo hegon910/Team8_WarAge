@@ -24,7 +24,7 @@ namespace KYG
         {
             if (target == null)
             {
-                PhotonNetwork.Destroy(gameObject); // 타겟이 없으면 발사체 삭제
+               if(photonView.IsMine) PhotonNetwork.Destroy(gameObject); // 타겟이 없으면 발사체 삭제
                 return;
             }
             
@@ -39,16 +39,13 @@ namespace KYG
 
         private void HitTarget() // 타겟명중 처리
         {
-            if (target != null)
-            {
-                // PhotonView를 찾아 RPC로 데미지 전달
-                PhotonView enemyPV = target.GetComponent<PhotonView>();
-                if (enemyPV != null)
-                {
-                    enemyPV.RPC("TakeDamage", RpcTarget.All,damage);
-                }
-            }
-            PhotonNetwork.Destroy(gameObject); // 발사체 제거
+            // 타겟이 PhotonView를 가지고 있으면 RPC로 데미지 전달
+            if (target != null && target.TryGetComponent(out PhotonView enemyPV))
+                enemyPV.RPC("TakeDamage", RpcTarget.All, damage);
+            
+            // 소유자만 발사체 제거 권한 있음
+            if (photonView.IsMine)
+                PhotonNetwork.Destroy(gameObject); // 발사체 제거
         }
     }
 }

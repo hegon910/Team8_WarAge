@@ -19,6 +19,8 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
             // PhotonNetwork로 터렛 설치 → 모든 클라이언트에 동기화됨
             GameObject turretObj =
                 PhotonNetwork.Instantiate(data.turretPrefab.name, transform.position, Quaternion.identity);
+                
+            // 터렛 컨트롤러 초기화
                 currentTurret = turretObj.GetComponent<TurretController>();
                 currentTurret.Init(data, this);
                 // TODO UI 버튼 연동
@@ -27,17 +29,13 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
         public void SellTurret() // 터렛 판매
         {
             if (IsEmpty) return;
+            
+            // PhotonNetwork로 터렛 제거 (모든 클라이언트에 반영)
             PhotonNetwork.Destroy(currentTurret.gameObject);
             currentTurret = null;
             // TODO UI 버튼 연동
         }
 
-        public void CancelInstall() // 설치 취소
-        {
-            if (IsEmpty) return;
-            PhotonNetwork.Destroy(currentTurret.gameObject);
-            currentTurret = null;
-            // TODO UI 버튼 연동
-        }
+    
 }
 }
