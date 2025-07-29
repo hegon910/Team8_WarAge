@@ -7,9 +7,8 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("Option Panels")]
-    public GameObject optionPanel;
-    public GameObject graphicPanel;
-    public GameObject soundPanel;
+    public GameObject mainPanel;
+    public GameObject loadingPanel;
     public GameObject loginPanel;
     public GameObject signUpPanel;
     public GameObject lobbyPanel;
@@ -23,12 +22,13 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // 씬 이동 시 유지
         }
-        else
+
+        else if (Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // 중복 방지
         }
+
     }
 
     ///<summary>
@@ -36,44 +36,13 @@ public class UIManager : MonoBehaviour
     ///<summary>
 
     #region 함수
-    public void ShowOptionPanel()
-    {
-        optionPanel.SetActive(true);
-        ShowGraphicPanel(); // 기본값으로 Graphic
-    }
-
-    public void HideOptionPanel()
-    {
-        optionPanel.SetActive(false);
-    }
-    
-    public void ShowGraphicPanel()
-    {
-        graphicPanel.SetActive(true);
-        soundPanel.SetActive(false);
-    }
-    
-    public void ShowSoundPanel()
-    {
-        graphicPanel.SetActive(false);
-        soundPanel.SetActive(true);
-    }
 
     public void OnClickedStart()
     {
-
+        mainPanel.SetActive(false);
+        loadingPanel.SetActive(true);
     }
 
-    public void OnClickedOptionConfirm()
-    {
-        // 예: 설정 저장, 옵션 닫기
-    }
-
-    public void OnClickedOptionCancel()
-    {
-        soundPanel.SetActive(false);
-        graphicPanel.SetActive(false);
-    }
     #endregion
 
     ///<summary>
@@ -89,13 +58,41 @@ public class UIManager : MonoBehaviour
         loginPanel.SetActive(false);
     }
 
+    public void OnClickedCancelBackMain()
+    {
+
+        mainPanel.SetActive(true);
+        loginPanel.SetActive(false);
+    }
+
     public void OnClickedSignup()
     {
-        //TODO 파이어베이스 회원가입 함수 호출
 
         signUpPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
+
+    public void OnClickedSignupConfrim()
+    {
+        //TODO 파이어베이스 회원가입 함수 호출
+
+        //signUpPanel.SetActive(true);
+        //loginPanel.SetActive(false);
+    }
+
+    public void OnClickedSignupCancel()
+    {
+        loginPanel.SetActive(true);
+        signUpPanel.SetActive(false);
+    }
+
+
+    public void OnClickedLoginConfirm()
+    {
+        loginPanel.SetActive(true);
+        signUpPanel.SetActive(false);
+    }
+
 
     public void OnClickedCreatRoom()
     {
@@ -104,11 +101,11 @@ public class UIManager : MonoBehaviour
         lobbyPanel.SetActive(false);
     }
 
-    public void OnClickedLoginConfirm()
+    public void OnClickedLobbyCancel()
     {
+        lobbyPanel.SetActive(false);
         loginPanel.SetActive(true);
-        signUpPanel.SetActive(false);
-    }
+    }    
 
     public void OnClickedStartInGame()
     {
