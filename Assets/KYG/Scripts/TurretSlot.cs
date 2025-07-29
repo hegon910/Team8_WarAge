@@ -9,7 +9,13 @@ namespace KYG
 public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,취소 관리
 {
         private TurretController currentTurret; // 현재 설치된 터렛
-
+        public string TeamTag { get; private set; }
+    
+        public void Init(string teamTag)
+        {
+            TeamTag = teamTag;
+        }
+        
         public bool IsEmpty => currentTurret == null; // 현재 설치된 터렛이 없는지 확인
         
         public void InstallTurret(TurretData data) // 터렛 설치
@@ -22,7 +28,7 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
                 
             // 터렛 컨트롤러 초기화
                 currentTurret = turretObj.GetComponent<TurretController>();
-                currentTurret.Init(data, this);
+                currentTurret.Init(data, this, TeamTag); // 팀 정보 전달
                 // TODO UI 버튼 연동
         }
 

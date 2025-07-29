@@ -27,12 +27,13 @@ namespace KYG
 
         private int currentHP; // 임의로 수정 불가능한 현재 체력
 
+        public string TeamTag { get; private set; } // 팀 태그 (1P/2P)
+            
         // 프로퍼티로 외부 접근 캡슐화
         public int MaxHP => maxHP; // 최대 체력 접근용 프로퍼티
 
         public int CurrentHP => currentHP; // 현재 체력 접근용 프로퍼티
 
-        // [SerializeField] private TeamType teamType; // 팀 정보 
 
         [Header("Spawner")] public Transform spawnerPoint; // 유닛 생성 위치
         [SerializeField] private GameObject currentBaseModel;
@@ -53,6 +54,19 @@ namespace KYG
         private void Awake()
         {
             pv = GetComponent<PhotonView>(); // PhotonView 함수 초기화
+            
+            // Photon Instantiate 데이터로 팀 정보 가져오기
+            if (pv.InstantiationData != null && pv.InstantiationData.Length > 0)
+            {
+                TeamTag = (string)pv.InstantiationData[0];
+                gameObject.tag = TeamTag;
+                
+                // Layer 지정
+                if (TeamTag == "P1")
+                    gameObject.layer = LayerMask.NameToLayer("P1Base");
+                else if (TeamTag == "P2")
+                    gameObject.layer = LayerMask.NameToLayer("P2Base");
+            }
         }
 
         /*
@@ -81,8 +95,10 @@ namespace KYG
         /// 데미지를 받아 현재 체력이 0이 되면 게임 매니저에 게임 오버 연동
         /// 체력이 0이 될시 파괴되는 에니메이션은 추가 과제
         /// </summary>
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, string attackerTag)
         {
+            if(attackerTag == TeamTag) return; // 아군이면 무시
+            
             if (damage <= 0 || (PhotonNetwork.IsConnected && !pv.IsMine)) return; // Damege 0일때 무시
 
             ApplyDamage(damage);
@@ -193,7 +209,10 @@ namespace KYG
                 PhotonNetwork.Instantiate(turretSlotPrefab.name, turretSlotParent.position, Quaternion.identity);
             slotObj.transform.SetParent(turretSlotParent, true);
 
-            turretSlots.Add(slotObj.GetComponent<TurretSlot>());
+            TurretSlot slot = slotObj.GetComponent<TurretSlot>();
+            slot.Init(TeamTag);   // 팀 정보 전달
+            turretSlots.Add(slot);
+            
             RepositionTurretSlots();
         }
 

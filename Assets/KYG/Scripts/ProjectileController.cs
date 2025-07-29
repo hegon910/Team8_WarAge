@@ -12,12 +12,14 @@ namespace KYG
         private Transform target; // 발사체 목표
         private int damage; // 데미지
         private float speed; // 이동속도
+        private string teamTag;  // 소속 팀 정보 추가
 
-        public void Init(Transform target, int damage, float speed) // 발사체 초기화
+        public void Init(Transform target, int damage, float speed, string teamTag) // 발사체 초기화
         {
             this.target = target;
             this.damage = damage;
             this.speed = speed;
+            this.teamTag = teamTag;
         }
 
         private void Update()
@@ -39,9 +41,18 @@ namespace KYG
 
         private void HitTarget() // 타겟명중 처리
         {
-            // 타겟이 PhotonView를 가지고 있으면 RPC로 데미지 전달
-            if (target != null && target.TryGetComponent(out PhotonView enemyPV))
-                enemyPV.RPC("TakeDamage", RpcTarget.All, damage);
+            if (target == null) return;
+
+            // BaseController에 데미지 전달 시 아군인지 체크
+            if (target.TryGetComponent(out BaseController baseCtrl))
+            {
+                baseCtrl.TakeDamage(damage, teamTag);
+            }
+            else if (target.TryGetComponent(out UnitController unitCtrl))
+            {
+                // 유닛은 기존 TakeDamage 사용 (UnitController 내부에서 아군 방어 가능)
+                unitCtrl.TakeDamage(damage);
+            }
             
             // 소유자만 발사체 제거 권한 있음
             if (photonView.IsMine)

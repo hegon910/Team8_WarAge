@@ -15,15 +15,25 @@ namespace KYG
         private Transform target; // 현재 공격 중인 타겟
         private float attackTimer = 0f; // 공격 딜레이 타이머
         
+        public string TeamTag { get; private set; }  // 팀 정보 추가
+        
         /// <summary>
         /// 터렛 초기화
         /// </summary>
         /// <param name="data"></param>
         /// <param name="slot"></param>
-        public void Init(TurretData data, TurretSlot slot)
+        public void Init(TurretData data, TurretSlot slot, string teamTag)
         {
             this.data = data;
             this.parentSlot = slot;
+            this.TeamTag = teamTag;
+            
+            // Layer 설정 (유닛과 동일한 팀에 맞춤)
+            if (TeamTag == "P1")
+                gameObject.layer = LayerMask.NameToLayer("P1Turret");
+            else if (TeamTag == "P2")
+                gameObject.layer = LayerMask.NameToLayer("P2Turret");
+            
         }
 
         private void Update()
@@ -54,8 +64,18 @@ namespace KYG
         /// <returns></returns>
         private Transform FindNearestEnemy()
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, data.attackRange, LayerMask.GetMask("Enemy"));
-            return hits.Length > 0 ? hits[0].transform : null;
+            // 팀별로 적 Layer만 탐색하도록 변경
+            string enemyLayer = TeamTag == "P1" ? "P2Unit" : "P1Unit";
+            Collider[] hits = Physics.OverlapSphere(transform.position, data.attackRange, LayerMask.GetMask(enemyLayer));
+
+            // 추가: 기지도 타겟으로
+            string enemyBaseLayer = TeamTag == "P1" ? "P2Base" : "P1Base";
+            Collider[] baseHits = Physics.OverlapSphere(transform.position, data.attackRange, LayerMask.GetMask(enemyBaseLayer));
+
+            if (hits.Length > 0) return hits[0].transform;
+            if (baseHits.Length > 0) return baseHits[0].transform;
+
+            return null;
         }
         
         /// <summary>
@@ -69,7 +89,9 @@ namespace KYG
             // ProjectileController 초기화
             GameObject projObj = PhotonNetwork.Instantiate(data.projectilePrefab.name, transform.position, Quaternion.identity);
             if (projObj.TryGetComponent(out ProjectileController projectile))
-                projectile.Init(target, data.attackDamage, data.projectileSpeed);
+            {
+                projectile.Init(target, data.attackDamage, data.projectileSpeed, TeamTag); // TeamTag 전달
+            }
         }
     }
 }
