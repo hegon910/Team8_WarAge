@@ -254,6 +254,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ffd3c094641fc694c994e145d92c86da, type: 3}
+--- !u!1 &226291395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 226291397}
+  - component: {fileID: 226291396}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &226291396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226291395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 083b24004cce8a348b8ac5295ea03e1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &226291397
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226291395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.15922609, y: 0.9969984, z: -0.001552185}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &259394156 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2069880306173601769, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
@@ -301,8 +345,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f38150abdb4597429f4c12a05c6de5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftPlayerText: {fileID: 1147389587}
-  rightPlayerText: {fileID: 1204050469}
 --- !u!4 &313188244
 Transform:
   m_ObjectHideFlags: 0
@@ -1777,6 +1819,8 @@ MonoBehaviour:
   edgeThreshold: 20
   maxSpeed: 30
   acceleration: 8
+  spawnPointP1: {fileID: 0}
+  spawnPointP2: {fileID: 0}
   minX: -10
   maxX: 10
 --- !u!1 &1637236620
@@ -2100,6 +2144,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 226291397}
   - {fileID: 1607150756}
   - {fileID: 1637236621}
   - {fileID: 773022361}

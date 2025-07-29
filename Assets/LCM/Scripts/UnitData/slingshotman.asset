@@ -13,16 +13,18 @@ MonoBehaviour:
   m_Name: slingshotman
   m_EditorClassIdentifier: 
   unitName: slingshotman
+  unitExp: 0
   health: 42
   attackDamage: 10
   rangedDamage: 8
-  MeleeRange: 20
-  rangedrange: 100
+  MeleeRange: 1
+  rangedrange: 10
   attackSpeed: 1
   SpawnTime: 3
   moveSpeed: 3
   goldCost: 25
   unitSprite: {fileID: 0}
   description: StoneAgeSlingshotMan
+  ArrowPrefab: {fileID: 0}
   unitType: 1
   eraType: 0
