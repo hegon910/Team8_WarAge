@@ -1,107 +1,177 @@
 using PHK;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-//인게임의 전반적인 UI를 관리하는 스크립트(골드, 기지 체력, 정보 텍스트 등)
 
+// 인게임의 전반적인 UI를 관리하는 스크립트.
+// 다른 매니저들로부터 이벤트를 받아 UI를 갱신하고, UI 버튼 입력을 받아 다른 매니저에게 요청.
 public class InGameUIManager : MonoBehaviour
 {
-    //싱글턴 패턴 : 다른 스크립트에서 참조할 수 있도록 함.
-
     public static InGameUIManager Instance { get; private set; }
-    private Button button;
 
-    [Header("UI요소")]
-    public TextMeshProUGUI inGameInfoText; //인게임 정보 텍스트
-    public TextMeshProUGUI UnitInfoText; //유닛 상황 정보 텍스트
-
-    [Header("자원 및 기지 상태(구현 예정")]
-    public TextMeshProUGUI goldText; //골드 텍스트
-    public TextMeshProUGUI expText; //경험치 표시 텍스트
-    public Slider baseHpSlider; //기지 체력 표시
+    [Header("UI 요소")]
+    public TextMeshProUGUI inGameInfoText;
+    public TextMeshProUGUI UnitInfoText;
+    public TextMeshProUGUI goldText;
+    public TextMeshProUGUI expText;
+    public Slider baseHpSlider;
+    public Button evolveButton; // 시대 발전 버튼 참조
 
     [Header("유닛 생산 큐")]
     public Slider productionSlider;
     public Toggle[] queueSlots = new Toggle[5];
 
-
+    // --- 터렛 관련 상태 ---
+    // PlayerActionState는 이제 UI와 상호작용하는 모드를 나타내므로 UI 매니저가 관리.
+    public enum PlayerActionState
+    {
+        None,
+        PlacingTurret,
+        SellingTurret
+    }
+    public PlayerActionState currentState { get; private set; } = PlayerActionState.None;
+    public GameObject turretPrefabToPlace { get; private set; } // 읽기 전용으로 외부 노출
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
-    void Start()
-    {
-        //게임 시작 시에는 정보 텍스트 보이지 않도록
-        HideInfoText();
-
-        InGameManager.Instance.OnQueueChanged += UpdateQueueUI;
-        InGameManager.Instance.OnProductionProgress += UpdateProductionSlider;
-        InGameManager.Instance.OnProductionStatusChanged += ToggleProductionSliderVisibility; 
-
-        if (productionSlider != null) productionSlider.value = 0;
-        if(queueSlots != null)
+        if (Instance == null)
         {
-            foreach(var slot in queueSlots)
-            {
-                if(slot != null) slot.SetIsOnWithoutNotify(false);
-            }
-        }
-    }
-   
-    //유닛 정보를 받아 정보 텍스트 UI에 골드 비용 표시
-    public void ShowUnitGoldCost(Unit unitData)
-    {
-        if (unitData != null && inGameInfoText != null)
-        {
-            inGameInfoText.text = unitData.unitName + "Cost : " + unitData.goldCost;
-            inGameInfoText.gameObject.SetActive(true);
+            Instance = this;
         }
         else
         {
-            Debug.LogWarning("Unit data or inGameInfoText is null");
+            Destroy(gameObject);
         }
     }
-    //정보 텍스트를 숨김
+
+    void Start()
+    {
+        // 게임 시작 시 정보 텍스트 숨기기
+        if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
+        if (UnitInfoText != null) UnitInfoText.text = "";
+
+        // --- 이벤트 구독 ---
+        // 싱글턴 인스턴스가 null일 수 있으므로 안전하게 확인
+        if (UnitSpawnManager.Instance != null)
+        {
+            UnitSpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
+            UnitSpawnManager.Instance.OnProductionProgress += UpdateProductionSlider;
+            UnitSpawnManager.Instance.OnProductionStatusChanged += ToggleProductionSliderVisibility;
+        }
+        if (InGameManager.Instance != null)
+        {
+            InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
+            InGameManager.Instance.OnBaseHealthChanged += UpdateBaseHpUI;
+            InGameManager.Instance.OnInfoMessage += ShowInfoText;
+            InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
+        }
+
+        // UI 초기화
+        if (productionSlider != null) productionSlider.gameObject.SetActive(false);
+        if (queueSlots != null)
+        {
+            foreach (var slot in queueSlots)
+            {
+                if (slot != null) slot.SetIsOnWithoutNotify(false);
+            }
+        }
+        //시작할때 evolve버튼 비활성화
+        if (evolveButton != null)
+            evolveButton.interactable = false; // 초기에는 비활성화
+    }
+
+    private void OnDestroy()
+    {
+        // 오브젝트 파괴 시 이벤트 구독을 반드시 해제해야 메모리 누수를 방지
+        if (UnitSpawnManager.Instance != null)
+        {
+            UnitSpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
+            UnitSpawnManager.Instance.OnProductionProgress -= UpdateProductionSlider;
+            UnitSpawnManager.Instance.OnProductionStatusChanged -= ToggleProductionSliderVisibility;
+        }
+        if (InGameManager.Instance != null)
+        {
+            InGameManager.Instance.OnResourceChanged -= UpdateResourceUI;
+            InGameManager.Instance.OnBaseHealthChanged -= UpdateBaseHpUI;
+            InGameManager.Instance.OnInfoMessage -= ShowInfoText;
+            InGameManager.Instance.OnEvolveStatusChanged -= UpdateEvolveButton;
+        }
+    }
+    private void Update()
+    {
+        // 터렛 건설 또는 판매 모드일 때만 입력을 확인합니다.
+        if (currentState != PlayerActionState.None)
+        {
+            // 우클릭 또는 ESC 키를 누르면 행동을 취소합니다.
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+            {
+                CancelPlayerAction();
+            }
+        }
+    }
+
+    #region UI 업데이트 함수 (이벤트 수신)
+    public void UpdateResourceUI(int newGold, int newExp)
+    {
+        if (goldText != null) goldText.text = $"{newGold}";
+        if (expText != null) expText.text = $"{newExp}";
+    }
+
+    public void UpdateBaseHpUI(int currentHp, int maxHp)
+    {
+        if (baseHpSlider != null && maxHp > 0)
+        {
+            baseHpSlider.value = (float)currentHp / maxHp;
+        }
+    }
+
+    public void ShowInfoText(string message)
+    {
+        if (inGameInfoText != null)
+        {
+            inGameInfoText.text = message;
+            inGameInfoText.gameObject.SetActive(true);
+            // 필요하다면 몇 초 뒤에 자동으로 사라지는 로직 추가 가능
+        }
+    }
+
     public void HideInfoText()
     {
         if (inGameInfoText != null)
         {
             inGameInfoText.gameObject.SetActive(false);
         }
-
     }
 
-
-
-    //구현 예정 기능 함수
-    //골드와 EXP 반영
-    public void UpdateResourceUI(int currentGold, int currentExp)
+    private void UpdateEvolveButton(bool canEvolve)
     {
-        if (goldText != null) goldText.text = $"{currentGold}";
-        if (expText != null) expText.text = $"{currentExp}";
-    }
-
-    //기지 체력바 업데이트 
-    public void UpdateBaseHpUI(int currentHp, int maxHp)
-    {
-        if(baseHpSlider != null)
+        if (evolveButton != null)
         {
-            //(float)을 붙혀 정수 나눗셈이 되지 않도록
-            baseHpSlider.value = (float)currentHp / maxHp;
+            evolveButton.interactable = canEvolve;
         }
     }
-    private void OnDisable()
-    {
-        InGameManager.Instance.OnQueueChanged -= UpdateQueueUI;
-        InGameManager.Instance.OnProductionProgress -= UpdateProductionSlider;
-        InGameManager.Instance.OnProductionStatusChanged -= ToggleProductionSliderVisibility;
+    #endregion
 
+    #region 유닛 생산 UI
+    private void UpdateQueueUI(int queuedCount)
+    {
+        for (int i = 0; i < queueSlots.Length; i++)
+        {
+            if (queueSlots[i] != null)
+            {
+                queueSlots[i].SetIsOnWithoutNotify(i < queuedCount);
+            }
+        }
     }
+
+    private void UpdateProductionSlider(float progress)
+    {
+        if (productionSlider != null)
+        {
+            productionSlider.value = progress;
+        }
+    }
+
     private void ToggleProductionSliderVisibility(bool isVisible)
     {
         if (productionSlider != null)
@@ -109,34 +179,47 @@ public class InGameUIManager : MonoBehaviour
             productionSlider.gameObject.SetActive(isVisible);
         }
     }
+    #endregion
 
-    //SpawnManager로부터 유닛 큐데이터를 받아와 UI 갱신
-    private void UpdateQueueUI(int queuedCount)
+    #region 터렛 관련 UI 및 상태 관리
+    // 터렛 건설 버튼에서 호출
+    public void EnterTurretPlaceMode(GameObject turretPrefab)
     {
-        //5개의 모든 토글 슬롯을 순회
-        for (int i = 0; i < queueSlots.Length; i++)
-        {
-            //현재 인덱스(i)가 큐에 있는 유닛 수 보다 작으면 해당 슬롯은 사용중
-            if(i < queuedCount)
-            {
-                //토글을 on 상태로 만든다.
-                queueSlots[i].SetIsOnWithoutNotify(true);
-            }
-            else
-            {
-                //해당 슬롯은 비어있으므로 토글을 off
-                queueSlots[i].SetIsOnWithoutNotify(false);
-            }
-        }
-
-    }
-    private void UpdateProductionSlider(float progress)
-    {
-        if(productionSlider != null)
-        {
-            productionSlider.value = progress;
-        }
+        currentState = PlayerActionState.PlacingTurret;
+        turretPrefabToPlace = turretPrefab;
+        ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
     }
 
+    // 터렛 판매 버튼에서 호출
+    public void EnterTurretSellMode()
+    {
+        currentState = PlayerActionState.SellingTurret;
+        turretPrefabToPlace = null;
+        ShowInfoText("Select a turret to sell. (Right-click to cancel)");
+    }
 
+    // 터렛 건설/판매 성공 또는 취소 시 호출
+    public void CancelPlayerAction()
+    {
+        currentState = PlayerActionState.None;
+        turretPrefabToPlace = null;
+        HideInfoText();
+    }
+
+    // 터렛 슬롯 추가 버튼에서 호출
+    public void OnClick_AddTurretSlotButton()
+    {
+        int slotCost = 100; // 비용은 InGameManager나 다른 데이터 시트에서 관리하는 것이 더 좋음
+        if (InGameManager.Instance.SpendGold(slotCost))
+        {
+            ShowInfoText("Turret Slot Added!");
+            // TODO: BaseController에 슬롯 추가를 요청하는 로직
+            // 예: InGameManager.Instance.GetPlayerBase().AddNewSlot();
+        }
+        else
+        {
+            ShowInfoText("Not Enough Gold to Add Turret Slot!");
+        }
+    }
+    #endregion
 }
