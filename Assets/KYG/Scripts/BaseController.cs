@@ -93,6 +93,7 @@ namespace KYG
 
         private void UpdateHpUI() => OnHpChanged?.Invoke(currentHP, maxHP); // UI로 HP 갱신 이벤트
         
+
         /// <summary>
         /// 데미지를 받으면 해당 공력력 만큼 현재체력 감소
         /// 체력 UI에 기지 체력 연동 필요
@@ -127,6 +128,7 @@ namespace KYG
                 BaseDestroyed();
             }
         }
+
         
         /// <summary>
         /// HP 감소 로직
