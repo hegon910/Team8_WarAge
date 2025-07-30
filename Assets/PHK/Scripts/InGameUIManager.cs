@@ -15,6 +15,7 @@ public class InGameUIManager : MonoBehaviour
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI expText;
     public Slider baseHpSlider;
+    public Slider GuestBaseHpSlider;
     public Button evolveButton; // 시대 발전 버튼 참조
 
     [Header("유닛 생산 큐")]
@@ -62,7 +63,8 @@ public class InGameUIManager : MonoBehaviour
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
             InGameManager.Instance.OnBaseHealthChanged += UpdateBaseHpUI;
-            InGameManager.Instance.OnInfoMessage += ShowInfoText;
+            //게스트 베이스 HP 처리
+            InGameManager.Instance.OnBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
         }
 
@@ -122,6 +124,14 @@ public class InGameUIManager : MonoBehaviour
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
+        }
+    }
+
+    public void UpdateGuestBaseUI(int currentHp, int maxHp)
+    {
+        if (GuestBaseHpSlider != null && maxHp > 0)
+        {
+            GuestBaseHpSlider.value = (float)currentHp / maxHp;
         }
     }
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 431238563583722832}
   - component: {fileID: 1666037119960961727}
   - component: {fileID: 1532923211078002510}
+  - component: {fileID: 4619045415523740582}
   m_Layer: 0
   m_Name: PlayerCameraPrefab
   m_TagString: MainCamera
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 389628679941489670}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -24.44, y: 0, z: -10}
+  m_LocalPosition: {x: -24.44, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -106,3 +107,23 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &4619045415523740582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 389628679941489670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe5b1ca12dce98468c600b824fd0e0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 3
+  edgeThreshold: 20
+  maxSpeed: 30
+  acceleration: 8
+  spawnPointP1: {fileID: 7827294884128509022, guid: ca304959f6f018f40ac798ec916296f6, type: 3}
+  spawnPointP2: {fileID: 3263421618889891868, guid: 3e7575f34e841b74e8c11b3d3dde5f40, type: 3}
+  minX: -20
+  maxX: 20

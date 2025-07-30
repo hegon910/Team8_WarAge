@@ -515,7 +515,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loginSceneName: JWH_LoginScene
   lobbySceneName: JWH_LobbyScene
-  gameSceneName: JWH_GameScene
+  gameSceneName: PHG_NetWorkInGameTest
 --- !u!4 &737277722
 Transform:
   m_ObjectHideFlags: 0

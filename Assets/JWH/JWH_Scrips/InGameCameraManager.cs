@@ -10,7 +10,7 @@ public class InGameCameraManager : MonoBehaviourPunCallbacks
     public override void OnEnable()
     {
         base.OnEnable();//카메라 강제로 끄기
-        DisableCameras();
+      //  DisableCameras();
     }
 
     public override void OnDisable()
@@ -55,23 +55,23 @@ public class InGameCameraManager : MonoBehaviourPunCallbacks
     }
 
 
-    private void DisableCameras()//원래있는 카메라 끄기
-    {
-        Camera[] sceneCameras = FindObjectsOfType<Camera>();
-        foreach (Camera cam in sceneCameras)
-        {
-            if (cam.gameObject != this.gameObject && cam.GetComponent<PhotonView>() == null)
-            {
-                cam.enabled = false;
-                AudioListener audioListener = cam.GetComponent<AudioListener>();
-                if (audioListener != null)
-                {
-                    audioListener.enabled = false;
-                }
-                Debug.Log($"기본 씬 카메라 비활성화: {cam.gameObject.name}");
-            }
-        }
-    }
+   // private void DisableCameras()//원래있는 카메라 끄기
+   // {
+   //     Camera[] sceneCameras = FindObjectsOfType<Camera>();
+   //     foreach (Camera cam in sceneCameras)
+   //     {
+   //         if (cam.gameObject != this.gameObject && cam.GetComponent<PhotonView>() == null)
+   //         {
+   //             cam.enabled = false;
+   //             AudioListener audioListener = cam.GetComponent<AudioListener>();
+   //             if (audioListener != null)
+   //             {
+   //                 audioListener.enabled = false;
+   //             }
+   //             Debug.Log($"기본 씬 카메라 비활성화: {cam.gameObject.name}");
+   //         }
+   //     }
+   // }
 
     private void EnableOnlyMyCamera()//내카메라켜고 다른 카메가 끄기
     {
@@ -119,11 +119,11 @@ public class InGameCameraManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient) //마스터클라이언트의 경우
         {
-            return new Vector3(-10f, 5f, -10f); // 왼쪽
+            return new Vector3(-10f, 0f, -10f); // 왼쪽
         }
         else //나머지
         {
-            return new Vector3(10f, 5f, -10f); // 오른쪽
+            return new Vector3(10f, 0f, -10f); // 오른쪽
         }
     }
 }
