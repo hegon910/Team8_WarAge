@@ -513,8 +513,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loginSceneName: JWH_LoginScene
-  lobbySceneName: JWH_LobbyScene
-  roomSceneName: JWH_RoomScene
   gameSceneName: JWH_GameScene
 --- !u!4 &737277722
 Transform:

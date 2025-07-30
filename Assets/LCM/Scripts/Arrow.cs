@@ -1,7 +1,9 @@
+using KYG;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Arrow : MonoBehaviourPun
 {
@@ -23,6 +25,7 @@ public class Arrow : MonoBehaviourPun
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;
+        this.maxRange = maxRange;
         startPosition = transform.position;
 
         rb.velocity = moveDirection.normalized * speed;
@@ -51,25 +54,49 @@ public class Arrow : MonoBehaviourPun
             {
                 Debug.Log($"{gameObject.name}이 최대 사거리 ({maxRange})에 도달하여 파괴됩니다.");
                 PhotonNetwork.Destroy(gameObject);
-                return; 
+                return;
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!photonView.IsMine) return;
+        Debug.Log("충돌발생");
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        {
+
+        }
+        else 
+        {
+            if (!photonView.IsMine) return; 
+        }
 
 
         UnitController targetUnit = other.GetComponent<UnitController>();
-
-
-        if (targetUnit != null)
+        BaseController targetBase = other.GetComponent<BaseController>();
+        if (other.CompareTag(ownerTag) == false)
         {
-            if(other.CompareTag(ownerTag) == false)
+            if (targetUnit != null)
             {
-                targetUnit.TakeDamage(damage);
-                Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                string opponentUnitTag = (ownerTag == "P1") ? "P2" : "P1";
+                if (other.CompareTag(opponentUnitTag))
+                {
+                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, damage);
+                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                }
+            }
+            else if (targetBase != null) 
+            {
+                string opponentBaseTag = (ownerTag == "P1") ? "BaseP2" : "BaseP1";
+                if (other.CompareTag(opponentBaseTag))
+                {
+                    targetBase.TakeDamage(damage,ownerTag);
+                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                }
+            }
+            Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+            if (photonView.IsMine) 
+            {
                 PhotonNetwork.Destroy(gameObject);
             }
         }

@@ -1,3 +1,4 @@
+using KYG;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    private int currentHealth;
+    public int currentHealth;
     private Transform currentTarget;
     private float attackCooldownTimer;
 
@@ -22,9 +23,12 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
     public bool IsMine => photonView.IsMine;
 
+    private InGameManager gm;
+
     private void Awake()
     {
         currentHealth = unitdata.health;
+        gm = InGameManager.Instance;
 
         if (rb == null)
         {
@@ -38,12 +42,11 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         PhotonView photonView = GetComponent<PhotonView>();
+        
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
             this.gameObject.tag = (string)photonView.InstantiationData[0];
             this.moveDirection = (Vector3)photonView.InstantiationData[1];
-
-
         }
     }
     private void Start()
@@ -51,6 +54,19 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (gameObject.tag == "P2")
         {
             spriteRenderer.flipX = !spriteRenderer.flipX; // P2 유닛은 스프라이트를 뒤집음
+        }
+
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        {
+
+            if (gameObject.CompareTag("P1"))
+            {
+                unitLayer = LayerMask.GetMask("P1Unit");
+            }
+            else if (gameObject.CompareTag("P2"))
+            {
+                unitLayer = LayerMask.GetMask("P2Unit");
+            }
         }
     }
 
@@ -65,6 +81,10 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (currentTarget == null || !IsTargetInRange()) 
         {
             FindTarget();
+            if (currentTarget != null)
+            {
+                Debug.Log($"{currentTarget.name}");
+            }
             if (currentTarget == null || !IsTargetInRange())
             {
                 Move();
@@ -79,7 +99,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             Attack(currentTarget);
         }
     }
-
     // ---------- 네트워크 구현 -------------
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -119,36 +138,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
-
-    //[PunRPC]
-    //public void RpcSetPlayerProps(string playerTag, Vector3 initialMoveDirection)
-    //{
-    //    gameObject.tag = playerTag; 
-    //    moveDirection = initialMoveDirection; 
-
-    //    Debug.Log($"{gameObject.name}의 태그가 {playerTag}로 설정되고, 방향은 {moveDirection}입니다.");
-
-    //    if (spriteRenderer != null)
-    //    {
-    //        if (playerTag == "P1")
-    //        {
-    //            spriteRenderer.flipX = true; // P1은 기본 방향 (오른쪽)
-    //        }
-    //        else if (playerTag == "P2")
-    //        {
-    //            spriteRenderer.flipX = false; // P2는 이미지 플립 (왼쪽)
-    //        }
-    //    }
-    //    else
-    //    {
-    //        Debug.LogWarning($"{gameObject.name}에 SpriteRenderer가 없습니다. 이미지를 플립할 수 없습니다.");
-    //    }
-
-    //}
-
-    // --------------------------------------------------------
-
-
     //---------- 이동 -----------------
     private void Move()
     {
@@ -176,36 +165,58 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         rb.MovePosition(transform.position + moveDirection * unitdata.moveSpeed * Time.deltaTime);
     }
-
     private bool CanMove()
     {
         return currentHealth > 0;
     }
-
-    //-----------------------------------
-
-
     //----------- 공격 ------------------
-
     private void FindTarget()
     {
-        string targetTag = CompareTag("P1") ? "P2" : "P1";
+        Debug.Log("FindTarget 호출");
+        string opponentUnitTag = CompareTag("P1") ? "P2" : "P1";
+        string opponentBaseTag = CompareTag("P1") ? "BaseP2" : "BaseP1";
 
-        GameObject[] potentialTargets = GameObject.FindGameObjectsWithTag(targetTag);
+        Transform newTarget = null;
+        float closestDistance = Mathf.Infinity;
 
-        Transform closestTarget = null;
-        float minDistance = Mathf.Infinity;
-
-        foreach (GameObject go in potentialTargets)
+        GameObject[] enemyUnits = GameObject.FindGameObjectsWithTag(opponentUnitTag);
+        foreach (GameObject go in enemyUnits)
         {
             float distance = Vector3.Distance(transform.position, go.transform.position);
-            if (distance < minDistance)
+            if (distance < closestDistance)
             {
-                minDistance = distance;
-                closestTarget = go.transform;
+                Debug.Log("유닛 설정");
+                closestDistance = distance;
+                newTarget = go.transform;
             }
         }
-        SetTarget(closestTarget);
+
+        if (newTarget == null)
+        {
+            GameObject enemyBaseGO = GameObject.FindGameObjectWithTag(opponentBaseTag);
+            if (enemyBaseGO != null)
+            {
+                float distanceToBase = Vector3.Distance(transform.position, enemyBaseGO.transform.position);
+                if (unitdata.unitType == UnitType.Melee)
+                {
+                    if (distanceToBase <= unitdata.MeleeRange)
+                    {
+                        newTarget = enemyBaseGO.transform;
+                        closestDistance = distanceToBase;
+                    }
+                }
+                else if (unitdata.unitType == UnitType.Ranged)
+                {
+                    if (distanceToBase <= unitdata.rangedrange)
+                    {
+                        newTarget = enemyBaseGO.transform;
+                        closestDistance = distanceToBase;
+                    }
+                }
+            }
+        }
+        
+        SetTarget(newTarget);
     }
     private bool IsTargetInRange()
     {
@@ -241,10 +252,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 if (attackCooldownTimer <= 0)
                 {
                     UnitController targetUnit = target.GetComponent<UnitController>();
+                    BaseController targetBase = target.GetComponent<BaseController>();
                     if (targetUnit != null)
                     {
                         targetUnit.TakeDamage(unitdata.attackDamage); 
                         Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
+                        Debug.Log($"남은 체력은 {currentHealth}");
+                    }
+                    else if (targetBase != null) 
+                    {
+                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
+                        Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
@@ -263,10 +281,16 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 if(attackCooldownTimer <= 0)
                 {
                     UnitController targetUnit = target.GetComponent<UnitController>();
+                    BaseController targetBase = target.GetComponent<BaseController>();
                     if (targetUnit != null)
                     {
                         targetUnit.TakeDamage(unitdata.attackDamage); // 목표에게 데미지 적용
                         Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
+                    }
+                    else if (targetBase != null)
+                    {
+                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
+                        Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
@@ -275,17 +299,22 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if(attackCooldownTimer <= 0)
                 {
-                    string spawnerTag = gameObject.tag;
-                    Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
-
-                    GameObject ArrowGo = PhotonNetwork.Instantiate("Arrow", ArrowSpawnPos, Quaternion.identity);
-
-                    Arrow arrow = ArrowGo.GetComponent<Arrow>();
-                    if (arrow != null)
+                    if (photonView.IsMine) // 이 유닛의 소유자 클라이언트만 화살을 생성
                     {
-                        arrow.photonView.RPC("InitializeProjectile", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage);
+                        string spawnerTag = gameObject.tag;
+                        Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
+                        string arrowPrefabName = unitdata.ArrowPrefab.name;
+                        GameObject ArrowGo = PhotonNetwork.Instantiate(arrowPrefabName, ArrowSpawnPos, Quaternion.identity);
+                        Arrow arrow = ArrowGo.GetComponent<Arrow>();
+
+                        if (arrow != null)
+                        {
+                            // Instantiate를 호출한 클라이언트가 소유자가 되므로, 이 RPC는 RpcTarget.All로 보내도 됩니다.
+                            arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
+                        }
+
+                        Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     }
-                    Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
                 }
             }
@@ -295,34 +324,60 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
     }
-    private bool CanAttack()
-    {
-        return currentHealth > 0 && attackCooldownTimer <= 0 && currentTarget != null;
-    }
-
     //-------------------------------------
 
     //--------- 체력 및 사망 --------------
     public void TakeDamage(int amount)
     {
-        if (!IsMine) return;
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        {
+            // 디버그 모드에서는 소유권 검사 없이 바로 데미지 적용
+            currentHealth -= amount;
+            Debug.Log($"[DebugMode] {gameObject.name}의 체력 감소: {amount}, 현재 체력: {currentHealth}");
+        }
+        else // 실제 네트워크 모드에서는 기존의 소유권 검사를 유지하거나 RPC 방식으로 전환
+        {
+            if (!IsMine) return; // 유닛의 소유자만 체력 감소 가능
+            currentHealth -= amount;
+            Debug.Log($"[NetworkMode] {gameObject.name}의 체력 감소: {amount}, 현재 체력: {currentHealth}");
+        }
 
+        if (currentHealth < 0)
+        {
+            if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+            {
+                if (gm != null)
+                {
+                    gm.AddExp(unitdata.unitExp);
+                }
+                Destroy(gameObject, 1f);
+                Debug.Log($"[DebugMode] {gameObject.name} 사망 처리");
+            }
+            else
+            {
+                // 네트워크 모드에서는 RPC 호출
+                photonView.RPC("RpcDie", RpcTarget.All);
+            }
+        }
+    }
+
+    [PunRPC]
+    public void RpcTakeDamage(int amount)
+    {
         currentHealth -= amount;
 
-        if(currentHealth < 0)
+        if (currentHealth < 0)
         {
             photonView.RPC("RpcDie", RpcTarget.All);
         }
     }
 
-
     [PunRPC]
     private void RpcDie()
     {
+        gm.AddExp(unitdata.unitExp);
+        Debug.Log($"유닛 경험치 추가{unitdata.unitExp}");
         Destroy(gameObject, 2f);
     }
-
-    
-
     
 }
