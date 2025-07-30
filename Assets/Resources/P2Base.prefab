@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3263421618889891868}
   - component: {fileID: 3603166453519421250}
   - component: {fileID: 7859681413816368356}
-  - component: {fileID: -7982181458623366182}
+  - component: {fileID: -5649184052994296015}
   m_Layer: 9
   m_Name: P2Base
   m_TagString: Untagged
@@ -132,7 +132,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 7.607831, y: 6.007881}
   m_EdgeRadius: 0
---- !u!114 &-7982181458623366182
+--- !u!114 &-5649184052994296015
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,12 +141,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1964809442947762113}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd9d18ff9727264e9b24ba495b79249, type: 3}
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 0
-  spawnerPoint: {fileID: 0}
-  unitPrefab: {fileID: 0}
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &4926639495809154130
 GameObject:
   m_ObjectHideFlags: 0

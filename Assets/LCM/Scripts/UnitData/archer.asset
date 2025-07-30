@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: archer
   m_EditorClassIdentifier: 
   unitName: Archer
+  unitExp: 70
   health: 80
   attackDamage: 80
   rangedDamage: 14
@@ -24,5 +25,6 @@ MonoBehaviour:
   goldCost: 75
   unitSprite: {fileID: 0}
   description: MedievalArcher
+  ArrowPrefab: {fileID: 0}
   unitType: 1
   eraType: 1

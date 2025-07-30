@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: slingshotman
   m_EditorClassIdentifier: 
   unitName: slingshotman
-  unitExp: 0
+  unitExp: 50
   health: 42
   attackDamage: 10
   rangedDamage: 8
-  MeleeRange: 1
+  MeleeRange: 20
   rangedrange: 10
   attackSpeed: 1
   SpawnTime: 3

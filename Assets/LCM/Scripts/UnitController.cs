@@ -299,7 +299,10 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if(attackCooldownTimer <= 0)
                 {
-                    if (photonView.IsMine) // 이 유닛의 소유자 클라이언트만 화살을 생성
+
+
+
+                    if (photonView.IsMine)
                     {
                         string spawnerTag = gameObject.tag;
                         Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
