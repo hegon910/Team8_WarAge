@@ -261,7 +261,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     }
                     else if (targetBase != null) 
                     {
-                        targetBase.TakeDamage(unitdata.attackDamage);
+                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
                         Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
@@ -289,7 +289,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     }
                     else if (targetBase != null)
                     {
-                        targetBase.TakeDamage(unitdata.attackDamage);
+                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
                         Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
