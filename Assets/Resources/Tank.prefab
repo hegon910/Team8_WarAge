@@ -176,6 +176,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: 53e47e8a78b834841a66e156661fb300, type: 2}
   rb: {fileID: 631968976436225276}
   spriteRenderer: {fileID: 0}
+  currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
     serializedVersion: 2

@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: kr
+  DevRegion: jp
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -48,6 +48,7 @@ MonoBehaviour:
   - InitializeArrow
   - RPC_RepositionTurretSlots
   - 
+  - RpcTakeDamage
   DisableAutoOpenWizard: 1
   ShowSettings: 0
-  DevRegionSetOnce: 0
+  DevRegionSetOnce: 1
