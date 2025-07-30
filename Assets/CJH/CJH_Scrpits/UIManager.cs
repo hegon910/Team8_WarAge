@@ -119,8 +119,14 @@ public class UIManager : MonoBehaviour
     {
         PhotonManager.Instance.CreateOrJoinLobby();
         Debug.Log("Å¬¸¯");
+        
     }
 
+    public void CreateRoom()
+    {
+        roomPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
+    }
     public void OnClickedLobbyCancel()
     {
         loginPanel.SetActive(true);

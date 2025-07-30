@@ -46,7 +46,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-            CreateOrJoinLobby();
+        // 방 제목 null 아닐 때
+        // 채팅 활성화
+        // 전적 활성화
+        // 방 목록 활성화
     }
 
     public void CreateOrJoinLobby()// �� ���� ����� ������
@@ -59,9 +62,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             return;
         }
 
+        UIManager.Instance.CreateRoom();
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
         Debug.Log("JoinOrCreateRoom ȣ��");
+
     }
 
     public void SetLocalPlayerReady(bool ready)
