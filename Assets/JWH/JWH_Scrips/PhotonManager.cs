@@ -10,7 +10,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public static PhotonManager Instance;
 
     [SerializeField] private string loginSceneName = "JWH_LoginScene";
-    [SerializeField] private string lobbySceneName = "JWH_LobbyScene";
     [SerializeField] private string gameSceneName = "JWH_GameScene";
 
     void Awake()
@@ -34,6 +33,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             OnConnectedToMaster();
             return;
         }
+        Debug.Log("서버연결");
         PhotonNetwork.NickName = nickname;
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -41,11 +41,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinLobby();
+        UIManager.Instance.Connect();
     }
 
     public override void OnJoinedLobby()
     {
-        SceneManager.LoadScene(lobbySceneName);
         CreateOrJoinLobby();
     }
 

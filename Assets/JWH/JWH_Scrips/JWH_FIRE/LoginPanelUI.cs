@@ -31,6 +31,11 @@ public class LoginPanel : MonoBehaviour
 
     private void Login()
     {
+        Login(idInput.text);
+    }    
+
+    private void Login(string nickname)
+    {
         UserAuthService.Instance.Login(idInput.text, passInput.text, (success, user) =>
         {
             if (!success) return;
@@ -40,7 +45,7 @@ public class LoginPanel : MonoBehaviour
                 if (string.IsNullOrEmpty(user.DisplayName))
                     nicknamePanel.SetActive(true);
                 else
-                    UIManager.Instance.OnClickedNicknameConfirm();
+                    UIManager.Instance.OnClickedNicknameConfirm(nickname);
             }
             else
             {
