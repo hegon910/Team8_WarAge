@@ -52,7 +52,7 @@ namespace KYG
             else if (target.TryGetComponent(out UnitController unitCtrl))
             {
                 // 유닛은 기존 TakeDamage 사용 (UnitController 내부에서 아군 방어 가능)
-                unitCtrl.TakeDamage(damage, attackerActorNumber);
+                unitCtrl.TakeDamage(damage);
             }
             
             // 소유자만 발사체 제거 권한 있음
