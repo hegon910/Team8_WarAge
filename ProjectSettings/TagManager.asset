@@ -6,6 +6,8 @@ TagManager:
   tags:
   - P1
   - P2
+  - BaseP1
+  - BaseP2
   layers:
   - Default
   - TransparentFX

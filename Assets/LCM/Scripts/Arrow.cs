@@ -1,7 +1,9 @@
+using KYG;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Arrow : MonoBehaviourPun
 {
@@ -71,12 +73,32 @@ public class Arrow : MonoBehaviourPun
 
 
         UnitController targetUnit = other.GetComponent<UnitController>();
-
-            if(other.CompareTag(ownerTag) == false)
+        BaseController targetBase = other.GetComponent<BaseController>();
+        if (other.CompareTag(ownerTag) == false)
+        {
+            if (targetUnit != null)
             {
-                targetUnit.TakeDamage(damage);
-                Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
-                PhotonNetwork.Destroy(gameObject); 
+                string opponentUnitTag = (ownerTag == "P1") ? "P2" : "P1";
+                if (other.CompareTag(opponentUnitTag))
+                {
+                    targetUnit.TakeDamage(damage);
+                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                }
             }
+            else if (targetBase != null) 
+            {
+                string opponentBaseTag = (ownerTag == "P1") ? "BaseP2" : "BaseP1";
+                if (other.CompareTag(opponentBaseTag))
+                {
+                    targetBase.TakeDamage(damage,ownerTag);
+                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                }
+            }
+            Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+            if (photonView.IsMine) 
+            {
+                PhotonNetwork.Destroy(gameObject);
+            }
+        }
     }
 }
