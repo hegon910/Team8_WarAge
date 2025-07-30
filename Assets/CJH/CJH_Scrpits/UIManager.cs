@@ -79,15 +79,21 @@ public class UIManager : MonoBehaviour
         emailPanel.SetActive(false);
     }
 
-    public void OnClickedNicknameConfirm()
+    public void OnClickedNicknameConfirm(string nickname)
     {
-        lobbyPanel.SetActive(true);
-        loginPanel.SetActive(false);
+        PhotonManager.Instance.ConnectToServer(nickname);
     }
+
     public void OnClickedNicknameBack()
     {
         loginPanel.SetActive(true);
         nicknamePanel.SetActive(false);
+    }
+
+    public void Connect()
+    {
+        lobbyPanel.SetActive(true);
+        loginPanel.SetActive(false);
     }
 
     public void OnClickedSignup()
@@ -109,12 +115,18 @@ public class UIManager : MonoBehaviour
         signUpPanel.SetActive(false);
     }
  
-    public void OnClickedCreatRoom()
+    public void OnClickedCreateRoom()
+    {
+        PhotonManager.Instance.CreateOrJoinLobby();
+        Debug.Log("Å¬¸¯");
+        
+    }
+
+    public void CreateRoom()
     {
         roomPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
-
     public void OnClickedLobbyCancel()
     {
         loginPanel.SetActive(true);

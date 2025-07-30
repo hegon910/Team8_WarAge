@@ -15,7 +15,12 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
+<<<<<<< HEAD
         PhotonNetwork.JoinOrCreateRoom("Room1", new RoomOptions { MaxPlayers = 2 }, null);
+=======
+        Debug.Log("OnConnectedToMaster: 마스터 서버 연결됨. PhotonNetwork.IsConnected = " + PhotonNetwork.IsConnected);
+        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions { MaxPlayers = 2 }, null);
+>>>>>>> main
     }
 
     // '나 자신'이 룸에 들어왔을 때 각자 한 번씩 호출됩니다.

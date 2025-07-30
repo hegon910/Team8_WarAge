@@ -11,7 +11,11 @@ GameObject:
   - component: {fileID: 431238563583722832}
   - component: {fileID: 1666037119960961727}
   - component: {fileID: 1532923211078002510}
+<<<<<<< HEAD:Assets/Resources/PlayerCameraPrefab.prefab
   - component: {fileID: 4619045415523740582}
+=======
+  - component: {fileID: -7182411276355276487}
+>>>>>>> main:Assets/JWH/JWH_Prefabs/PlayerCameraPrefab.prefab
   m_Layer: 0
   m_Name: PlayerCameraPrefab
   m_TagString: MainCamera
@@ -107,7 +111,11 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+<<<<<<< HEAD:Assets/Resources/PlayerCameraPrefab.prefab
 --- !u!114 &4619045415523740582
+=======
+--- !u!114 &-7182411276355276487
+>>>>>>> main:Assets/JWH/JWH_Prefabs/PlayerCameraPrefab.prefab
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,7 +131,12 @@ MonoBehaviour:
   edgeThreshold: 20
   maxSpeed: 30
   acceleration: 8
+<<<<<<< HEAD:Assets/Resources/PlayerCameraPrefab.prefab
   spawnPointP1: {fileID: 4736705230234108627, guid: 4483ba5f5221a1e4e98a073c0d201f42, type: 3}
   spawnPointP2: {fileID: 24661455319403069, guid: d166d09e77ab00649a9eb4dc3f223a78, type: 3}
+=======
+  spawnPointP1: {fileID: 0}
+  spawnPointP2: {fileID: 0}
+>>>>>>> main:Assets/JWH/JWH_Prefabs/PlayerCameraPrefab.prefab
   minX: -20
   maxX: 20

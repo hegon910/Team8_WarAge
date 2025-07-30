@@ -47,6 +47,11 @@ MonoBehaviour:
   - RpcDie
   - InitializeArrow
   - RPC_RepositionTurretSlots
+<<<<<<< HEAD
+=======
+
+  - RpcTakeDamage
+>>>>>>> main
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
