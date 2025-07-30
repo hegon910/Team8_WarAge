@@ -31,6 +31,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private int currentEXP;
     private int currentBaseHealth;
     private PhotonView photonView;
+    private string teamTag;
 
     // --- 이벤트 ---
     public event Action<KYG.AgeData> OnAgeEvolved;
@@ -59,6 +60,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
         currentGold = startingGold;
         currentEXP = 0;
         currentBaseHealth = maxBaseHealth;
+        if(isDebugMode) teamTag = isDebugHost ? "P1" : "P2";
+        else teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
 
         // 초기 게임 상태를 이벤트로 UI에 반영
         OnResourceChanged?.Invoke(currentGold, currentEXP);
@@ -67,7 +70,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
         if (ageManager != null)
         {
-            ageManager.OnAgeChanged += HandleAgeChanged;
+            ageManager.OnAgeChangedByTeam += HandleAgeChanged;
         }
         else
         {
@@ -82,7 +85,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     {
         if (ageManager != null)
         {
-            ageManager.OnAgeChanged -= HandleAgeChanged;
+            ageManager.OnAgeChangedByTeam -= HandleAgeChanged;
         }
     }
 
@@ -145,7 +148,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     {
         if (isDebugMode)
         {
-            ageManager.TryUpgradeAge(currentEXP);
+            ageManager.TryUpgradeAge(teamTag, currentEXP);
         }
         else
         {
@@ -166,17 +169,18 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private void RPC_ConfirmEvolve(int targetPlayerActorNumber)
     {
         Debug.Log($"{targetPlayerActorNumber}번 플레이어의 시대 발전 확정 RPC 수신");
+        string teamTag = (targetPlayerActorNumber == 1) ? "P1" : "P2";
         if (targetPlayerActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
         {
-            ageManager.TryUpgradeAge(currentEXP);
+            ageManager.TryUpgradeAge(teamTag, currentEXP);
         }
         else
         {
-            Debug.Log($"다른 플레이어({targetPlayerActorNumber})의 시대 발전을 확인했습니다.");
+            Debug.Log($"다른 플레이어({targetPlayerActorNumber}, 팀: {teamTag})의 시대 발전을 확인했습니다.");
         }
     }
 
-    private void HandleAgeChanged(KYG.AgeData newAgeData)
+    private void HandleAgeChanged(string teamtag, KYG.AgeData newAgeData)
     {
         Debug.Log($"[InGameManager] AgeData 수신. 유닛 수: {newAgeData.spawnableUnits.Count}");
 

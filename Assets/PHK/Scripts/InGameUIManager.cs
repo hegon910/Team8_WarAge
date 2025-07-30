@@ -64,6 +64,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnBaseHealthChanged += UpdateBaseHpUI;
             InGameManager.Instance.OnInfoMessage += ShowInfoText;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
+            InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
         }
 
         // UI 초기화
@@ -95,6 +96,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnBaseHealthChanged -= UpdateBaseHpUI;
             InGameManager.Instance.OnInfoMessage -= ShowInfoText;
             InGameManager.Instance.OnEvolveStatusChanged -= UpdateEvolveButton;
+            InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
         }
     }
     private void Update()
@@ -108,6 +110,12 @@ public class InGameUIManager : MonoBehaviour
                 CancelPlayerAction();
             }
         }
+    }
+    private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
+    {
+        // 예: 시대가 변경되었음을 알리는 텍스트 업데이트
+        Debug.Log($"UI UPDATE: New Age - {newAgeData.ageType}");
+        // 여기에 새로운 시대 정보(newAgeData)를 바탕으로 UI를 갱신하는 코드를 작성
     }
 
     #region UI 업데이트 함수 (이벤트 수신)
