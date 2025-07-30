@@ -81,7 +81,7 @@ public class Arrow : MonoBehaviourPun
                 string opponentUnitTag = (ownerTag == "P1") ? "P2" : "P1";
                 if (other.CompareTag(opponentUnitTag))
                 {
-                    targetUnit.TakeDamage(damage);
+                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, damage);
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
