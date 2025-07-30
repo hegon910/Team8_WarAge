@@ -297,20 +297,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             }
             else if(distanceToTarget <= unitdata.rangedrange)
             {
-                if(attackCooldownTimer <= 0)
-                {
-<<<<<<< HEAD
-                    string spawnerTag = gameObject.tag;
-                    Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
 
-                    string arrowPrefabName = unitdata.ArrowPrefab.name;
-                    GameObject ArrowGo = PhotonNetwork.Instantiate(arrowPrefabName, ArrowSpawnPos, Quaternion.identity);
-                    Arrow arrow = ArrowGo.GetComponent<Arrow>();
-
-                    if (arrow != null)
-=======
-                    if (photonView.IsMine) // 이 유닛의 소유자 클라이언트만 화살을 생성
->>>>>>> main
+                    if (photonView.IsMine)
                     {
                         string spawnerTag = gameObject.tag;
                         Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
@@ -327,7 +315,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                         Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     }
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
-                }
+                
             }
             else
             {
