@@ -62,9 +62,9 @@ public class InGameUIManager : MonoBehaviour
         if (InGameManager.Instance != null)
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
-            InGameManager.Instance.OnBaseHealthChanged += UpdateBaseHpUI;
+            InGameManager.Instance.OnPlayerBaseHealthChanged += UpdateBaseHpUI;
             //게스트 베이스 HP 처리
-            InGameManager.Instance.OnBaseHealthChanged += UpdateGuestBaseUI;
+            InGameManager.Instance.OnOpponentBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
         }
@@ -95,10 +95,19 @@ public class InGameUIManager : MonoBehaviour
         if (InGameManager.Instance != null)
         {
             InGameManager.Instance.OnResourceChanged -= UpdateResourceUI;
-            InGameManager.Instance.OnBaseHealthChanged -= UpdateBaseHpUI;
+            InGameManager.Instance.OnPlayerBaseHealthChanged -= UpdateBaseHpUI;
+            InGameManager.Instance.OnOpponentBaseHealthChanged -= UpdateGuestBaseUI;
             InGameManager.Instance.OnInfoMessage -= ShowInfoText;
             InGameManager.Instance.OnEvolveStatusChanged -= UpdateEvolveButton;
-            InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
+            InGameManager.Instance.OnAgeEvolved -= HandleAgeEvolvedUI;
+            if (InGameManager.Instance.p1_Base != null)
+            {
+                InGameManager.Instance.p1_Base.OnHpChanged -= UpdateBaseHpUI;
+            }
+            if (InGameManager.Instance.p2_Base != null)
+            {
+                InGameManager.Instance.p2_Base.OnHpChanged -= UpdateGuestBaseUI;
+            }
         }
     }
     private void Update()
@@ -120,6 +129,27 @@ public class InGameUIManager : MonoBehaviour
         // 여기에 새로운 시대 정보(newAgeData)를 바탕으로 UI를 갱신하는 코드를 작성
     }
 
+    public void RegisterPlayerBase(KYG.BaseController playerBase)
+    {
+        if (playerBase != null)
+        {
+            // 내 HP 슬라이더를 '내 기지'의 체력 변경 이벤트에 연결
+        //    playerBase.OnHpChanged += UpdateBaseHpUI;
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
+            UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
+        }
+    }
+    public void RegisterOpponentBase(KYG.BaseController opponentBase)
+    {
+        if (opponentBase != null)
+        {
+            // 상대방 HP 슬라이더를 '상대 기지'의 체력 변경 이벤트에 연결
+         //   opponentBase.OnHpChanged += UpdateGuestBaseUI;
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
+            UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
+        }
+    }
+
     #region UI 업데이트 함수 (이벤트 수신)
     public void UpdateResourceUI(int newGold, int newExp)
     {
@@ -129,6 +159,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
+        Debug.LogError($"--- PLAYER UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
@@ -137,6 +168,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateGuestBaseUI(int currentHp, int maxHp)
     {
+        Debug.LogWarning($"--- OPPONENT UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (GuestBaseHpSlider != null && maxHp > 0)
         {
             GuestBaseHpSlider.value = (float)currentHp / maxHp;

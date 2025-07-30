@@ -123,7 +123,7 @@ MonoBehaviour:
   edgeThreshold: 20
   maxSpeed: 30
   acceleration: 8
-  spawnPointP1: {fileID: 7827294884128509022, guid: ca304959f6f018f40ac798ec916296f6, type: 3}
-  spawnPointP2: {fileID: 3263421618889891868, guid: 3e7575f34e841b74e8c11b3d3dde5f40, type: 3}
+  spawnPointP1: {fileID: 4736705230234108627, guid: 4483ba5f5221a1e4e98a073c0d201f42, type: 3}
+  spawnPointP2: {fileID: 24661455319403069, guid: d166d09e77ab00649a9eb4dc3f223a78, type: 3}
   minX: -20
   maxX: 20

@@ -302,7 +302,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     string spawnerTag = gameObject.tag;
                     Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
 
-                    GameObject ArrowGo = PhotonNetwork.Instantiate("Arrow", ArrowSpawnPos, Quaternion.identity);
+                    string arrowPrefabName = unitdata.ArrowPrefab.name;
+                    GameObject ArrowGo = PhotonNetwork.Instantiate(arrowPrefabName, ArrowSpawnPos, Quaternion.identity);
                     Arrow arrow = ArrowGo.GetComponent<Arrow>();
 
                     if (arrow != null)

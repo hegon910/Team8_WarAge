@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: dueler
   m_EditorClassIdentifier: 
   unitName: dueler
+  unitExp: 100
   health: 200
   attackDamage: 79
   rangedDamage: 0
@@ -24,5 +25,6 @@ MonoBehaviour:
   goldCost: 200
   unitSprite: {fileID: 0}
   description: IndustrialDueler
+  ArrowPrefab: {fileID: 0}
   unitType: 0
   eraType: 2
