@@ -47,6 +47,7 @@ MonoBehaviour:
   - RpcDie
   - InitializeArrow
   - RPC_RepositionTurretSlots
+
   - RpcTakeDamage
   DisableAutoOpenWizard: 1
   ShowSettings: 0
