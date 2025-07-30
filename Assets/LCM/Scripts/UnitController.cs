@@ -11,7 +11,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
     [SerializeField] private SpriteRenderer spriteRenderer;
 
-    private int currentHealth;
+    public int currentHealth;
     private Transform currentTarget;
     private float attackCooldownTimer;
 
@@ -299,18 +299,22 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if(attackCooldownTimer <= 0)
                 {
-                    string spawnerTag = gameObject.tag;
-                    Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
-
-                    GameObject ArrowGo = PhotonNetwork.Instantiate("Arrow", ArrowSpawnPos, Quaternion.identity);
-                    Arrow arrow = ArrowGo.GetComponent<Arrow>();
-
-                    if (arrow != null)
+                    if (photonView.IsMine) // 이 유닛의 소유자 클라이언트만 화살을 생성
                     {
-                        arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
-                    }
+                        string spawnerTag = gameObject.tag;
+                        Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
+                        string arrowPrefabName = unitdata.ArrowPrefab.name;
+                        GameObject ArrowGo = PhotonNetwork.Instantiate(arrowPrefabName, ArrowSpawnPos, Quaternion.identity);
+                        Arrow arrow = ArrowGo.GetComponent<Arrow>();
 
-                    Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
+                        if (arrow != null)
+                        {
+                            // Instantiate를 호출한 클라이언트가 소유자가 되므로, 이 RPC는 RpcTarget.All로 보내도 됩니다.
+                            arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
+                        }
+
+                        Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
+                    }
                     attackCooldownTimer = 1f/ unitdata.attackSpeed;
                 }
             }
@@ -354,6 +358,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 // 네트워크 모드에서는 RPC 호출
                 photonView.RPC("RpcDie", RpcTarget.All);
             }
+        }
+    }
+
+    [PunRPC]
+    public void RpcTakeDamage(int amount)
+    {
+        currentHealth -= amount;
+
+        if (currentHealth < 0)
+        {
+            photonView.RPC("RpcDie", RpcTarget.All);
         }
     }
 
