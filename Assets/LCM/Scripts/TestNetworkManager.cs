@@ -21,7 +21,7 @@ public class TestNetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-        //PhotonNetwork.Instantiate("ClubMan", Vector3.zero, Quaternion.identity);
+        
     }
 
 }

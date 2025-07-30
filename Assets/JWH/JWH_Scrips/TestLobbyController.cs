@@ -34,10 +34,16 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        //UpdateAllLobbyUI();
+    }
+
+    public override void OnJoinedRoom()
+    {
+        Debug.Log("방 입장 완료");
         UpdateAllLobbyUI();
     }
 
-    
+
     public override void OnJoinedLobby()
     {
         LoadLocalPlayerReadyState();

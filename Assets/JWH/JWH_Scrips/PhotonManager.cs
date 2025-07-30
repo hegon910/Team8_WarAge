@@ -33,7 +33,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             OnConnectedToMaster();
             return;
         }
-        Debug.Log("¼­¹ö¿¬°á");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         PhotonNetwork.NickName = nickname;
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -46,14 +46,22 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        //CreateOrJoinLobby();
+            CreateOrJoinLobby();
     }
 
-    public void CreateOrJoinLobby()// ¹æ ¸¸µç »ç¶÷ÀÌ ¸¶½ºÅÍ
+    public void CreateOrJoinLobby()// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
-        string LobbyName = "TestLobby";
+        Debug.Log("CreateOrJoinLobby È£ï¿½ï¿½");
+
+        if (!PhotonNetwork.InLobby)
+        {
+            Debug.LogWarning("ï¿½Îºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
+            return;
+        }
+
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom(LobbyName, options, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        Debug.Log("JoinOrCreateRoom È£ï¿½ï¿½");
     }
 
     public void SetLocalPlayerReady(bool ready)
@@ -64,7 +72,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public bool AreAllPlayersReady()
     {
-        if (!PhotonNetwork.InRoom) return false; // ¹æ¿¡ ¾øÀ¸¸é ÁØºñ »óÅÂ¸¦ È®ÀÎÇÒ ¼ö ¾øÀ½
+        if (!PhotonNetwork.InRoom) return false; // ï¿½æ¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Øºï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ È®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
         foreach (Player p in PhotonNetwork.PlayerList)
         {
@@ -84,11 +92,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
         else if (!PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning("½ÃÀÛ±ÇÇÑ ¾øÀ½");
+            Debug.LogWarning("ï¿½ï¿½ï¿½Û±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
         }
         else
         {
-            Debug.LogWarning("·¹µð¾ÈµÊ");
+            Debug.LogWarning("ï¿½ï¿½ï¿½ï¿½Èµï¿½");
         }
     }
 
@@ -101,7 +109,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            return new Player[0]; // ¹æ¿¡ ¾øÀ¸¸é ºó ¹è¿­ ¹ÝÈ¯
+            return new Player[0]; // ï¿½æ¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½è¿­ ï¿½ï¿½È¯
         }
     }
 }

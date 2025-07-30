@@ -34,9 +34,7 @@ namespace KYG.Editor
                 
                 AgeData ageData = ScriptableObject.CreateInstance<AgeData>(); // ScriptableObject 인스턴스 생성
                 ageData.ageType = age;
-                ageData.maxHP = 500; // 초기 체력 설정
-                ageData.requiredExp = 0; // 초기 경험치 설정
-                ageData.spawnableUnits = new List<GameObject>(); // 초기화
+                
                 
                 AssetDatabase.CreateAsset(ageData, assetPath); // 에셋 생성
 
