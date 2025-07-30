@@ -46,7 +46,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        CreateOrJoinLobby();
+        //CreateOrJoinLobby();
     }
 
     public void CreateOrJoinLobby()// 방 만든 사람이 마스터
