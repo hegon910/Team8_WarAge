@@ -46,14 +46,24 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        CreateOrJoinLobby();
+       
+            CreateOrJoinLobby();
+        
     }
 
     public void CreateOrJoinLobby()// 방 만든 사람이 마스터
     {
-        string LobbyName = "TestLobby";
+        Debug.Log("CreateOrJoinLobby 호출");
+
+        if (!PhotonNetwork.InLobby)
+        {
+            Debug.LogWarning("로비입장전");
+            return;
+        }
+
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom(LobbyName, options, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        Debug.Log("JoinOrCreateRoom 호출");
     }
 
     public void SetLocalPlayerReady(bool ready)
