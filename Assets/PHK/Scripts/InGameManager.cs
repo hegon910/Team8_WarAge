@@ -1,5 +1,6 @@
 using KYG;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -28,9 +29,11 @@ public class InGameManager : MonoBehaviourPunCallbacks
     [Header("게임 기본 설정")]
     [SerializeField] private int startingGold = 175;
 
+    private const string PLAYER_EXP_KEY = "PlayerExp"; // Photon Custom Properties 키
+
     // 현재 게임 상태 변수
     private int currentGold;
-    private int currentEXP;
+    //private int currentEXP; // 로컬 변수 대신 Photon Custom Properties 사용
     private PhotonView photonView;
     private string teamTag;
 
@@ -77,21 +80,30 @@ public class InGameManager : MonoBehaviourPunCallbacks
     {
         // 게임 상태 초기화
         currentGold = startingGold;
-        currentEXP = 0;
+        // 플레이어 커스텀 프로퍼티 초기화 (없으면 0으로 설정)
+        if (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(PLAYER_EXP_KEY))
+        {
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, 0 } });
+        }
+        else
+        {
+            // 이미 키가 있다면 명시적으로 0으로 초기화
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, 0 } });
+        }
         if (p1_Base != null) p1_Base.InitializeTeam("P1");
         if (p2_Base != null) p2_Base.InitializeTeam("P2");
         if (isDebugMode)
-    {
-        teamTag = isDebugHost ? "P1" : "P2";
-    }
-    else
-    {
-        teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
-    }
+        {
+            teamTag = isDebugHost ? "P1" : "P2";
+        }
+        else
+        {
+            teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
+        }
 
 
-        // 초기 게임 상태를 이벤트로 UI에 반영
-        OnResourceChanged?.Invoke(currentGold, currentEXP);
+        // 초기 골드 및 경험치 업데이트 (경험치는 CustomProperties에서 가져옴)
+        OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp());
         OnInfoMessage?.Invoke("Game Started!");
 
         if (ageManager != null)
@@ -102,16 +114,6 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("AgeManager가 할당되지 않았습니다! InGameManager의 Inspector에서 할당해주세요.");
         }
-      //  if (p1_Base != null)
-      //  {
-      //      // p1_Base의 이벤트는 P1용 핸들러에 연결
-      //      p1_Base.OnHpChanged += HandleP1BaseHpChanged;
-      //  }
-      //  if (p2_Base != null)
-      //  {
-      //      // p2_Base의 이벤트는 P2용 핸들러에 연결
-      //      p2_Base.OnHpChanged += HandleP2BaseHpChanged;
-      //  }
         // 게임 시작 시 시대 발전 버튼은 비활성화 상태로 시작
         OnEvolveStatusChanged?.Invoke(false);
         StartCoroutine(PassiveGoldGeneration());
@@ -131,27 +133,59 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             p2_Base.OnHpChanged -= HandleP2BaseHpChanged;
         }
-    
-}
+    }
+
+    // 플레이어 커스텀 프로퍼티 업데이트 콜백 재정의
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        // 플레이어의 경험치 프로퍼티가 변경되었을 때
+        if (changedProps.ContainsKey(PLAYER_EXP_KEY))
+        {
+            int updatedExp = (int)changedProps[PLAYER_EXP_KEY];
+
+            if (targetPlayer == PhotonNetwork.LocalPlayer)
+            {
+                // 내 경험치가 변경된 경우 UI 업데이트 및 시대 발전 체크
+                OnResourceChanged?.Invoke(currentGold, updatedExp); // 골드와 함께 경험치 UI 업데이트
+                CheckForAgeUp();
+                Debug.Log($"내 경험치 업데이트: {updatedExp}");
+            }
+            else
+            {
+                // 다른 플레이어의 경험치 변경은 현재 InGameManager에서 직접 처리하지 않음 (필요 시 추가)
+                Debug.Log($"다른 플레이어({targetPlayer.NickName})의 경험치 업데이트: {updatedExp}");
+            }
+        }
+    }
 
     private void Update()
     {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                AddGold(50); // 테스트용 골드 추가
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                AddExp(500); // 테스트용 경험치 추가
-            }
-        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            AddGold(50); // 테스트용 골드 추가
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            // 'G' 키로 경험치 추가 시 로컬 플레이어의 ActorNumber 사용
+            AddExp(PhotonNetwork.LocalPlayer.ActorNumber, 500); // 테스트용 경험치 추가
+        }
     }
 
     #region 자원 및 체력 관리 함수
+
+    public int GetLocalPlayerExp() // 로컬 플레이어의 경험치를 CustomProperties에서 가져옴
+    {
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            return (int)expValue;
+        }
+        return 0;
+    }
+
     public void AddGold(int amount)
     {
         currentGold += amount;
-        OnResourceChanged?.Invoke(currentGold, currentEXP);
+        OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp()); // 경험치 UI도 함께 업데이트
     }
 
     public bool SpendGold(int amount)
@@ -159,22 +193,84 @@ public class InGameManager : MonoBehaviourPunCallbacks
         if (currentGold >= amount)
         {
             currentGold -= amount;
-            OnResourceChanged?.Invoke(currentGold, currentEXP);
+            OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp()); // 경험치 UI도 함께 업데이트
             return true;
         }
         return false;
     }
-
-    public void AddExp(int amount)
+    /// <summary>
+    /// 특정 플레이어의 경험치를 추가하고 동기화.
+    /// 이 함수는 해당 경험치 획득의 주체가 되는 클라이언트에서 호출되어야 함.
+    /// 예: 유닛 처치 시 해당 유닛을 처치한 플레이어 클라이언트에서 호출
+    /// </summary>
+    /// <param name="targetPlayerActorNumber">경험치를 획득할 플레이어의 ActorNumber.</param>
+    /// <param name="amount">추가할 경험치 양.</param>
+    public void AddExp(int targetPlayerActorNumber, int amount)
     {
-        if (ageManager.GetNextAgeData() != null)
+        // 네트워크 모드에서만 RPC를 통해 경험치 업데이트 요청
+        if (!isDebugMode)
         {
-            currentEXP += amount;
-            OnResourceChanged?.Invoke(currentGold, currentEXP);
-            CheckForAgeUp();
-            Debug.Log($"{amount} 경험치 획득. 현재 경험치 : {currentEXP}");
+            // 마스터 클라이언트에게 경험치 업데이트 요청
+            photonView.RPC("RPC_AddExp", RpcTarget.MasterClient, targetPlayerActorNumber, amount);
+            Debug.Log($"경험치 추가 요청: 플레이어 {targetPlayerActorNumber}, 양: {amount}");
+        }
+        else // 디버그 모드에서는 로컬에서 직접 처리
+        {
+            Player targetPlayer = PhotonNetwork.LocalPlayer; // 디버그 모드에서는 로컬 플레이어 (나 자신)
+            if (targetPlayer.ActorNumber == targetPlayerActorNumber) // 요청된 플레이어가 로컬 플레이어인지 확인
+            {
+                int currentExp = 0;
+                if (targetPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+                {
+                    currentExp = (int)expValue;
+                }
+                int newExp = currentExp + amount;
+                ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
+                playerProps[PLAYER_EXP_KEY] = newExp;
+                targetPlayer.SetCustomProperties(playerProps); // 이 시점에서 OnPlayerPropertiesUpdate가 호출됨
+                OnResourceChanged?.Invoke(currentGold, newExp); // UI 업데이트
+                CheckForAgeUp(); // 시대 발전 체크
+                Debug.Log($"[DebugMode] 플레이어 {targetPlayerActorNumber}의 경험치 {amount} 추가. 현재 경험치: {newExp}");
+            }
+            else
+            {
+                Debug.LogWarning($"[DebugMode] AddExp: 요청된 ActorNumber({targetPlayerActorNumber})와 로컬 플레이어 ActorNumber({targetPlayer.ActorNumber})가 다릅니다. 경험치 추가를 건너뜁니다.");
+            }
         }
     }
+
+    [PunRPC]
+    private void RPC_AddExp(int targetPlayerActorNumber, int amount, PhotonMessageInfo info)
+    {
+        // 마스터 클라이언트만 이 RPC를 실행합니다.
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        Player targetPlayer = PhotonNetwork.CurrentRoom.GetPlayer(targetPlayerActorNumber);
+        if (targetPlayer == null)
+        {
+            Debug.LogError($"RPC_AddExp: 대상 플레이어 (ActorNumber: {targetPlayerActorNumber})를 찾을 수 없습니다.");
+            return;
+        }
+
+        // 현재 경험치를 가져와서 업데이트.
+        int currentExp = 0;
+        if (targetPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            currentExp = (int)expValue;
+        }
+
+        int newExp = currentExp + amount;
+
+        // 경험치 업데이트
+        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
+        playerProps[PLAYER_EXP_KEY] = newExp;
+        targetPlayer.SetCustomProperties(playerProps); // 이 시점에서 OnPlayerPropertiesUpdate가 모든 클라이언트에서 호출
+
+        Debug.Log($"마스터 클라이언트: 플레이어 {targetPlayerActorNumber}에게 {amount} 경험치 추가, 새 경험치: {newExp}");
+
+        // 시대 발전 체크는 각 클라이언트의 OnPlayerPropertiesUpdate에서 로컬 경험치를 보고 판단합니다.
+    }
+
     private void HandleP1BaseHpChanged(int currentHp, int maxHp)
     {
         // P1 기지 체력이 바뀌면 P1용 이벤트를 발생시킴
@@ -195,21 +291,57 @@ public class InGameManager : MonoBehaviourPunCallbacks
     {
         if (isDebugMode)
         {
-            ageManager.TryUpgradeAge(teamTag, currentEXP);
+            // 디버그 모드에서는 로컬 플레이어의 경험치를 사용하여 직접 시대를 발전
+            string debugTeamTag = isDebugHost ? "P1" : "P2"; // 디버그 호스트 여부로 팀 결정
+            ageManager.TryUpgradeAge(debugTeamTag, GetLocalPlayerExp());
         }
         else
         {
-            photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
+            photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, GetLocalPlayerExp()); // 경험치도 함께 전달
             Debug.Log("마스터 클라이언트에게 시대 발전을 요청합니다.");
         }
     }
 
     [PunRPC]
-    private void RPC_RequestEvolve(int requestingPlayerActorNumber)
+    private void RPC_RequestEvolve(int requestingPlayerActorNumber, int playerExp, PhotonMessageInfo info) // playerExp 매개변수 추가
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        Debug.Log($"{requestingPlayerActorNumber}번 플레이어의 시대 발전 요청을 수신 및 검증 (현재는 자동 통과)");
-        photonView.RPC("RPC_ConfirmEvolve", RpcTarget.All, requestingPlayerActorNumber);
+
+        Debug.Log($"{requestingPlayerActorNumber}번 플레이어의 시대 발전 요청을 수신 (현재 경험치: {playerExp})");
+
+        Player requestingPlayer = PhotonNetwork.CurrentRoom.GetPlayer(requestingPlayerActorNumber);
+        if (requestingPlayer == null)
+        {
+            Debug.LogError($"RPC_RequestEvolve: 요청 플레이어 (ActorNumber: {requestingPlayerActorNumber})를 찾을 수 없습니다.");
+            return;
+        }
+
+        // 마스터 클라이언트에서 해당 플레이어의 실제 경험치와 시대 발전 조건을 다시 검증
+        // 플레이어의 CustomProperties에서 최신 경험치를 가져옵니다.
+        int actualExp = 0;
+        if (requestingPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            actualExp = (int)expValue;
+        }
+
+        // 시대 발전 가능 여부 재확인
+        bool canUpgrade = ageManager.CanUpgrade(actualExp); // 실제 경험치로 검증
+
+        if (canUpgrade)
+        {
+            // 시대 발전 성공 시
+            photonView.RPC("RPC_ConfirmEvolve", RpcTarget.All, requestingPlayerActorNumber);
+            // 시대 발전 시 경험치를 초기화해야 한다면 여기서 초기화 로직 추가
+            // ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
+            // playerProps[PLAYER_EXP_KEY] = 0; // 예: 경험치 초기화
+            // requestingPlayer.SetCustomProperties(playerProps);
+        }
+        else
+        {
+            // 시대 발전 실패 시 (예: 경험치 부족)
+            Debug.LogWarning($"플레이어 {requestingPlayerActorNumber} 시대 발전 실패: 경험치 부족 ({actualExp} / {ageManager.GetRequiredExpForNextAge()})");
+            // 실패 메시지를 해당 플레이어에게만 전송하거나 처리하는 로직 추가 가능
+        }
     }
 
     [PunRPC]
@@ -219,7 +351,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
         string teamTag = (targetPlayerActorNumber == 1) ? "P1" : "P2";
         if (targetPlayerActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
         {
-            ageManager.TryUpgradeAge(teamTag, currentEXP);
+            ageManager.TryUpgradeAge(teamTag, GetLocalPlayerExp()); // 로컬 플레이어 경험치로 시대 발전 시도
+
         }
         else
         {
@@ -241,7 +374,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void CheckForAgeUp()
     {
-        bool canUpgrade = ageManager.CanUpgrade(currentEXP);
+        bool canUpgrade = ageManager.CanUpgrade(GetLocalPlayerExp()); // 로컬 플레이어 경험치로 체크
         OnEvolveStatusChanged?.Invoke(canUpgrade); // 시대 발전 가능 여부를 이벤트로 알림
 
         if (canUpgrade)

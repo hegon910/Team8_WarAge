@@ -243,7 +243,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     {
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-        if(unitdata.unitType == UnitType.Melee)
+        if (unitdata.unitType == UnitType.Melee)
         {
             if (distanceToTarget <= unitdata.MeleeRange)
             {
@@ -255,13 +255,13 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     BaseController targetBase = target.GetComponent<BaseController>();
                     if (targetUnit != null)
                     {
-                        targetUnit.TakeDamage(unitdata.attackDamage); 
+                        targetUnit.TakeDamage(unitdata.attackDamage);
                         Debug.Log($"{gameObject.name}이 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                         Debug.Log($"남은 체력은 {currentHealth}");
                     }
-                    else if (targetBase != null) 
+                    else if (targetBase != null)
                     {
-                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
+                        targetBase.TakeDamage(unitdata.attackDamage, this.tag);
                         Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
@@ -272,13 +272,13 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 Move();
             }
         }
-        else if(unitdata.unitType == UnitType.Ranged)
+        else if (unitdata.unitType == UnitType.Ranged)
         {
             rb.velocity = Vector2.zero;
             //가까이 왔을때 근접 공격
-            if(distanceToTarget <= meleeSwitchRange && unitdata.attackDamage > 0)
+            if (distanceToTarget <= meleeSwitchRange && unitdata.attackDamage > 0)
             {
-                if(attackCooldownTimer <= 0)
+                if (attackCooldownTimer <= 0)
                 {
                     UnitController targetUnit = target.GetComponent<UnitController>();
                     BaseController targetBase = target.GetComponent<BaseController>();
@@ -289,15 +289,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     }
                     else if (targetBase != null)
                     {
-                        targetBase.TakeDamage(unitdata.attackDamage,this.tag);
+                        targetBase.TakeDamage(unitdata.attackDamage, this.tag);
                         Debug.Log($"{gameObject.name}이 베이스 {target.name}에게 {unitdata.attackDamage} 데미지를 주었습니다.");
                     }
                     attackCooldownTimer = 1f / unitdata.attackSpeed;
                 }
             }
-            else if(distanceToTarget <= unitdata.rangedrange)
+            else if (distanceToTarget <= unitdata.rangedrange)
             {
-
+                // 원거리 공격 쿨다운 체크를 PhotonNetwork.Instantiate 전에 추가
+                if (attackCooldownTimer <= 0) // 이 조건이 추가됩니다.
+                {
                     if (photonView.IsMine)
                     {
                         string spawnerTag = gameObject.tag;
@@ -314,8 +316,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
                         Debug.Log($"{gameObject.name}이 원거리 공격을 시작합니다. 발사 유닛 태그: {spawnerTag}");
                     }
-                    attackCooldownTimer = 1f/ unitdata.attackSpeed;
-                
+                    attackCooldownTimer = 1f / unitdata.attackSpeed; // 화살 생성 후 쿨타임 설정
+                }
             }
             else
             {
@@ -345,9 +347,10 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
             {
+                int playerActorNumber = (gameObject.CompareTag("P1") && gm.isDebugHost) || (gameObject.CompareTag("P2") && !gm.isDebugHost) ? PhotonNetwork.LocalPlayer.ActorNumber : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? 2 : 1);
                 if (gm != null)
                 {
-                    gm.AddExp(unitdata.unitExp);
+                    gm.AddExp(playerActorNumber, unitdata.unitExp);
                 }
                 Destroy(gameObject, 1f);
                 Debug.Log($"[DebugMode] {gameObject.name} 사망 처리");
@@ -372,11 +375,23 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    private void RpcDie()
+    private void RpcDie(int ownerActorNumber) // ownerActorNumber 매개변수 추가
     {
-        gm.AddExp(unitdata.unitExp);
-        Debug.Log($"유닛 경험치 추가{unitdata.unitExp}");
+        // 마스터 클라이언트만 경험치를 추가하도록 처리
+        if (PhotonNetwork.IsMasterClient || InGameManager.Instance.isDebugMode) // 디버그 모드에서도 로컬에서 처리
+        {
+            if (gm != null)
+            {
+                gm.AddExp(ownerActorNumber, unitdata.unitExp); // 전달받은 ownerActorNumber에게 경험치 추가
+            }
+            Debug.Log($"유닛 경험치 추가 {unitdata.unitExp} (대상 플레이어 ActorNumber: {ownerActorNumber})");
+        }
+        else
+        {
+            Debug.Log($"슬레이브 클라이언트: 유닛 사망 확인. 마스터 클라이언트가 경험치 처리");
+        }
+
         Destroy(gameObject, 2f);
     }
-    
+
 }

@@ -10,6 +10,8 @@ public class Arrow : MonoBehaviourPun
     public float speed = 10f;
     public int damage = 10;
     public string ownerTag;
+    // [추가] 공격자의 ActorNumber를 저장할 변수 (InitializeArrow에서 할당받음)
+    private int attackerActorNumber;
 
     private Rigidbody2D rb;
     private Vector3 startPosition; // <-- 투사체 발사 시작 위치 저장
@@ -21,12 +23,13 @@ public class Arrow : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange)
+    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange, int _attackerActorNumber) // [수정] attackerActorNumber 매개변수 추가
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;
         this.maxRange = maxRange;
         startPosition = transform.position;
+        this.attackerActorNumber = _attackerActorNumber; // [추가] 전달받은 attackerActorNumber 저장
 
         rb.velocity = moveDirection.normalized * speed;
 
@@ -66,9 +69,9 @@ public class Arrow : MonoBehaviourPun
         {
 
         }
-        else 
+        else
         {
-            if (!photonView.IsMine) return; 
+            if (!photonView.IsMine) return;
         }
 
 
@@ -81,21 +84,23 @@ public class Arrow : MonoBehaviourPun
                 string opponentUnitTag = (ownerTag == "P1") ? "P2" : "P1";
                 if (other.CompareTag(opponentUnitTag))
                 {
-                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, damage);
+                    // [수정] RpcTakeDamage 호출 시 attackerActorNumber 전달
+                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, damage, attackerActorNumber);
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
-            else if (targetBase != null) 
+            else if (targetBase != null)
             {
                 string opponentBaseTag = (ownerTag == "P1") ? "BaseP2" : "BaseP1";
                 if (other.CompareTag(opponentBaseTag))
                 {
-                    targetBase.TakeDamage(damage,ownerTag);
+                    // BaseController는 건드리지 않는다는 지침에 따라 attackerActorNumber를 전달하지 않습니다.
+                    targetBase.TakeDamage(damage, ownerTag);
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
             Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
-            if (photonView.IsMine) 
+            if (photonView.IsMine)
             {
                 PhotonNetwork.Destroy(gameObject);
             }
