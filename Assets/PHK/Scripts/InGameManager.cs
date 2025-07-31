@@ -36,6 +36,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     //private int currentEXP; // 로컬 변수 대신 Photon Custom Properties 사용
     private PhotonView photonView;
     private string teamTag;
+    private bool isGameOver = false;
 
     // --- 이벤트 ---
     public event Action<KYG.AgeData> OnAgeEvolved;
@@ -44,6 +45,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
     public event Action<int, int> OnOpponentBaseHealthChanged;  // P2(상대 기지)용 이벤트
     public event Action<string> OnInfoMessage; // UI에 일반 메시지를 전달하기 위한 이벤트
     public event Action<bool> OnEvolveStatusChanged; // 시대 발전 가능 상태 변경 이벤트
+    public event Action OnGameWon;
+    public event Action OnGameLost;
     #endregion
 
     private void Awake()
@@ -167,7 +170,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
         if (Input.GetKeyDown(KeyCode.G))
         {
             // 'G' 키로 경험치 추가 시 로컬 플레이어의 ActorNumber 사용
-            AddExp(PhotonNetwork.LocalPlayer.ActorNumber, 500); // 테스트용 경험치 추가
+            AddExp(this.teamTag, 500); // 테스트용 경험치 추가
         }
     }
 
@@ -205,50 +208,41 @@ public class InGameManager : MonoBehaviourPunCallbacks
     /// </summary>
     /// <param name="targetPlayerActorNumber">경험치를 획득할 플레이어의 ActorNumber.</param>
     /// <param name="amount">추가할 경험치 양.</param>
-    public void AddExp(int targetPlayerActorNumber, int amount)
+    public void AddExp(string targetTeamTag, int amount)
     {
         // 네트워크 모드에서만 RPC를 통해 경험치 업데이트 요청
         if (!isDebugMode)
         {
             // 마스터 클라이언트에게 경험치 업데이트 요청
-            photonView.RPC("RPC_AddExp", RpcTarget.MasterClient, targetPlayerActorNumber, amount);
-            Debug.Log($"경험치 추가 요청: 플레이어 {targetPlayerActorNumber}, 양: {amount}");
+            photonView.RPC("RPC_AddExp", RpcTarget.MasterClient, targetTeamTag, amount);
+            Debug.Log($"경험치 추가 요청: 팀 {targetTeamTag}, 양: {amount}");
         }
         else // 디버그 모드에서는 로컬에서 직접 처리
         {
-            Player targetPlayer = PhotonNetwork.LocalPlayer; // 디버그 모드에서는 로컬 플레이어 (나 자신)
-            if (targetPlayer.ActorNumber == targetPlayerActorNumber) // 요청된 플레이어가 로컬 플레이어인지 확인
+            // 디버그 모드에서는 요청된 팀이 로컬 플레이어의 팀과 같을 때만 경험치를 추가합니다.
+            string myTeamTag = isDebugHost ? "P1" : "P2";
+            if (myTeamTag == targetTeamTag)
             {
-                int currentExp = 0;
-                if (targetPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
-                {
-                    currentExp = (int)expValue;
-                }
-                int newExp = currentExp + amount;
-                ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
-                playerProps[PLAYER_EXP_KEY] = newExp;
-                targetPlayer.SetCustomProperties(playerProps); // 이 시점에서 OnPlayerPropertiesUpdate가 호출됨
-                OnResourceChanged?.Invoke(currentGold, newExp); // UI 업데이트
-                CheckForAgeUp(); // 시대 발전 체크
-                Debug.Log($"[DebugMode] 플레이어 {targetPlayerActorNumber}의 경험치 {amount} 추가. 현재 경험치: {newExp}");
-            }
-            else
-            {
-                Debug.LogWarning($"[DebugMode] AddExp: 요청된 ActorNumber({targetPlayerActorNumber})와 로컬 플레이어 ActorNumber({targetPlayer.ActorNumber})가 다릅니다. 경험치 추가를 건너뜁니다.");
+                int newExp = GetLocalPlayerExp() + amount;
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, newExp } });
+                Debug.Log($"[DebugMode] 팀 {targetTeamTag}의 경험치 {amount} 추가. 현재 경험치: {newExp}");
             }
         }
     }
 
     [PunRPC]
-    private void RPC_AddExp(int targetPlayerActorNumber, int amount, PhotonMessageInfo info)
+    private void RPC_AddExp(string targetTeamTag, int amount, PhotonMessageInfo info)
     {
         // 마스터 클라이언트만 이 RPC를 실행합니다.
         if (!PhotonNetwork.IsMasterClient) return;
 
+        // 팀 태그를 기반으로 플레이어의 ActorNumber를 결정합니다. (P1=1, P2=2)
+        int targetPlayerActorNumber = (targetTeamTag == "P1") ? 1 : 2;
+
         Player targetPlayer = PhotonNetwork.CurrentRoom.GetPlayer(targetPlayerActorNumber);
         if (targetPlayer == null)
         {
-            Debug.LogError($"RPC_AddExp: 대상 플레이어 (ActorNumber: {targetPlayerActorNumber})를 찾을 수 없습니다.");
+            Debug.LogError($"RPC_AddExp: 대상 플레이어 (팀: {targetTeamTag}, ActorNumber: {targetPlayerActorNumber})를 찾을 수 없습니다.");
             return;
         }
 
@@ -261,29 +255,30 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
         int newExp = currentExp + amount;
 
-        // 경험치 업데이트
-        ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
-        playerProps[PLAYER_EXP_KEY] = newExp;
-        targetPlayer.SetCustomProperties(playerProps); // 이 시점에서 OnPlayerPropertiesUpdate가 모든 클라이언트에서 호출
+        // 경험치 업데이트 (이 코드가 실행되면 모든 클라이언트의 OnPlayerPropertiesUpdate가 호출됩니다)
+        targetPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, newExp } });
 
-        Debug.Log($"마스터 클라이언트: 플레이어 {targetPlayerActorNumber}에게 {amount} 경험치 추가, 새 경험치: {newExp}");
-
-        // 시대 발전 체크는 각 클라이언트의 OnPlayerPropertiesUpdate에서 로컬 경험치를 보고 판단합니다.
+        Debug.Log($"마스터 클라이언트: 팀 {targetTeamTag}에게 {amount} 경험치 추가, 새 경험치: {newExp}");
     }
-
     private void HandleP1BaseHpChanged(int currentHp, int maxHp)
     {
         // P1 기지 체력이 바뀌면 P1용 이벤트를 발생시킴
         OnPlayerBaseHealthChanged?.Invoke(currentHp, maxHp);
-        if (currentHp <= 0) GameOver();
+        if (currentHp <= 0 && PhotonNetwork.IsMasterClient)
+        {
+            GameOver("P1");
+        }
     }
     private void HandleP2BaseHpChanged(int currentHp, int maxHp)
     {
         // P2 기지 체력이 바뀌면 P2용 이벤트를 발생시킴
         OnOpponentBaseHealthChanged?.Invoke(currentHp, maxHp);
-        if (currentHp <= 0) GameOver();
-    }
+        if (currentHp <= 0 && PhotonNetwork.IsMasterClient)
+        {
+            GameOver("P2");
 
+        }
+    }
     #endregion
 
     #region 시대 발전 관련
@@ -429,10 +424,44 @@ public class InGameManager : MonoBehaviourPunCallbacks
             }
         }
     }
-    private void GameOver()
+    private void GameOver(string losingTeamTag)
     {
-        Debug.Log("게임 오버 처리 추가 작업 필요");
-        OnInfoMessage?.Invoke("GAME OVER");
+        if (isGameOver) return; // 게임오버가 이미 처리되었다면 중복 실행 방지
+        isGameOver = true;
+
+        Debug.Log($"Game Over. Losing team: {losingTeamTag}. MasterClient will send RPC.");
+        // 모든 클라이언트에게 게임 결과 RPC를 전송
+        photonView.RPC("RPC_ShowResultPanels", RpcTarget.All, losingTeamTag);
+    }
+
+    [PunRPC]
+    private void RPC_ShowResultPanels(string losingTeamTag)
+    {
+        // 모든 클라이언트에서 게임 시간을 멈춤
         Time.timeScale = 0f;
+        OnInfoMessage?.Invoke("GAME OVER"); // 기존 GameOver 메시지 표시
+
+        // 디버그 모드와 네트워크 모드에 따라 자신의 팀 태그를 결정
+        string myTeamTag;
+        if (isDebugMode)
+        {
+            myTeamTag = isDebugHost ? "P1" : "P2";
+        }
+        else
+        {
+            myTeamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
+        }
+
+        // 패배한 팀과 자신의 팀을 비교하여 승/패 이벤트 호출
+        if (myTeamTag == losingTeamTag)
+        {
+            OnGameLost?.Invoke();
+            Debug.Log("Result: You Lost");
+        }
+        else
+        {
+            OnGameWon?.Invoke();
+            Debug.Log("Result: You Won");
+        }
     }
 }

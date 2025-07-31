@@ -147,18 +147,26 @@ namespace KYG
         /// 데미지를 받아 현재 체력이 0이 되면 게임 매니저에 게임 오버 연동
         /// 체력이 0이 될시 파괴되는 에니메이션은 추가 과제
         /// </summary>
-        public void TakeDamage(int damage, string attackerTag)
+        /// 
+        [PunRPC]
+        public void RpcTakeDamage(int damage, string attackerTag)
+        {
+            // 이 RPC는 모든 클라이언트에서 실행되지만,
+            // 실제 데미지 처리는 아래 private TakeDamage 함수의 소유권 체크 로직을 따릅니다.
+            TakeDamage(damage, attackerTag);
+        }
+        private void TakeDamage(int damage, string attackerTag)
         {
             if (attackerTag == TeamTag) return; // 아군이면 무시
 
-            if (damage <= 0 || (PhotonNetwork.IsConnected && !pv.IsMine)) return; // Damege 0일때 무시
+            // 'pv.IsMine' 체크 덕분에, 이 베이스의 소유자(마스터 클라이언트)만 아래 로직을 실행하게 됩니다.
+            if (damage <= 0 || (PhotonNetwork.IsConnected && !pv.IsMine)) return;
 
-            ApplyDamage(damage);
+            ApplyDamage(damage); // 소유자 클라이언트에서만 체력 감소
 
-            // RPC로 다른 클라이언트 HP 상태 동기화
+            // RPC로 다른 클라이언트(P2)에게 변경된 HP 상태를 동기화합니다.
             if (PhotonNetwork.IsConnected)
                 pv.RPC(nameof(RPC_UpdateHP), RpcTarget.Others, currentHP);
-
         }
 
         /// <summary>
@@ -301,6 +309,8 @@ namespace KYG
                 turretSlots[i].transform.localPosition = new Vector3(i * spacing, 0, 0);
             }
         }
+
+
     }
 
 

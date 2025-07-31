@@ -1275,12 +1275,28 @@ PrefabInstance:
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0003455582
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8700964341578291006, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0006914826
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8703794542624383176, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -3250,9 +3266,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 0
+    m_Left: 300
     m_Right: 0
-    m_Top: 0
+    m_Top: 40
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 0

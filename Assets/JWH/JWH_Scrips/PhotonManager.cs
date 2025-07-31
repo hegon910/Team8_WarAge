@@ -29,32 +29,21 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void LeaveRoomAndRejoinLobby()
     {
-        if (PhotonNetwork.InRoom) // 현재 방에 있다면
-        {
-            Debug.Log("현재 방에서 나가는 중...");
-            PhotonNetwork.LeaveRoom(); // 방에서 나가는 Photon 메서드 호출
-        }
-        else // 이미 방 밖에 있다면 (예: 로비에 이미 있음)
-        {
-            Debug.Log("이미 방 밖에 있으므로 바로 로비에 재접속 시도.");
-            // 로비에 접속되어 있지 않다면 재접속 시도
-            if (!PhotonNetwork.InLobby)
-            {
-                PhotonNetwork.JoinLobby();
-            }
-        }
+        // 방을 나가는 요청만 합니다.
+        // 실제 씬 로드는 OnLeftRoom 콜백에서 처리됩니다.
+        PhotonNetwork.LeaveRoom();
     }
-    // 방을 나갔을 때 호출되는 콜백 (MonoBehaviourPunCallbacks 상속으로 사용 가능)
+
+    // [수정] 방을 나간 후 자동으로 호출되는 콜백 함수
     public override void OnLeftRoom()
     {
-        Debug.Log("방에서 나왔습니다. 로비에 다시 접속합니다.");
-        // 방을 나간 후 로비로 다시 진입
-        if (!PhotonNetwork.InLobby)
-        {
-            PhotonNetwork.JoinLobby();
-        }
-        // UI를 로비 상태로 전환하는 부분은 UIManager에서 처리하도록 함
-        UIManager.Instance.ShowLobbyPanel(); // UIManager에 새롭게 추가할 메서드
+        base.OnLeftRoom(); // PUN의 기본 로직을 실행합니다.
+
+        // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
+        // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+
+        Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
     public void ConnectToServer(string nickname)
     {
