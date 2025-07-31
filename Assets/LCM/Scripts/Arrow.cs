@@ -1,3 +1,4 @@
+// ========== Arrow.cs 전체 코드 ==========
 using KYG;
 using Photon.Pun;
 using System.Collections;
@@ -10,11 +11,10 @@ public class Arrow : MonoBehaviourPun
     public float speed = 10f;
     public int damage = 10;
     public string ownerTag;
-    // [추가] 공격자의 ActorNumber를 저장할 변수 (InitializeArrow에서 할당받음)
     private int attackerActorNumber;
 
     private Rigidbody2D rb;
-    private Vector3 startPosition; // <-- 투사체 발사 시작 위치 저장
+    private Vector3 startPosition;
     private float maxRange;
 
     private void Awake()
@@ -22,28 +22,22 @@ public class Arrow : MonoBehaviourPun
         rb = GetComponent<Rigidbody2D>();
     }
 
+    // [HOTFIX] UnitController에서 5개의 파라미터를 보내므로, 이 정의는 올바릅니다. (수정 불필요)
     [PunRPC]
-    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange, int _attackerActorNumber) // [수정] attackerActorNumber 매개변수 추가
+    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float range, int _attackerActorNumber)
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;
-        this.maxRange = maxRange;
+        maxRange = range;
         startPosition = transform.position;
-        this.attackerActorNumber = _attackerActorNumber; // [추가] 전달받은 attackerActorNumber 저장
+        attackerActorNumber = _attackerActorNumber;
 
         rb.velocity = moveDirection.normalized * speed;
 
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
-            if (moveDirection.x < 0)
-            {
-                spriteRenderer.flipX = true;
-            }
-            else
-            {
-                spriteRenderer.flipX = false;
-            }
+            spriteRenderer.flipX = moveDirection.x < 0;
         }
     }
 
@@ -51,56 +45,46 @@ public class Arrow : MonoBehaviourPun
     {
         if (photonView.IsMine)
         {
-            float distanceTraveled = Vector3.Distance(startPosition, transform.position);
-
-            if (distanceTraveled >= maxRange)
+            if (Vector3.Distance(startPosition, transform.position) >= maxRange)
             {
-                Debug.Log($"{gameObject.name}이 최대 사거리 ({maxRange})에 도달하여 파괴됩니다.");
                 PhotonNetwork.Destroy(gameObject);
-                return;
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("충돌발생");
-        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
-        {
+        // 화살의 소유자만 충돌 판정을 처리
+        if (!photonView.IsMine) return;
 
-        }
-        else
+        // 자신의 태그와 다른 오브젝트와 충돌했는지 확인
+        if (!other.CompareTag(ownerTag))
         {
-            if (!photonView.IsMine) return;
-        }
+            UnitController targetUnit = other.GetComponent<UnitController>();
+            BaseController targetBase = other.GetComponent<BaseController>();
 
-
-        UnitController targetUnit = other.GetComponent<UnitController>();
-        BaseController targetBase = other.GetComponent<BaseController>();
-        if (other.CompareTag(ownerTag) == false)
-        {
+            // 상대 유닛과 충돌 시
             if (targetUnit != null)
             {
                 string opponentUnitTag = (ownerTag == "P1") ? "P2" : "P1";
                 if (other.CompareTag(opponentUnitTag))
                 {
-                    // [수정] RpcTakeDamage 호출 시 attackerActorNumber 전달
+                    // [HOTFIX] UnitController의 RpcTakeDamage가 (int, int)를 받으므로 이 코드는 올바릅니다. (수정 불필요)
                     targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, damage, attackerActorNumber);
-                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
+            // 상대 기지와 충돌 시
             else if (targetBase != null)
             {
                 string opponentBaseTag = (ownerTag == "P1") ? "BaseP2" : "BaseP1";
                 if (other.CompareTag(opponentBaseTag))
                 {
-                    // BaseController는 건드리지 않는다는 지침에 따라 attackerActorNumber를 전달하지 않습니다.
-                    targetBase.TakeDamage(damage, ownerTag);
-                    Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
+                    targetBase.RpcTakeDamage(damage, ownerTag);
                 }
             }
-            Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
-            if (photonView.IsMine)
+
+            // 유효한 대상(유닛, 베이스 등)과 충돌했다면 화살을 파괴
+            if (targetUnit != null || targetBase != null)
             {
                 PhotonNetwork.Destroy(gameObject);
             }

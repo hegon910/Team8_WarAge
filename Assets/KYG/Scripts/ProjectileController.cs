@@ -47,12 +47,12 @@ namespace KYG
             // BaseController에 데미지 전달 시 아군인지 체크
             if (target.TryGetComponent(out BaseController baseCtrl))
             {
-                baseCtrl.TakeDamage(damage, teamTag);
+                baseCtrl.RpcTakeDamage(damage, teamTag);
             }
             else if (target.TryGetComponent(out UnitController unitCtrl))
             {
                 // 유닛은 기존 TakeDamage 사용 (UnitController 내부에서 아군 방어 가능)
-                unitCtrl.TakeDamage(damage);
+                unitCtrl.RpcTakeDamage(damage, attackerActorNumber);
             }
             
             // 소유자만 발사체 제거 권한 있음
