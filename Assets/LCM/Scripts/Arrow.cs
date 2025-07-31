@@ -21,7 +21,7 @@ public class Arrow : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange) // [수정] attackerActorNumber 매개변수 추가
+    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange) 
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;

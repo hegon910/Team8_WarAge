@@ -1,8 +1,8 @@
-// ========== UnitController.cs 전체 코드 (Hotfix) ==========
 using KYG;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
@@ -173,10 +173,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     private void Attack(Transform target)
     {
         if (attackCooldownTimer > 0) return;
-
         rb.velocity = Vector2.zero;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
-        int myActorNumber = photonView.Owner.ActorNumber;
 
         // 근접 공격
         if (unitdata.unitType == UnitType.Melee && distanceToTarget <= unitdata.MeleeRange)
@@ -185,14 +183,14 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             var targetBase = target.GetComponent<BaseController>();
 
             if (targetUnit != null)
-                targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage, myActorNumber);
+                targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
             else if (targetBase != null)
             {
                 // [HOTFIX] 베이스 공격을 RPC로 변경
                 PhotonView basePV = targetBase.GetComponent<PhotonView>();
                 if (basePV != null)
                 {
-                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage, this.tag);
+                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
                 }
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;
@@ -207,14 +205,14 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 var targetBase = target.GetComponent<BaseController>();
 
                 if (targetUnit != null)
-                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage, myActorNumber);
+                    targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
                 else if (targetBase != null)
                 {
                     // [HOTFIX] 베이스 공격을 RPC로 변경
                     PhotonView basePV = targetBase.GetComponent<PhotonView>();
                     if (basePV != null)
                     {
-                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage, this.tag);
+                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
                     }
                 }
             }
@@ -228,7 +226,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
                 if (arrow != null)
                 {
-                    arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange, myActorNumber);
+                    arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
                 }
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;
@@ -240,20 +238,21 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
-    public void RpcTakeDamage(int amount, int killerActorNumber)
+    public void RpcTakeDamage(int amount)
     {
         if (currentHealth <= 0) return; // 이미 죽었으면 중복 실행 방지
 
         currentHealth -= amount;
-        if (currentHealth <= 0)
+        if (currentHealth <= 0 && PhotonNetwork.IsMasterClient)
         {
-            photonView.RPC("RpcDie", RpcTarget.All, killerActorNumber);
+            photonView.RPC("RpcDie", RpcTarget.All);
         }
     }
 
     [PunRPC]
-    private void RpcDie(int killerActorNumber)
+    private void RpcDie()
     {
+        string GiveExpTag = CompareTag("P1") ? "P2" : "P1";
         if (currentHealth > 0 && currentHealth != -1) // 아직 살아있으면 return (중복 실행 방지용)
         {
             // 이 조건은 RpcTakeDamage에서 이미 처리하므로 사실상 불필요하지만 안전장치로 둡니다.
@@ -264,9 +263,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (PhotonNetwork.IsMasterClient && gm != null)
         {
-            string killerTeamTag = (killerActorNumber == 1) ? "P1" : "P2";
-            gm.AddExp(killerTeamTag, unitdata.unitExp);
-            Debug.Log($"유닛 사망. 경험치 {unitdata.unitExp}를 팀 {killerTeamTag}(Actor: {killerActorNumber})에게 지급합니다.");
+            gm.AddExp(GiveExpTag, unitdata.unitExp);
+            Debug.Log($"유닛 사망. 경험치 {unitdata.unitExp}를 팀 {GiveExpTag}에게 지급");
         }
 
         Destroy(gameObject, 2f);
