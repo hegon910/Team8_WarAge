@@ -91,7 +91,7 @@ public class Arrow : MonoBehaviourPun
                 if (other.CompareTag(opponentBaseTag))
                 {
                     // BaseController는 건드리지 않는다는 지침에 따라 attackerActorNumber를 전달하지 않습니다.
-                    targetBase.TakeDamage(damage, ownerTag);
+                    targetBase.RpcTakeDamage(damage, ownerTag);
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
