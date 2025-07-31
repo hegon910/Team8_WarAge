@@ -388,6 +388,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
+            photonView.RPC("RPC_AddExp", RpcTarget.All, this.tag, unitdata.unitExp);
             Debug.Log($"슬레이브 클라이언트: 유닛 사망 확인. 마스터 클라이언트가 경험치 처리");
         }
 
