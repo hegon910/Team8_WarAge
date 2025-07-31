@@ -56,17 +56,35 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         // UI를 로비 상태로 전환하는 부분은 UIManager에서 처리하도록 함
         UIManager.Instance.ShowLobbyPanel(); // UIManager에 새롭게 추가할 메서드
     }
-    public void ConnectToServer(string nickname)
+
+    public void ConnectToServer(string fallbackNickname)
     {
-        if (PhotonNetwork.IsConnected)
+        string nicknameToUse = fallbackNickname;
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
         {
-            OnConnectedToMaster();
-            return;
+            string displayName = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.DisplayName;
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                nicknameToUse = displayName;
+            }
         }
-        Debug.Log("��������");
-        PhotonNetwork.NickName = nickname;
+
+        Debug.Log($"{nicknameToUse}");
+        PhotonNetwork.NickName = nicknameToUse;
         PhotonNetwork.ConnectUsingSettings();
     }
+    //public void ConnectToServer(string nickname)
+    //{
+    //    if (PhotonNetwork.IsConnected)
+    //    {
+    //        OnConnectedToMaster();
+    //        return;
+    //    }
+    //    Debug.Log("��������");
+    //    PhotonNetwork.NickName = nickname;
+    //    PhotonNetwork.ConnectUsingSettings();
+    //}
+
 
     public override void OnConnectedToMaster()
     {
