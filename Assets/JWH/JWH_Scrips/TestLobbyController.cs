@@ -34,10 +34,16 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        //UpdateAllLobbyUI();
+    }
+
+    public override void OnJoinedRoom()
+    {
+        Debug.Log("방 입장 완료");
         UpdateAllLobbyUI();
     }
 
-    
+
     public override void OnJoinedLobby()
     {
         LoadLocalPlayerReadyState();
@@ -164,4 +170,10 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
         readyText.text = ready ? "Ready" : "Not Ready";
         readyText.color = ready ? Color.green : Color.red;
     }
+
+    //public override void OnJoinedRoom()
+    //{
+    //    Debug.Log("방 입장 완료");
+    //    UpdateAllLobbyUI();
+    //}
 }

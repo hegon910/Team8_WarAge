@@ -40,9 +40,8 @@ public class UnitSpawnManager : MonoBehaviour
     /// 
     public void RequestUnitProduction(GameObject unitPrefab, string ownerTag)
     {
+        Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
 
-
-        InGameUIManager.Instance.UnitInfoText.text = $"Producing {unitPrefab.name}...";
         // 현재 유닛이 생산 중인지 아닌지에 따라 로직을 분리
         if (isProducing)
         {
@@ -50,13 +49,19 @@ public class UnitSpawnManager : MonoBehaviour
             if (productionQueue.Count < 5) // 큐는 5칸
             {
 
-                InGameUIManager.Instance.UnitInfoText.text = $"{unitPrefab.name} is Ready to Spawn...";
-                Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
                 if (InGameManager.SpendGold(unitData.goldCost))
                 {
                     productionQueue.Enqueue((unitPrefab, ownerTag));
-                    // 대기열 UI 업데이트 (현재 대기중인 유닛 수만 전달)
                     OnQueueChanged?.Invoke(productionQueue.Count);
+                    // UI 텍스트를 "대기열에 추가됨"으로 명확히 표시합니다.
+                    InGameUIManager.Instance.UnitInfoText.text = $"{unitPrefab.name} added to queue.";
+                }
+                else
+                {
+                    // 골드 부족 시 UI에 피드백을 줍니다.
+
+                    InGameUIManager.Instance.UnitInfoText.text = $"Faild to Spawn {unitPrefab.name}...";
+                    InGameUIManager.Instance.inGameInfoText.text = "Not enough gold!";
                 }
             }
             else
@@ -67,13 +72,18 @@ public class UnitSpawnManager : MonoBehaviour
         else
         {
             // --- 생산 라인이 비어있을 경우: 바로 생산 시작 ---
-            Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+            // 골드 지불을 먼저 시도하고 성공하면 생산을 시작
             if (InGameManager.SpendGold(unitData.goldCost))
             {
-                // 이 유닛은 큐를 거치지 않고 바로 생산 코루틴으로 전달
                 StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag));
             }
+            else
+            {
+                // 골드 부족 시 UI에 피드백을.
+                InGameUIManager.Instance.inGameInfoText.text = "Not enough gold!";
+            }
         }
+
     }
     /// <summary>
     /// 유닛 '한 개'를 생산하고, 완료되면 대기열에서 다음 유닛을 가져와 다시 이 코루틴을 실행
@@ -134,7 +144,18 @@ public class UnitSpawnManager : MonoBehaviour
             {
                 // --- 실제 네트워크 환경: PhotonNetwork.Instantiate 사용 ---
                 object[] data = new object[] { ownerTag, initialMoveDirection };
-                PhotonNetwork.Instantiate(prefabToProduce.name, spawnPoint.position, spawnPoint.rotation, 0, data);
+
+                // 1. Photon으로 유닛을 생성하고, 생성된 게임오브젝트를 변수에 저장합니다.
+                GameObject newUnit = PhotonNetwork.Instantiate(prefabToProduce.name, spawnPoint.position, spawnPoint.rotation, 0, data);
+
+                // 2. 생성된 유닛의 PhotonView를 가져옵니다.
+                PhotonView newUnitPV = newUnit.GetComponent<PhotonView>();
+                if (newUnitPV != null)
+                {
+                    // 3. 모든 클라이언트에게 태그와 레이어를 설정하라는 RPC를 호출합니다.
+                    //    (UnitSpawnManager 자신의 PhotonView를 이용해 RPC를 전송)
+                    GetComponent<PhotonView>().RPC("RPC_SetUnitTag", RpcTarget.AllBuffered, newUnitPV.ViewID, ownerTag);
+                }
             }
         }
 
@@ -180,5 +201,6 @@ public class UnitSpawnManager : MonoBehaviour
         }
     }
     #endregion
+
 
 }

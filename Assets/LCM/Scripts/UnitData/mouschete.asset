@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: mouschete
   m_EditorClassIdentifier: 
   unitName: Mousechete
+  unitExp: 70
   health: 160
   attackDamage: 40
   rangedDamage: 20
@@ -24,5 +25,6 @@ MonoBehaviour:
   goldCost: 400
   unitSprite: {fileID: 0}
   description: IndustrialMouschete
-  unitType: 1
+  ArrowPrefab: {fileID: 0}
+  unitType: 0
   eraType: 2

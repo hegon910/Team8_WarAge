@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: sword
   m_EditorClassIdentifier: 
   unitName: Sword
+  unitExp: 50
   health: 100
   attackDamage: 35
   rangedDamage: 0
-  MeleeRange: 20
+  MeleeRange: 15
   rangedrange: 0
   attackSpeed: 1
   SpawnTime: 3
@@ -24,5 +25,6 @@ MonoBehaviour:
   goldCost: 50
   unitSprite: {fileID: 0}
   description: MedievalSword
+  ArrowPrefab: {fileID: 0}
   unitType: 0
   eraType: 1

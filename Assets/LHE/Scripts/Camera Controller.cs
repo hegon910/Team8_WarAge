@@ -27,14 +27,19 @@ namespace LHE
             // 마우스 화면 가두기
             Cursor.lockState = CursorLockMode.Confined;
 
-            if (PhotonNetwork.IsMasterClient)
-            {
-                transform.position = spawnPointP1.position;
-            }
-            else
-            {
-                transform.position = spawnPointP2.position;
-            }
+            Transform targetSpawnPoint = PhotonNetwork.IsMasterClient ? spawnPointP1 : spawnPointP2;
+
+            //카메라의 새위치 설정
+            transform.position = new Vector3(targetSpawnPoint.position.x, transform.position.y, transform.position.z);
+
+            // if (PhotonNetwork.IsMasterClient)
+            // {
+            //     transform.position = spawnPointP1.position;
+            // }
+            // else
+            // {
+            //     transform.position = spawnPointP2.position;
+            // }
 
             // 화면 제한 설정
             SetXLimits(minX, maxX);

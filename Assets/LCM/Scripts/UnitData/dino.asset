@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: dino
   m_EditorClassIdentifier: 
   unitName: Dino
+  unitExp: 70
   health: 160
   attackDamage: 40
   rangedDamage: 0
-  MeleeRange: 20
+  MeleeRange: 5
   rangedrange: 0
   attackSpeed: 1
   SpawnTime: 3
@@ -24,5 +25,6 @@ MonoBehaviour:
   goldCost: 50
   unitSprite: {fileID: 0}
   description: StoneAgeDino
+  ArrowPrefab: {fileID: 0}
   unitType: 0
   eraType: 0

@@ -1,8 +1,7 @@
+using Photon.Pun; // 네트워크 연동을 위한 using
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun; // 네트워크 연동을 위한 using
 
 namespace KYG
 {
@@ -14,7 +13,7 @@ namespace KYG
         Player1,Player2
     }*/
 
-    public class BaseController : MonoBehaviourPunCallbacks // PUN 연동 시 PhotonView 사용 가능
+    public class BaseController : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback // PUN 연동 시 PhotonView 사용 가능
     {
         /// <summary>
         /// 기지 시스템 컨트롤러
@@ -23,17 +22,19 @@ namespace KYG
         /// 네트워크와 동기화 로직 필요
         /// </summary>
 
-        [Header("Base")] [SerializeField] private int maxHP; // 최대 체력
+        [Header("Base")][SerializeField] private int maxHP; // 최대 체력
 
         private int currentHP; // 임의로 수정 불가능한 현재 체력
 
         public string TeamTag { get; private set; } // 팀 태그 (1P/2P)
-            
+        private string teamTag;
+
         // 프로퍼티로 외부 접근 캡슐화
         public int MaxHP => maxHP; // 최대 체력 접근용 프로퍼티
 
         public int CurrentHP => currentHP; // 현재 체력 접근용 프로퍼티
 
+        [SerializeField] private SpriteRenderer mySpriteRenderer;
 
         [Header("Spawner")] public Transform spawnerPoint; // 유닛 생성 위치
         [SerializeField] private GameObject currentBaseModel;
@@ -53,19 +54,39 @@ namespace KYG
 
         private void Awake()
         {
-            pv = GetComponent<PhotonView>(); // PhotonView 함수 초기화
-            
-            // Photon Instantiate 데이터로 팀 정보 가져오기
-            if (pv.InstantiationData != null && pv.InstantiationData.Length > 0)
+            pv = GetComponent<PhotonView>();
+
+        }
+
+        public void OnPhotonInstantiate(PhotonMessageInfo info)
+        {
+            // 1. TestNetworkManager가 보낸 InstantiationData에서 팀 태그를 받아옵니다.
+            this.teamTag = (string)info.photonView.InstantiationData[0];
+
+            // 2. GameObject의 태그를 받아온 팀 태그로 설정합니다.
+            this.gameObject.tag = this.teamTag;
+            Debug.Log($"기지가 생성되었습니다. 팀: {this.teamTag}, GameObject 태그: {this.gameObject.tag}");
+
+            // 3. 팀 태그가 "BaseP2"인 경우, 스프라이트와 콜라이더를 반전시킵니다.
+            if (this.teamTag == "BaseP2")
             {
-                TeamTag = (string)pv.InstantiationData[0];
-                gameObject.tag = TeamTag;
-                
-                // Layer 지정
-                if (TeamTag == "P1")
-                    gameObject.layer = LayerMask.NameToLayer("P1Base");
-                else if (TeamTag == "P2")
-                    gameObject.layer = LayerMask.NameToLayer("P2Base");
+                // 객체의 로컬 스케일의 x값을 -1로 바꿔 한 번에 뒤집습니다.
+                // 이 방법이 스프라이트와 콜라이더를 각각 제어하는 것보다 간단하고 효율적입니다.
+                Vector3 currentScale = transform.localScale;
+                currentScale.x *= -1;
+                transform.localScale = currentScale;
+
+                Debug.Log("BaseP2 기체의 transform.localScale.x 값을 반전시켰습니다.");
+            }
+
+            // 4. InGameManager에 자기 자신을 등록합니다.
+            if (InGameManager.Instance != null)
+            {
+                InGameManager.Instance.RegisterBase(this, this.teamTag);
+            }
+            else
+            {
+                Debug.LogError("InGameManager를 찾을 수 없습니다! 씬에 InGameManager가 있는지 확인하세요.");
             }
         }
 
@@ -75,16 +96,42 @@ namespace KYG
         */
         public void Start() // 게임 시작시 
         {
+            if (pv != null && pv.InstantiationData != null && pv.InstantiationData.Length > 0)
+            {
+                string teamFromPhoton = (string)pv.InstantiationData[0];
+                InitializeTeam(teamFromPhoton);
+            }
             InitBase(); // 기지 초기화
+         
             if (AgeManager.Instance != null)
                 AgeManager.Instance.OnAgeChangedByTeam += (teamTag, nextAgeData) =>
                 {
                     if (teamTag == TeamTag)
                         UpgradeBaseByAge(nextAgeData); // 시대 변경 이벤트 받아 자동 업그레이드 처리
                 };
-
         }
+        public void InitializeTeam(string team)
+        {
+            if (string.IsNullOrEmpty(TeamTag))
+            {
+                // TestNetworkManager가 보낸 "BaseP1" 또는 "BaseP2"를 TeamTag와 gameObject.tag에 모두 설정
+                TeamTag = team;
+                gameObject.tag = TeamTag;
 
+                if (TeamTag == "BaseP1")
+                    gameObject.layer = LayerMask.NameToLayer("P1Base");
+                else if (TeamTag == "BaseP2")
+                    gameObject.layer = LayerMask.NameToLayer("P2Base");
+
+                Debug.Log($"{gameObject.name}의 TeamTag와 GameObject.tag가 '{TeamTag}'로 설정되었습니다.");
+
+                if (InGameManager.Instance != null)
+                {
+                    // InGameManager에는 "BaseP1" 또는 "BaseP2" 태그를 그대로 전달합니다.
+                    InGameManager.Instance.RegisterBase(this, this.TeamTag);
+                }
+            }
+        }
         public void InitBase()
         {
             currentHP = maxHP; // 현재 체력 = 최대 체력으로 초기화
@@ -92,7 +139,7 @@ namespace KYG
         }
 
         private void UpdateHpUI() => OnHpChanged?.Invoke(currentHP, maxHP); // UI로 HP 갱신 이벤트
-        
+
 
         /// <summary>
         /// 데미지를 받으면 해당 공력력 만큼 현재체력 감소
@@ -100,18 +147,26 @@ namespace KYG
         /// 데미지를 받아 현재 체력이 0이 되면 게임 매니저에 게임 오버 연동
         /// 체력이 0이 될시 파괴되는 에니메이션은 추가 과제
         /// </summary>
-        public void TakeDamage(int damage, string attackerTag)
+        /// 
+        [PunRPC]
+        public void RpcTakeDamage(int damage, string attackerTag)
         {
-            if(attackerTag == TeamTag) return; // 아군이면 무시
-            
-            if (damage <= 0 || (PhotonNetwork.IsConnected && !pv.IsMine)) return; // Damege 0일때 무시
+            // 이 RPC는 모든 클라이언트에서 실행되지만,
+            // 실제 데미지 처리는 아래 private TakeDamage 함수의 소유권 체크 로직을 따릅니다.
+            TakeDamage(damage, attackerTag);
+        }
+        private void TakeDamage(int damage, string attackerTag)
+        {
+            if (attackerTag == TeamTag) return; // 아군이면 무시
 
-            ApplyDamage(damage);
-            
-            // RPC로 다른 클라이언트 HP 상태 동기화
+            // 'pv.IsMine' 체크 덕분에, 이 베이스의 소유자(마스터 클라이언트)만 아래 로직을 실행하게 됩니다.
+            if (damage <= 0 || (PhotonNetwork.IsConnected && !pv.IsMine)) return;
+
+            ApplyDamage(damage); // 소유자 클라이언트에서만 체력 감소
+
+            // RPC로 다른 클라이언트(P2)에게 변경된 HP 상태를 동기화합니다.
             if (PhotonNetwork.IsConnected)
                 pv.RPC(nameof(RPC_UpdateHP), RpcTarget.Others, currentHP);
-
         }
 
         /// <summary>
@@ -129,7 +184,7 @@ namespace KYG
             }
         }
 
-        
+
         /// <summary>
         /// HP 감소 로직
         /// </summary>
@@ -179,10 +234,19 @@ namespace KYG
         /// </summary>
         private void UpgradeBaseByAge(AgeData nextAgeData)
         {
+            Debug.LogError($"--- UpgradeBaseByAge CALLED for {gameObject.name} ---");
             // TODO 업그래이드 기능 구현
             this.maxHP = nextAgeData.maxHP; // 최대 체력 업그레이드
             this.currentHP = maxHP; // 현재 체력 업그레이드 및 회복
-
+            if (mySpriteRenderer != null && nextAgeData.baseSprite != null)
+            {
+                Debug.Log("새로운 baseSprite가 있습니다. 스프라이트를 교체합니다.");
+                mySpriteRenderer.sprite = nextAgeData.baseSprite;
+            }
+            else
+            {
+                Debug.LogWarning("경고: SpriteRenderer 또는 nextAgeData의 baseSprite가 할당되지 않았습니다.");
+            }
             // TODO : newAgeData.baseModelPrefab 적용하여 외형 변경 가능하도록 기능 구현
             if (nextAgeData.baseModelPrefab != null)
             {
@@ -213,12 +277,12 @@ namespace KYG
 
             var slotObj =
                 PhotonNetwork.Instantiate(turretSlotPrefab.name, turretSlotParent.position, Quaternion.identity);
-            
+
 
             TurretSlot slot = slotObj.GetComponent<TurretSlot>();
             slot.Init(TeamTag);   // 팀 정보 전달
             turretSlots.Add(slot);
-            
+
             if (PhotonNetwork.IsConnected)
                 pv.RPC(nameof(RPC_RepositionTurretSlots), RpcTarget.All);
             else
@@ -245,6 +309,8 @@ namespace KYG
                 turretSlots[i].transform.localPosition = new Vector3(i * spacing, 0, 0);
             }
         }
+
+
     }
 
 

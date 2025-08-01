@@ -15,7 +15,10 @@ public class InGameUIManager : MonoBehaviour
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI expText;
     public Slider baseHpSlider;
+    public Slider GuestBaseHpSlider;
     public Button evolveButton; // 시대 발전 버튼 참조
+    public GameObject winnerPanel;
+    public GameObject loserPanel;
 
     [Header("유닛 생산 큐")]
     public Slider productionSlider;
@@ -61,10 +64,13 @@ public class InGameUIManager : MonoBehaviour
         if (InGameManager.Instance != null)
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
-            InGameManager.Instance.OnBaseHealthChanged += UpdateBaseHpUI;
-            InGameManager.Instance.OnInfoMessage += ShowInfoText;
+            InGameManager.Instance.OnPlayerBaseHealthChanged += UpdateBaseHpUI;
+            //게스트 베이스 HP 처리
+            InGameManager.Instance.OnOpponentBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
+            InGameManager.Instance.OnGameWon += ShowWinnerPanel;
+            InGameManager.Instance.OnGameLost += ShowLoserPanel;
         }
 
         // UI 초기화
@@ -79,6 +85,8 @@ public class InGameUIManager : MonoBehaviour
         //시작할때 evolve버튼 비활성화
         if (evolveButton != null)
             evolveButton.interactable = false; // 초기에는 비활성화
+        if (winnerPanel != null) winnerPanel.SetActive(false);
+        if (loserPanel != null) loserPanel.SetActive(false);
     }
 
     private void OnDestroy()
@@ -93,10 +101,21 @@ public class InGameUIManager : MonoBehaviour
         if (InGameManager.Instance != null)
         {
             InGameManager.Instance.OnResourceChanged -= UpdateResourceUI;
-            InGameManager.Instance.OnBaseHealthChanged -= UpdateBaseHpUI;
+            InGameManager.Instance.OnPlayerBaseHealthChanged -= UpdateBaseHpUI;
+            InGameManager.Instance.OnOpponentBaseHealthChanged -= UpdateGuestBaseUI;
             InGameManager.Instance.OnInfoMessage -= ShowInfoText;
             InGameManager.Instance.OnEvolveStatusChanged -= UpdateEvolveButton;
-            InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
+            InGameManager.Instance.OnAgeEvolved -= HandleAgeEvolvedUI;
+            if (InGameManager.Instance.p1_Base != null)
+            {
+                InGameManager.Instance.p1_Base.OnHpChanged -= UpdateBaseHpUI;
+            }
+            if (InGameManager.Instance.p2_Base != null)
+            {
+                InGameManager.Instance.p2_Base.OnHpChanged -= UpdateGuestBaseUI;
+            }
+            InGameManager.Instance.OnGameWon -= ShowWinnerPanel;
+            InGameManager.Instance.OnGameLost -= ShowLoserPanel;
         }
     }
     private void Update()
@@ -118,6 +137,27 @@ public class InGameUIManager : MonoBehaviour
         // 여기에 새로운 시대 정보(newAgeData)를 바탕으로 UI를 갱신하는 코드를 작성
     }
 
+    public void RegisterPlayerBase(KYG.BaseController playerBase)
+    {
+        if (playerBase != null)
+        {
+            // 내 HP 슬라이더를 '내 기지'의 체력 변경 이벤트에 연결
+        //    playerBase.OnHpChanged += UpdateBaseHpUI;
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
+            UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
+        }
+    }
+    public void RegisterOpponentBase(KYG.BaseController opponentBase)
+    {
+        if (opponentBase != null)
+        {
+            // 상대방 HP 슬라이더를 '상대 기지'의 체력 변경 이벤트에 연결
+         //   opponentBase.OnHpChanged += UpdateGuestBaseUI;
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
+            UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
+        }
+    }
+
     #region UI 업데이트 함수 (이벤트 수신)
     public void UpdateResourceUI(int newGold, int newExp)
     {
@@ -127,9 +167,19 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
+        Debug.LogError($"--- PLAYER UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
+        }
+    }
+
+    public void UpdateGuestBaseUI(int currentHp, int maxHp)
+    {
+        Debug.LogWarning($"--- OPPONENT UI UPDATED --- 체력: {currentHp}/{maxHp}");
+        if (GuestBaseHpSlider != null && maxHp > 0)
+        {
+            GuestBaseHpSlider.value = (float)currentHp / maxHp;
         }
     }
 
@@ -229,5 +279,45 @@ public class InGameUIManager : MonoBehaviour
             ShowInfoText("Not Enough Gold to Add Turret Slot!");
         }
     }
+    private void ShowWinnerPanel()
+    {
+        if (winnerPanel != null)
+        {
+            winnerPanel.SetActive(true);
+        }
+    }
+    private void ShowLoserPanel()
+    {
+        if (loserPanel != null)
+        {
+            loserPanel.SetActive(true);
+        }
+    }
+
+    public void ReturnToLobby()
+    {
+        // 게임이 멈춘 상태일 수 있으므로 시간을 다시 흐르게 합니다.
+        Time.timeScale = 1f;
+
+        // 현재 씬의 결과 패널들을 비활성화합니다.
+        if (winnerPanel != null) winnerPanel.SetActive(false);
+        if (loserPanel != null) loserPanel.SetActive(false);
+
+        Debug.Log("로비로 돌아가기 위해 PhotonManager 호출.");
+
+        // PhotonManager에게 방을 나가고 로비 씬을 로드하라고 요청합니다.
+        if (PhotonManager.Instance != null)
+        {
+            // 함수 이름을 LeaveRoomAndLoadLobby 등 더 명확하게 바꿔도 좋습니다.
+            PhotonManager.Instance.LeaveRoomAndRejoinLobby();
+        }
+        else
+        {
+            Debug.LogError("PhotonManager를 찾을 수 없습니다! 수동으로 LobbyScene을 로드합니다.");
+            // PhotonManager가 없는 비상 상황을 대비해 직접 씬을 로드합니다.
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene"); // "LobbyScene"은 실제 씬 이름으로 변경해야 합니다.
+        }
+    }
+
     #endregion
 }

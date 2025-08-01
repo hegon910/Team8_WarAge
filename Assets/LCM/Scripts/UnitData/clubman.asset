@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: clubman
   m_EditorClassIdentifier: 
   unitName: ClubMan
-  unitExp: 100
+  unitExp: 30
   health: 55
   attackDamage: 16
   rangedDamage: 0

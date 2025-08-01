@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Firebase.Auth;
+using Photon.Realtime;
+using Photon.Pun;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,8 +18,11 @@ public class UIManager : MonoBehaviour
     public GameObject lobbyPanel;
     public GameObject roomPanel;
 
-
-
+    //추가
+    [Header("Lobby UI")]
+    public GameObject roomItemPrefab; // 1단계에서 만든 RoomItem 프리팹을 연결
+    public Transform roomListContent; // 방 목록이 생성될 부모 Transform (ScrollView의 Content)
+    private List<RoomItem> roomItemsList = new List<RoomItem>();
 
 
     private void Awake()
@@ -119,8 +124,53 @@ public class UIManager : MonoBehaviour
     {
         PhotonManager.Instance.CreateOrJoinLobby();
         Debug.Log("클릭");
+        
     }
 
+    public void CreateRoom()
+    {
+        roomPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
+    }
+    // 새로 추가된 로비 패널 활성화 메서드 (OnLeftRoom 콜백에서 호출)
+    public void ShowLobbyPanel()
+    {
+        lobbyPanel.SetActive(true);
+        roomPanel.SetActive(false);
+    }
+    //추가
+    public void UpdateRoomList(List<RoomInfo> roomList)
+    {
+        // 1. 기존에 생성된 모든 방 UI 아이템 삭제
+        foreach (RoomItem item in roomItemsList)
+        {
+            Destroy(item.gameObject);
+        }
+        roomItemsList.Clear();
+
+        // 2. 서버에서 받아온 방 목록을 기반으로 새로운 UI 아이템 생성
+        foreach (RoomInfo info in roomList)
+        {
+            // 닫혔거나, 비공개거나, 목록에서 제거된 방은 표시하지 않음
+            if (info.RemovedFromList || !info.IsVisible || info.IsOpen == false)
+            {
+                continue;
+            }
+
+            GameObject newRoomItemObj = Instantiate(roomItemPrefab, roomListContent);
+            RoomItem newRoomItem = newRoomItemObj.GetComponent<RoomItem>();
+            newRoomItem.SetRoomInfo(info);
+
+            roomItemsList.Add(newRoomItem);
+        }
+    }
+    public void ShowRoomPanel()
+    {
+        roomPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
+        Debug.Log("UI: 방 패널 활성화, 로비 패널 비활성화");
+    }
+    //---------------
     public void OnClickedLobbyCancel()
     {
         loginPanel.SetActive(true);
@@ -144,6 +194,10 @@ public class UIManager : MonoBehaviour
         lobbyPanel.SetActive(true);
         roomPanel.SetActive(false);
     }
+
+
+
+
     #endregion
 
 

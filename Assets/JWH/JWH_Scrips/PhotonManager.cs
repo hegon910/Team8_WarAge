@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using ExitGames.Client.Photon;
 using System;
+using System.Collections.Generic;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
@@ -26,35 +27,110 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void ConnectToServer(string nickname)
+    public void LeaveRoomAndRejoinLobby()
     {
-        if (PhotonNetwork.IsConnected)
+        // 방을 나가는 요청만 합니다.
+        // 실제 씬 로드는 OnLeftRoom 콜백에서 처리됩니다.
+        PhotonNetwork.LeaveRoom();
+    }
+
+    // [수정] 방을 나간 후 자동으로 호출되는 콜백 함수
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom(); // PUN의 기본 로직을 실행합니다.
+
+        // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
+        // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+
+        Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
+    }
+
+    public void ConnectToServer(string fallbackNickname)
+    {
+        string nicknameToUse = fallbackNickname;
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
         {
-            OnConnectedToMaster();
-            return;
+            string displayName = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.DisplayName;
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                nicknameToUse = displayName;
+            }
         }
-        Debug.Log("��������");
-        PhotonNetwork.NickName = nickname;
+
+        Debug.Log($"{nicknameToUse}");
+        PhotonNetwork.NickName = nicknameToUse;
         PhotonNetwork.ConnectUsingSettings();
     }
+    //public void ConnectToServer(string nickname)
+    //{
+    //    if (PhotonNetwork.IsConnected)
+    //    {
+    //        OnConnectedToMaster();
+    //        return;
+    //    }
+    //    Debug.Log("��������");
+    //    PhotonNetwork.NickName = nickname;
+    //    PhotonNetwork.ConnectUsingSettings();
+    //}
+
 
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
     }
-
-    public override void OnJoinedLobby()
+    //추가    PHG : 방에 참가했을 때 호출되는 콜백
+    public override void OnJoinedRoom()
     {
-        CreateOrJoinLobby();
+        Debug.Log($"방에 참가했습니다: {PhotonNetwork.CurrentRoom.Name}");
+        // 방에 성공적으로 참가했으므로, UIManager를 통해 방 패널을 활성화합니다.
+        UIManager.Instance.ShowRoomPanel(); // UIManager에 이 메서드를 추가해야 합니다.
+        // 필요하다면 여기서 게임 시작 전 준비 상태 UI 등을 업데이트할 수 있습니다.
+    }
+    //추가 PHG : 주석처리
+    //public override void OnJoinedLobby()
+    //{
+    //    // 방 제목 null 아닐 때
+    //    // 채팅 활성화
+    //    // 전적 활성화
+    //    // 방 목록 활성화
+    //}
+    //추가 PHG
+    public void CreateOrJoinRoom()
+    {
+        Debug.Log("CreateOrJoinRoom 호출");
+
+        if (!PhotonNetwork.InLobby)
+        {
+            Debug.LogWarning("로비에 접속하지 않아 방을 만들 수 없습니다.");
+            return;
+        }
+
+        UIManager.Instance.CreateRoom();
+        RoomOptions options = new RoomOptions { MaxPlayers = 2, IsVisible = true, IsOpen = true };
+        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        Debug.Log("JoinOrCreateRoom 호출 완료");
     }
 
-    public void CreateOrJoinLobby()// �� ���� ����� ������
+
+    public void CreateOrJoinLobby()// �� ���� ����� ������
     {
-        string LobbyName = "TestLobby";
+        Debug.Log("CreateOrJoinLobby ȣ��");
+
+        if (!PhotonNetwork.InLobby)
+        {
+            Debug.LogWarning("�κ�������");
+            return;
+        }
+
+        UIManager.Instance.CreateRoom();
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom(LobbyName, options, TypedLobby.Default);
+        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        Debug.Log("JoinOrCreateRoom ȣ��");
+
     }
+
 
     public void SetLocalPlayerReady(bool ready)
     {
@@ -64,7 +140,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public bool AreAllPlayersReady()
     {
-        if (!PhotonNetwork.InRoom) return false; // �濡 ������ �غ� ���¸� Ȯ���� �� ����
+        if (!PhotonNetwork.InRoom) return false; // �濡 ������ �غ� ���¸� Ȯ���� �� ����
 
         foreach (Player p in PhotonNetwork.PlayerList)
         {
@@ -84,11 +160,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
         else if (!PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning("���۱��� ����");
+            Debug.LogWarning("���۱��� ����");
         }
         else
         {
-            Debug.LogWarning("����ȵ�");
+            Debug.LogWarning("����ȵ�");
         }
     }
 
@@ -101,7 +177,40 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            return new Player[0]; // �濡 ������ �� �迭 ��ȯ
+            return new Player[0]; // �濡 ������ �� �迭 ��ȯ
         }
     }
+
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        // --- [새로 추가된 디버그 로그 시작] ---
+        if (roomList.Count == 0)
+        {
+            Debug.Log("OnRoomListUpdate: 수신된 방 목록이 비어있습니다. (현재 생성된 방이 없거나, 로비에 방이 없는 상태일 수 있습니다.)");
+        }
+        else
+        {
+            Debug.Log($"<color=lime>OnRoomListUpdate: {roomList.Count}개의 방 정보 변경사항 수신.</color> -- 목록 --");
+            foreach (RoomInfo info in roomList)
+            {
+                // info.RemovedFromList는 해당 방이 목록에서 제거되었음을 의미합니다.
+                if (info.RemovedFromList)
+                {
+                    Debug.Log($" - 방 '{info.Name}'이 제거되었습니다.");
+                }
+                else
+                {
+                    Debug.Log($" - 방 이름: <color=yellow>{info.Name}</color> | 인원: {info.PlayerCount}/{info.MaxPlayers}");
+                }
+            }
+            Debug.Log("------------------------------------");
+        }
+        // --- [디버그 로그 끝] ---
+
+        // 기존 UI 업데이트 로직은 그대로 호출합니다.
+        UIManager.Instance.UpdateRoomList(roomList);
+    }
+ 
+
+
 }
