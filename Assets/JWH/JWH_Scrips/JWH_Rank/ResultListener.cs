@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatsListener : MonoBehaviour
+public class ResultListener : MonoBehaviour
 {
     //void OnEnable()
     //{
