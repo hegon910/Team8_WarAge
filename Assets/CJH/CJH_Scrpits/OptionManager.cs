@@ -42,7 +42,13 @@ public class OptionManager : MonoBehaviour
 
     public void OnClickedOptionConfirm()
     {
-        // 예: 설정 저장, 옵션 닫기
+        ResolutionManager resolutionManager = FindObjectOfType<ResolutionManager>();
+        if (resolutionManager != null)
+        {
+            resolutionManager.ApplyCurrentResolution();
+            Debug.Log("해상도 설정 확인");
+        }
+        // 옵션 패널 닫기
         optionPanel.SetActive(false);
     }
 

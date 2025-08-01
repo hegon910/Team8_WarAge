@@ -142,7 +142,6 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedReady()
     {
-        //Todo 레디 관련 함수 연결
     }
 
     public void OnClickedLeave()
