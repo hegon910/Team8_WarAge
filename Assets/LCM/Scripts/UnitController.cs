@@ -34,7 +34,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         gm = InGameManager.Instance;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
 
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
@@ -47,7 +47,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (gameObject.tag == "P2")
         {
-            spriteRenderer.flipX = !spriteRenderer.flipX;
+            transform.rotation = Quaternion.Euler(0, 180, 0);
         }
 
         if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
@@ -58,7 +58,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (animator != null)
         {
-            animator.SetBool(IsMoving, false); 
+            animator.SetBool(IsMoving, true); 
             animator.SetBool(IsDead, false);   
         }
     }
@@ -78,18 +78,16 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             if (currentTarget == null)
             {
                 Move();
-                if (animator != null) animator.SetBool(IsMoving, true);
             }
             else
             {
                 Attack(currentTarget);
-                if (animator != null) animator.SetBool(IsMoving, false);
             }
         }
         else
         {
             Attack(currentTarget);
-            if (animator != null) animator.SetBool(IsMoving, false);
+            
         }
     }
 
@@ -140,7 +138,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     private void Move()
     {
         if (currentHealth <= 0) return;
-
+        if (animator != null) animator.SetBool(IsMoving, true);
         Vector2 checkDirection = moveDirection;
         Collider2D myCollider = GetComponent<Collider2D>();
         Vector2 raycastOrigin = (Vector2)transform.position + checkDirection * (myCollider.bounds.extents.x + 0.05f);
@@ -220,7 +218,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonView basePV = targetBase.GetComponent<PhotonView>();
                 if (basePV != null)
                 {
-                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
+                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage,this.tag);
                 }
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;
@@ -242,7 +240,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     PhotonView basePV = targetBase.GetComponent<PhotonView>();
                     if (basePV != null)
                     {
-                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
+                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage,this.tag);
                     }
                 }
             }
