@@ -595,7 +595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de22e06b45cb5ec489af3a709ebc902b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretPrefab: {fileID: 0}
+  turretPrefab: {fileID: 587895179793134548, guid: 17bcc5ac16573c145868ba0887674ea1, type: 3}
 --- !u!1 &298207681
 GameObject:
   m_ObjectHideFlags: 0
@@ -1680,7 +1680,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5892570705319173535, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
       propertyPath: isDebugMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5892570705319173535, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
       propertyPath: startingGold
@@ -1713,6 +1713,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7584627368491985176, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1435201890}
+    - targetCorrespondingSourceObject: {fileID: 7584627368491985176, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1435201891}
   m_SourcePrefab: {fileID: 100100000, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
 --- !u!114 &1349323260 stripped
 MonoBehaviour:
@@ -1887,52 +1890,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitPrefab: {fileID: 0}
---- !u!1 &1432687694
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1432687696}
-  - component: {fileID: 1432687695}
-  m_Layer: 0
-  m_Name: InGameSpawnManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1432687695
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1432687694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b25ae633c3eead94abbd60d34443736a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  p1_spawnPoint: {fileID: 1608749305}
-  p2_spawnPoint: {fileID: 649957994}
---- !u!4 &1432687696
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1432687694}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.374514, y: 0.70489323, z: -0.060616903}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1435201888 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7584627368491985176, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
@@ -1960,6 +1917,21 @@ MonoBehaviour:
   sceneViewId: 3
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &1435201891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435201888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b25ae633c3eead94abbd60d34443736a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  basePrefab: {fileID: 1669524953809846975, guid: 98f3829b01fc8af4f991d9b848fe9003, type: 3}
+  p1_spawnPoint: {fileID: 1608749305}
+  p2_spawnPoint: {fileID: 649957994}
 --- !u!1001 &1465313491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2105,6 +2077,34 @@ PrefabInstance:
       value: PHK.UnitButton, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3758474150837400850, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 4818089090773087196, guid: 98f3829b01fc8af4f991d9b848fe9003, type: 3}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CreateTurretSlot
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: KYG.BaseController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
@@ -2352,6 +2352,10 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+    - target: {fileID: 9120152946296277355, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: b498b10e04b2d4d42b0c26e9eb535f19, type: 3}
     m_RemovedComponents:
     - {fileID: 7984821149039613299, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
     m_RemovedGameObjects: []
@@ -2553,7 +2557,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1607150753}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1607150755
 Camera:
   m_ObjectHideFlags: 0
@@ -3654,5 +3658,4 @@ SceneRoots:
   - {fileID: 7939572542780139632}
   - {fileID: 3757905835179977855}
   - {fileID: 5366120425423248999}
-  - {fileID: 1432687696}
   - {fileID: 189912355}
