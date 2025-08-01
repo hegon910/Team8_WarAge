@@ -285,12 +285,32 @@ public class InGameUIManager : MonoBehaviour
         if (baseCtrl != null)
             baseCtrl.UnlockNextTurretSlot(100); // 슬롯 해금 비용 100
     }
-    
-    
+    private void HideAllInGameUI()
+    {
+        if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
+        if (UnitInfoText != null) UnitInfoText.gameObject.SetActive(false);
+        if (goldText != null) goldText.gameObject.SetActive(false);
+        if (expText != null) expText.gameObject.SetActive(false);
+        if (baseHpSlider != null) baseHpSlider.gameObject.SetActive(false);
+        if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
+        if (evolveButton != null) evolveButton.gameObject.SetActive(false);
+
+        // ���� ���� ���� UI�� ����ϴ�.
+        if (productionSlider != null) productionSlider.gameObject.SetActive(false);
+        if (queueSlots != null)
+        {
+            foreach (var slot in queueSlots)
+            {
+                if (slot != null) slot.gameObject.SetActive(false);
+            }
+        }
+    }
+
     private void ShowWinnerPanel()
     {
         if (winnerPanel != null)
         {
+            HideAllInGameUI(); // �ٸ� �ΰ��� UI �����
             winnerPanel.SetActive(true);
         }
     }
@@ -298,6 +318,7 @@ public class InGameUIManager : MonoBehaviour
     {
         if (loserPanel != null)
         {
+            HideAllInGameUI(); // �ٸ� �ΰ��� UI �����
             loserPanel.SetActive(true);
         }
     }

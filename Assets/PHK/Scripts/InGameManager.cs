@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using KYG;
 using Photon.Pun;
 using Photon.Realtime;
@@ -52,6 +53,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     public event Action OnGameLost;
     #endregion
 
+    #region �ʱ⼳�� �� Update()
     private void Awake()
     {
         if (Instance == null)
@@ -120,7 +122,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void OnDestroy()
     {
-       
+
         if (p1_Base != null)
         {
             p1_Base.OnHpChanged -= HandleP1BaseHpChanged;
@@ -166,6 +168,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
             AddExp(this.teamTag, 500); // �׽�Ʈ�� ����ġ �߰�
         }
     }
+    #endregion
 
     #region �ڿ� �� ü�� ���� �Լ�
 
@@ -461,6 +464,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
     
     public BaseController GetLocalPlayerBase()
     {
@@ -510,5 +514,41 @@ public class InGameManager : MonoBehaviourPunCallbacks
             OnGameWon?.Invoke();
             Debug.Log("Result: You Won");
         }
+        // �й��� ���� �ڽ��� ���� ���Ͽ� ��/�� �̺�Ʈ ȣ�� �� ���� ��� ��ȣ ����
+        if (myTeamTag == losingTeamTag)
+        {
+            OnGameLost?.Invoke();
+            SendMatchResult(false); // �й� ��� ����
+        }
+        else
+        {
+            OnGameWon?.Invoke();
+            SendMatchResult(true); // �¸� ��� ����
+        }
     }
+
+    /// <summary>
+    /// ���� ����� ����ϱ� ���� ��Ʈ��ũ ���񽺿� ��ȣ
+    /// �� �Լ��� �� Ŭ���̾�Ʈ(�÷��̾�)���� �ڽ��� ����� ���� �� ���� ȣ��
+    /// </summary>
+    /// <param name="isWinner">���� �÷��̾��� �¸� ����.</param>
+    private void SendMatchResult(bool isWinner)
+    {
+        // ��Ʈ��ũ ����ڰ� ���� ��� �ý����� ����
+        // ����� �÷��̾� ������ ���� ����� �α׷� ���
+        FirebaseUser user = UserAuthService.Auth?.CurrentUser;
+        if (user == null)
+        {
+            Debug.LogError("���� ��� ����: ���� �α��ε� Firebase ������ �����ϴ�.");
+            return;
+        }
+
+        string resultLog = isWinner ? "�¸�" : "�й�";
+        Debug.Log($"[���� ��� ��ȣ] �÷��̾�: {user.DisplayName} ({user.UserId}), ���: {resultLog}");
+
+        // TODO: ��Ʈ��ũ ����ڴ� �� ��ȣ�� �޾� DB�� ������ ���
+        // ���� ������ ������Ʈ�ϴ� ������ ����
+
+    }
+    #endregion
 }
