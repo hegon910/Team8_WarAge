@@ -41,12 +41,14 @@ namespace KYG
         [SerializeField] private GameObject defaultUnitPrefab; // 생성할 유닛 프리팹
 
         [Header("Turret Slot")]
-        [SerializeField] private GameObject turretSlotPrefab;
+        [SerializeField] private TurretSlot[] turretSlots; // 미리 BasePrefab에 붙여놓을 슬롯 배열
+        private int unlockedSlotCount = 0; // 현재 열려 있는 슬롯 개수
+        //[SerializeField] private GameObject turretSlotPrefab;
 
-        [SerializeField] private Transform turretSlotParent;
+        //[SerializeField] private Transform turretSlotParent;
 
-        [SerializeField] private int maxTurretSlots = 4;
-        private readonly List<TurretSlot> turretSlots = new();
+        //[SerializeField] private int maxTurretSlots = 4;
+        //private readonly List<TurretSlot> turretSlots = new();
 
         private PhotonView pv; // 네트워크 식별용 포톤 뷰
         public event Action<int, int> OnHpChanged; //HP 변동시 이벤트 발생 (최대 체력, 현재 체력) 
@@ -55,6 +57,10 @@ namespace KYG
         private void Awake()
         {
             pv = GetComponent<PhotonView>();
+            
+            // 시작할 때 모든 슬롯을 비활성화
+            foreach (var slot in turretSlots)
+                slot.gameObject.SetActive(false);
 
         }
 
@@ -140,7 +146,24 @@ namespace KYG
 
         private void UpdateHpUI() => OnHpChanged?.Invoke(currentHP, maxHP); // UI로 HP 갱신 이벤트
 
+        
+        // 슬롯 해금
+        public void UnlockNextTurretSlot(int cost)
+        {
+            if (unlockedSlotCount >= turretSlots.Length) return;
 
+            if (InGameManager.Instance.SpendGold(cost))
+            {
+                turretSlots[unlockedSlotCount].gameObject.SetActive(true);
+                turretSlots[unlockedSlotCount].Init(TeamTag); // 팀 정보 전달
+                unlockedSlotCount++;
+            }
+            else
+            {
+                Debug.Log("골드가 부족합니다!");
+            }
+        }
+        
         /// <summary>
         /// 데미지를 받으면 해당 공력력 만큼 현재체력 감소
         /// 체력 UI에 기지 체력 연동 필요
@@ -271,7 +294,7 @@ namespace KYG
         /// <summary>
         /// 슬롯 추가: Base 위에 새로운 터렛 설치 공간 생성
         /// </summary>
-        public void CreateTurretSlot()
+        /*public void CreateTurretSlot()
         {
             if (turretSlots.Count >= maxTurretSlots || turretSlotPrefab == null) return;
 
@@ -308,7 +331,7 @@ namespace KYG
                 turretSlots[i].transform.SetParent(turretSlotParent, false);
                 turretSlots[i].transform.localPosition = new Vector3(i * spacing, 0, 0);
             }
-        }
+        }*/
 
 
     }

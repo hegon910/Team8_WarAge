@@ -595,7 +595,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de22e06b45cb5ec489af3a709ebc902b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretPrefab: {fileID: 587895179793134548, guid: 17bcc5ac16573c145868ba0887674ea1, type: 3}
+  turretPrefab: {fileID: 3273872876269889139, guid: c28a49272fa41024281de1b92a7a357b, type: 3}
+  turretData: {fileID: 11400000, guid: df01b73a14b715c41926e140c48c873d, type: 2}
 --- !u!1 &298207681
 GameObject:
   m_ObjectHideFlags: 0
@@ -830,6 +831,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretPrefab: {fileID: 0}
+  turretData: {fileID: 0}
 --- !u!4 &524520075 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4242021509740848, guid: ffd3c094641fc694c994e145d92c86da, type: 3}
@@ -1319,6 +1321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretPrefab: {fileID: 0}
+  turretData: {fileID: 0}
 --- !u!1 &1143845533 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3648225370336130557, guid: b4bedce08ec9e86489271d4fdc99388c, type: 3}
@@ -2091,18 +2094,18 @@ PrefabInstance:
     - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 4818089090773087196, guid: 98f3829b01fc8af4f991d9b848fe9003, type: 3}
+      objectReference: {fileID: 259394161}
     - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: CreateTurretSlot
+      value: OnClick_RequestTurret
       objectReference: {fileID: 0}
     - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: KYG.BaseController, Assembly-CSharp
+      value: PHK.TurretButton, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 4426256652939760139, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -2851,6 +2854,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretPrefab: {fileID: 0}
+  turretData: {fileID: 0}
 --- !u!1 &1768671329
 GameObject:
   m_ObjectHideFlags: 0

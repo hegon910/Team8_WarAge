@@ -8,6 +8,10 @@ TagManager:
   - P2
   - BaseP1
   - BaseP2
+  - P1Turret
+  - P2Turret
+  - P1Unit
+  - P2Unit
   layers:
   - Default
   - TransparentFX
@@ -20,8 +24,8 @@ TagManager:
   - P1Base
   - P2Base
   - Arrow
-  - 
-  - 
+  - P1Turret
+  - P2Turret
   - 
   - 
   - 

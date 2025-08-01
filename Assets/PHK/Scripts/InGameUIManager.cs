@@ -2,30 +2,33 @@ using PHK;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
-// ÀÎ°ÔÀÓÀÇ Àü¹ÝÀûÀÎ UI¸¦ °ü¸®ÇÏ´Â ½ºÅ©¸³Æ®.
-// ´Ù¸¥ ¸Å´ÏÀúµé·ÎºÎÅÍ ÀÌº¥Æ®¸¦ ¹Þ¾Æ UI¸¦ °»½ÅÇÏ°í, UI ¹öÆ° ÀÔ·ÂÀ» ¹Þ¾Æ ´Ù¸¥ ¸Å´ÏÀú¿¡°Ô ¿äÃ».
+using KYG;
+// ï¿½Î°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®.
+// ï¿½Ù¸ï¿½ ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½Þ¾ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½, UI ï¿½ï¿½Æ° ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½Þ¾ï¿½ ï¿½Ù¸ï¿½ ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã».
 public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance { get; private set; }
 
-    [Header("UI ¿ä¼Ò")]
+    [Header("UI ï¿½ï¿½ï¿½")]
     public TextMeshProUGUI inGameInfoText;
     public TextMeshProUGUI UnitInfoText;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI expText;
     public Slider baseHpSlider;
     public Slider GuestBaseHpSlider;
-    public Button evolveButton; // ½Ã´ë ¹ßÀü ¹öÆ° ÂüÁ¶
+    public Button evolveButton; // ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½
     public GameObject winnerPanel;
     public GameObject loserPanel;
+    public TurretData turretDataToPlace;
 
-    [Header("À¯´Ö »ý»ê Å¥")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¥")]
     public Slider productionSlider;
     public Toggle[] queueSlots = new Toggle[5];
+    
+    
 
-    // --- ÅÍ·¿ °ü·Ã »óÅÂ ---
-    // PlayerActionState´Â ÀÌÁ¦ UI¿Í »óÈ£ÀÛ¿ëÇÏ´Â ¸ðµå¸¦ ³ªÅ¸³»¹Ç·Î UI ¸Å´ÏÀú°¡ °ü¸®.
+    // --- ï¿½Í·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ---
+    // PlayerActionStateï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½å¸¦ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½Ç·ï¿½ UI ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
     public enum PlayerActionState
     {
         None,
@@ -33,7 +36,7 @@ public class InGameUIManager : MonoBehaviour
         SellingTurret
     }
     public PlayerActionState currentState { get; private set; } = PlayerActionState.None;
-    public GameObject turretPrefabToPlace { get; private set; } // ÀÐ±â Àü¿ëÀ¸·Î ¿ÜºÎ ³ëÃâ
+    public GameObject turretPrefabToPlace { get; private set; } // ï¿½Ð±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Üºï¿½ ï¿½ï¿½ï¿½ï¿½
 
     private void Awake()
     {
@@ -49,12 +52,12 @@ public class InGameUIManager : MonoBehaviour
 
     void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã Á¤º¸ ÅØ½ºÆ® ¼û±â±â
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½
         if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
         if (UnitInfoText != null) UnitInfoText.text = "";
 
-        // --- ÀÌº¥Æ® ±¸µ¶ ---
-        // ½Ì±ÛÅÏ ÀÎ½ºÅÏ½º°¡ nullÀÏ ¼ö ÀÖÀ¸¹Ç·Î ¾ÈÀüÇÏ°Ô È®ÀÎ
+        // --- ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ---
+        // ï¿½Ì±ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½ nullï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ È®ï¿½ï¿½
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
@@ -65,7 +68,7 @@ public class InGameUIManager : MonoBehaviour
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
             InGameManager.Instance.OnPlayerBaseHealthChanged += UpdateBaseHpUI;
-            //°Ô½ºÆ® º£ÀÌ½º HP Ã³¸®
+            //ï¿½Ô½ï¿½Æ® ï¿½ï¿½ï¿½Ì½ï¿½ HP Ã³ï¿½ï¿½
             InGameManager.Instance.OnOpponentBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
@@ -73,7 +76,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnGameLost += ShowLoserPanel;
         }
 
-        // UI ÃÊ±âÈ­
+        // UI ï¿½Ê±ï¿½È­
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {
@@ -82,16 +85,16 @@ public class InGameUIManager : MonoBehaviour
                 if (slot != null) slot.SetIsOnWithoutNotify(false);
             }
         }
-        //½ÃÀÛÇÒ¶§ evolve¹öÆ° ºñÈ°¼ºÈ­
+        //ï¿½ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½ evolveï¿½ï¿½Æ° ï¿½ï¿½È°ï¿½ï¿½È­
         if (evolveButton != null)
-            evolveButton.interactable = false; // ÃÊ±â¿¡´Â ºñÈ°¼ºÈ­
+            evolveButton.interactable = false; // ï¿½Ê±â¿¡ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        // ¿ÀºêÁ§Æ® ÆÄ±« ½Ã ÀÌº¥Æ® ±¸µ¶À» ¹Ýµå½Ã ÇØÁ¦ÇØ¾ß ¸Þ¸ð¸® ´©¼ö¸¦ ¹æÁö
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ä±ï¿½ ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ýµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Þ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
@@ -120,10 +123,10 @@ public class InGameUIManager : MonoBehaviour
     }
     private void Update()
     {
-        // ÅÍ·¿ °Ç¼³ ¶Ç´Â ÆÇ¸Å ¸ðµåÀÏ ¶§¸¸ ÀÔ·ÂÀ» È®ÀÎÇÕ´Ï´Ù.
+        // ï¿½Í·ï¿½ ï¿½Ç¼ï¿½ ï¿½Ç´ï¿½ ï¿½Ç¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ È®ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
         if (currentState != PlayerActionState.None)
         {
-            // ¿ìÅ¬¸¯ ¶Ç´Â ESC Å°¸¦ ´©¸£¸é Çàµ¿À» Ãë¼ÒÇÕ´Ï´Ù.
+            // ï¿½ï¿½Å¬ï¿½ï¿½ ï¿½Ç´ï¿½ ESC Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½àµ¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 CancelPlayerAction();
@@ -132,18 +135,18 @@ public class InGameUIManager : MonoBehaviour
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
-        // ¿¹: ½Ã´ë°¡ º¯°æµÇ¾úÀ½À» ¾Ë¸®´Â ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+        // ï¿½ï¿½: ï¿½Ã´ë°¡ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
         Debug.Log($"UI UPDATE: New Age - {newAgeData.ageType}");
-        // ¿©±â¿¡ »õ·Î¿î ½Ã´ë Á¤º¸(newAgeData)¸¦ ¹ÙÅÁÀ¸·Î UI¸¦ °»½ÅÇÏ´Â ÄÚµå¸¦ ÀÛ¼º
+        // ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½(newAgeData)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Úµå¸¦ ï¿½Û¼ï¿½
     }
 
     public void RegisterPlayerBase(KYG.BaseController playerBase)
     {
         if (playerBase != null)
         {
-            // ³» HP ½½¶óÀÌ´õ¸¦ '³» ±âÁö'ÀÇ Ã¼·Â º¯°æ ÀÌº¥Æ®¿¡ ¿¬°á
+            // ï¿½ï¿½ HP ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ 'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½'ï¿½ï¿½ Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         //    playerBase.OnHpChanged += UpdateBaseHpUI;
-            // UI ÃÊ±âÈ­¸¦ À§ÇØ ÇöÀç Ã¼·ÂÀ¸·Î ÇÑ¹ø ¾÷µ¥ÀÌÆ®
+            // UI ï¿½Ê±ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
             UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
         }
     }
@@ -151,14 +154,14 @@ public class InGameUIManager : MonoBehaviour
     {
         if (opponentBase != null)
         {
-            // »ó´ë¹æ HP ½½¶óÀÌ´õ¸¦ '»ó´ë ±âÁö'ÀÇ Ã¼·Â º¯°æ ÀÌº¥Æ®¿¡ ¿¬°á
+            // ï¿½ï¿½ï¿½ï¿½ HP ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ 'ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½'ï¿½ï¿½ Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
          //   opponentBase.OnHpChanged += UpdateGuestBaseUI;
-            // UI ÃÊ±âÈ­¸¦ À§ÇØ ÇöÀç Ã¼·ÂÀ¸·Î ÇÑ¹ø ¾÷µ¥ÀÌÆ®
+            // UI ï¿½Ê±ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
             UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
         }
     }
 
-    #region UI ¾÷µ¥ÀÌÆ® ÇÔ¼ö (ÀÌº¥Æ® ¼ö½Å)
+    #region UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ô¼ï¿½ (ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½)
     public void UpdateResourceUI(int newGold, int newExp)
     {
         if (goldText != null) goldText.text = $"{newGold}";
@@ -167,7 +170,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- PLAYER UI UPDATED --- Ã¼·Â: {currentHp}/{maxHp}");
+        Debug.Log($"--- PLAYER UI UPDATED --- Ã¼ï¿½ï¿½: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
@@ -176,7 +179,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateGuestBaseUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- OPPONENT UI UPDATED --- Ã¼·Â: {currentHp}/{maxHp}");
+        Debug.Log($"--- OPPONENT UI UPDATED --- Ã¼ï¿½ï¿½: {currentHp}/{maxHp}");
         if (GuestBaseHpSlider != null && maxHp > 0)
         {
             GuestBaseHpSlider.value = (float)currentHp / maxHp;
@@ -189,7 +192,7 @@ public class InGameUIManager : MonoBehaviour
         {
             inGameInfoText.text = message;
             inGameInfoText.gameObject.SetActive(true);
-            // ÇÊ¿äÇÏ´Ù¸é ¸î ÃÊ µÚ¿¡ ÀÚµ¿À¸·Î »ç¶óÁö´Â ·ÎÁ÷ Ãß°¡ °¡´É
+            // ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ú¿ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
     }
 
@@ -210,7 +213,7 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region À¯´Ö »ý»ê UI
+    #region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ UI
     private void UpdateQueueUI(int queuedCount)
     {
         for (int i = 0; i < queueSlots.Length; i++)
@@ -239,16 +242,16 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region ÅÍ·¿ °ü·Ã UI ¹× »óÅÂ °ü¸®
-    // ÅÍ·¿ °Ç¼³ ¹öÆ°¿¡¼­ È£Ãâ
-    public void EnterTurretPlaceMode(GameObject turretPrefab)
+    #region ï¿½Í·ï¿½ ï¿½ï¿½ï¿½ï¿½ UI ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    // ï¿½Í·ï¿½ ï¿½Ç¼ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
+    public void EnterTurretPlaceMode(TurretData data)
     {
         currentState = PlayerActionState.PlacingTurret;
-        turretPrefabToPlace = turretPrefab;
+        turretDataToPlace = data;
         ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
     }
 
-    // ÅÍ·¿ ÆÇ¸Å ¹öÆ°¿¡¼­ È£Ãâ
+    // ï¿½Í·ï¿½ ï¿½Ç¸ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
     public void EnterTurretSellMode()
     {
         currentState = PlayerActionState.SellingTurret;
@@ -256,7 +259,7 @@ public class InGameUIManager : MonoBehaviour
         ShowInfoText("Select a turret to sell. (Right-click to cancel)");
     }
 
-    // ÅÍ·¿ °Ç¼³/ÆÇ¸Å ¼º°ø ¶Ç´Â Ãë¼Ò ½Ã È£Ãâ
+    // ï¿½Í·ï¿½ ï¿½Ç¼ï¿½/ï¿½Ç¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ È£ï¿½ï¿½
     public void CancelPlayerAction()
     {
         currentState = PlayerActionState.None;
@@ -264,21 +267,26 @@ public class InGameUIManager : MonoBehaviour
         HideInfoText();
     }
 
-    // ÅÍ·¿ ½½·Ô Ãß°¡ ¹öÆ°¿¡¼­ È£Ãâ
+    // ï¿½Í·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
     public void OnClick_AddTurretSlotButton()
     {
-        int slotCost = 100; // ºñ¿ëÀº InGameManager³ª ´Ù¸¥ µ¥ÀÌÅÍ ½ÃÆ®¿¡¼­ °ü¸®ÇÏ´Â °ÍÀÌ ´õ ÁÁÀ½
+        /*int slotCost = 100; // ï¿½ï¿½ï¿½ï¿½ï¿½ InGameManagerï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (InGameManager.Instance.SpendGold(slotCost))
         {
             ShowInfoText("Turret Slot Added!");
-            // TODO: BaseController¿¡ ½½·Ô Ãß°¡¸¦ ¿äÃ»ÇÏ´Â ·ÎÁ÷
-            // ¿¹: InGameManager.Instance.GetPlayerBase().AddNewSlot();
+            // TODO: BaseControllerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½: InGameManager.Instance.GetPlayerBase().AddNewSlot();
         }
         else
         {
             ShowInfoText("Not Enough Gold to Add Turret Slot!");
-        }
+        }*/
+        var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
+        if (baseCtrl != null)
+            baseCtrl.UnlockNextTurretSlot(100); // ìŠ¬ë¡¯ í•´ê¸ˆ ë¹„ìš© 100
     }
+    
+    
     private void ShowWinnerPanel()
     {
         if (winnerPanel != null)
@@ -296,26 +304,26 @@ public class InGameUIManager : MonoBehaviour
 
     public void ReturnToLobby()
     {
-        // °ÔÀÓÀÌ ¸ØÃá »óÅÂÀÏ ¼ö ÀÖÀ¸¹Ç·Î ½Ã°£À» ´Ù½Ã Èå¸£°Ô ÇÕ´Ï´Ù.
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½å¸£ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.
         Time.timeScale = 1f;
 
-        // ÇöÀç ¾ÀÀÇ °á°ú ÆÐ³ÎµéÀ» ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ð³Îµï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ï¿½Õ´Ï´ï¿½.
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
 
-        Debug.Log("·Îºñ·Î µ¹¾Æ°¡±â À§ÇØ PhotonManager È£Ãâ.");
+        Debug.Log("ï¿½Îºï¿½ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ PhotonManager È£ï¿½ï¿½.");
 
-        // PhotonManager¿¡°Ô ¹æÀ» ³ª°¡°í ·Îºñ ¾ÀÀ» ·ÎµåÇÏ¶ó°í ¿äÃ»ÇÕ´Ï´Ù.
+        // PhotonManagerï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½Ï¶ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½Õ´Ï´ï¿½.
         if (PhotonManager.Instance != null)
         {
-            // ÇÔ¼ö ÀÌ¸§À» LeaveRoomAndLoadLobby µî ´õ ¸íÈ®ÇÏ°Ô ¹Ù²ãµµ ÁÁ½À´Ï´Ù.
+            // ï¿½Ô¼ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ LeaveRoomAndLoadLobby ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È®ï¿½Ï°ï¿½ ï¿½Ù²ãµµ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
             PhotonManager.Instance.LeaveRoomAndRejoinLobby();
         }
         else
         {
-            Debug.LogError("PhotonManager¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù! ¼öµ¿À¸·Î LobbySceneÀ» ·ÎµåÇÕ´Ï´Ù.");
-            // PhotonManager°¡ ¾ø´Â ºñ»ó »óÈ²À» ´ëºñÇØ Á÷Á¢ ¾ÀÀ» ·ÎµåÇÕ´Ï´Ù.
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene"); // "LobbyScene"Àº ½ÇÁ¦ ¾À ÀÌ¸§À¸·Î º¯°æÇØ¾ß ÇÕ´Ï´Ù.
+            Debug.LogError("PhotonManagerï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½! ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LobbySceneï¿½ï¿½ ï¿½Îµï¿½ï¿½Õ´Ï´ï¿½.");
+            // PhotonManagerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½È²ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½Õ´Ï´ï¿½.
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene"); // "LobbyScene"ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Õ´Ï´ï¿½.
         }
     }
 
