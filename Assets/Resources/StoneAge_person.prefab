@@ -95,7 +95,9 @@ GameObject:
   - component: {fileID: 4088534522721097039}
   - component: {fileID: 4424142580918087910}
   - component: {fileID: 7494127731545227541}
-  - component: {fileID: 5789389265206045816}
+  - component: {fileID: 8232322278572594314}
+  - component: {fileID: 1130964890787538895}
+  - component: {fileID: 5404793409948385571}
   m_Layer: 0
   m_Name: StoneAge_person
   m_TagString: Untagged
@@ -127,7 +129,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3472674702577018649}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -181,7 +183,29 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.3}
   m_Size: {x: 0.8, y: 1.8}
   m_Direction: 0
---- !u!114 &5789389265206045816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472674702577018649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitdata: {fileID: 11400000, guid: 7b2b6a3169e340249b839d8a16ee7f3e, type: 2}
+  rb: {fileID: 4424142580918087910}
+  spriteRenderer: {fileID: 4884451990854171855}
+  animator: {fileID: 3011288110607709450}
+  currentHealth: 0
+  meleeSwitchRange: 1.5
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopDistance: 1
+  moveDirection: {x: 1, y: 0, z: 0}
+--- !u!114 &1130964890787538895
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -199,10 +223,29 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents: []
+  ObservedComponents:
+  - {fileID: 8232322278572594314}
+  - {fileID: 5404793409948385571}
+  - {fileID: 1079495462407803439}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &5404793409948385571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472674702577018649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &5543026220087004097
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +257,7 @@ GameObject:
   - component: {fileID: 8608198501958459903}
   - component: {fileID: 4884451990854171855}
   - component: {fileID: 3011288110607709450}
+  - component: {fileID: 1079495462407803439}
   m_Layer: 0
   m_Name: Anim
   m_TagString: Untagged
@@ -230,7 +274,7 @@ Transform:
   m_GameObject: {fileID: 5543026220087004097}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.23, y: 0.12, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -277,7 +321,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300176, guid: 5675db4a4d8e12347911934eb7b196fd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -310,3 +354,30 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1079495462407803439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5543026220087004097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 1
+    Name: isDead
+  - Type: 4
+    SynchronizeType: 1
+    Name: isMoving
+  - Type: 9
+    SynchronizeType: 0
+    Name: isAttack
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
