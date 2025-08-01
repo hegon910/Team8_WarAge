@@ -45,17 +45,35 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
-    public void ConnectToServer(string nickname)
+
+    public void ConnectToServer(string fallbackNickname)
     {
-        if (PhotonNetwork.IsConnected)
+        string nicknameToUse = fallbackNickname;
+        if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
         {
-            OnConnectedToMaster();
-            return;
+            string displayName = Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser.DisplayName;
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                nicknameToUse = displayName;
+            }
         }
-        Debug.Log("��������");
-        PhotonNetwork.NickName = nickname;
+
+        Debug.Log($"{nicknameToUse}");
+        PhotonNetwork.NickName = nicknameToUse;
         PhotonNetwork.ConnectUsingSettings();
     }
+    //public void ConnectToServer(string nickname)
+    //{
+    //    if (PhotonNetwork.IsConnected)
+    //    {
+    //        OnConnectedToMaster();
+    //        return;
+    //    }
+    //    Debug.Log("��������");
+    //    PhotonNetwork.NickName = nickname;
+    //    PhotonNetwork.ConnectUsingSettings();
+    //}
+
 
     public override void OnConnectedToMaster()
     {

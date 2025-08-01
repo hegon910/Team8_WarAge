@@ -26,6 +26,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
 
 
+
     [Header("게임 기본 설정")]
     [SerializeField] private int startingGold = 175;
 
@@ -37,6 +38,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private PhotonView photonView;
     private string teamTag;
     private bool isGameOver = false;
+    private AgeType p1_currentAge = AgeType.Ancient;
+    private AgeType p2_currentAge = AgeType.Ancient;
 
     // --- 이벤트 ---
     public event Action<KYG.AgeData> OnAgeEvolved;
@@ -109,14 +112,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
         OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp());
         OnInfoMessage?.Invoke("Game Started!");
 
-        if (ageManager != null)
-        {
-            ageManager.OnAgeChangedByTeam += HandleAgeChanged;
-        }
-        else
-        {
-            Debug.LogError("AgeManager가 할당되지 않았습니다! InGameManager의 Inspector에서 할당해주세요.");
-        }
+
         // 게임 시작 시 시대 발전 버튼은 비활성화 상태로 시작
         OnEvolveStatusChanged?.Invoke(false);
         StartCoroutine(PassiveGoldGeneration());
@@ -124,10 +120,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void OnDestroy()
     {
-        if (ageManager != null)
-        {
-            ageManager.OnAgeChangedByTeam -= HandleAgeChanged;
-        }
+       
         if (p1_Base != null)
         {
             p1_Base.OnHpChanged -= HandleP1BaseHpChanged;
@@ -284,93 +277,135 @@ public class InGameManager : MonoBehaviourPunCallbacks
     #region 시대 발전 관련
     public void AttemptEvolve()
     {
-        if (isDebugMode)
+        // 로컬 플레이어의 팀 태그와 시대를 가져옵니다.
+        string localPlayerTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        AgeType localPlayerAge = (localPlayerTag == "P1") ? p1_currentAge : p2_currentAge;
+
+        // 발전 가능 여부를 확인합니다.
+        if (ageManager.CanUpgrade(localPlayerAge, GetLocalPlayerExp()))
         {
-            // 디버그 모드에서는 로컬 플레이어의 경험치를 사용하여 직접 시대를 발전
-            string debugTeamTag = isDebugHost ? "P1" : "P2"; // 디버그 호스트 여부로 팀 결정
-            ageManager.TryUpgradeAge(debugTeamTag, GetLocalPlayerExp());
+            // 디버그 모드일 경우
+            if (isDebugMode)
+            {
+                Debug.Log($"디버그 모드: {localPlayerTag}의 시대 발전을 직접 실행합니다.");
+                // isDebugHost를 기반으로 올바른 플레이어 ActorNumber를 시뮬레이션하여 RPC를 호출합니다.
+                int localActorNumber = isDebugHost ? 1 : 2;
+                RPC_ConfirmEvolve(localActorNumber);
+            }
+            // 네트워크 모드일 경우
+            else
+            {
+                photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
+            }
         }
         else
         {
-            photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, GetLocalPlayerExp()); // 경험치도 함께 전달
-            Debug.Log("마스터 클라이언트에게 시대 발전을 요청합니다.");
+            Debug.Log("시대 발전 실패: 경험치 부족");
         }
     }
 
     [PunRPC]
-    private void RPC_RequestEvolve(int requestingPlayerActorNumber, int playerExp, PhotonMessageInfo info) // playerExp 매개변수 추가
+    private void RPC_RequestEvolve(int requestingPlayerActorNumber, PhotonMessageInfo info)
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
-        Debug.Log($"{requestingPlayerActorNumber}번 플레이어의 시대 발전 요청을 수신 (현재 경험치: {playerExp})");
-
         Player requestingPlayer = PhotonNetwork.CurrentRoom.GetPlayer(requestingPlayerActorNumber);
-        if (requestingPlayer == null)
-        {
-            Debug.LogError($"RPC_RequestEvolve: 요청 플레이어 (ActorNumber: {requestingPlayerActorNumber})를 찾을 수 없습니다.");
-            return;
-        }
+        if (requestingPlayer == null) return;
 
-        // 마스터 클라이언트에서 해당 플레이어의 실제 경험치와 시대 발전 조건을 다시 검증
-        // 플레이어의 CustomProperties에서 최신 경험치를 가져옵니다.
+        string teamTag = (requestingPlayer.ActorNumber == 1) ? "P1" : "P2";
+        AgeType playerAge = (teamTag == "P1") ? p1_currentAge : p2_currentAge;
+
         int actualExp = 0;
         if (requestingPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
         {
             actualExp = (int)expValue;
         }
 
-        // 시대 발전 가능 여부 재확인
-        bool canUpgrade = ageManager.CanUpgrade(actualExp); // 실제 경험치로 검증
-
-        if (canUpgrade)
+        // 마스터 클라이언트가 해당 플레이어의 현재 시대와 경험치로 다시 한번 검증
+        if (ageManager.CanUpgrade(playerAge, actualExp))
         {
-            // 시대 발전 성공 시
             photonView.RPC("RPC_ConfirmEvolve", RpcTarget.All, requestingPlayerActorNumber);
-            // 시대 발전 시 경험치를 초기화해야 한다면 여기서 초기화 로직 추가
-            // ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
-            // playerProps[PLAYER_EXP_KEY] = 0; // 예: 경험치 초기화
-            // requestingPlayer.SetCustomProperties(playerProps);
         }
         else
         {
-            // 시대 발전 실패 시 (예: 경험치 부족)
-            Debug.LogWarning($"플레이어 {requestingPlayerActorNumber} 시대 발전 실패: 경험치 부족 ({actualExp} / {ageManager.GetRequiredExpForNextAge()})");
-            // 실패 메시지를 해당 플레이어에게만 전송하거나 처리하는 로직 추가 가능
+            Debug.LogWarning($"플레이어 {requestingPlayer.NickName} 시대 발전 실패 (마스터 클라이언트 검증)");
         }
     }
+
+
 
     [PunRPC]
     private void RPC_ConfirmEvolve(int targetPlayerActorNumber)
     {
         Debug.Log($"{targetPlayerActorNumber}번 플레이어의 시대 발전 확정 RPC 수신");
         string teamTag = (targetPlayerActorNumber == 1) ? "P1" : "P2";
-        if (targetPlayerActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-        {
-            ageManager.TryUpgradeAge(teamTag, GetLocalPlayerExp()); // 로컬 플레이어 경험치로 시대 발전 시도
 
+        // 1. InGameManager가 해당 팀의 시대 상태를 직접 업데이트
+        AgeData nextAgeData = null;
+        if (teamTag == "P1")
+        {
+            nextAgeData = ageManager.GetNextAgeData(p1_currentAge);
+            if (nextAgeData != null) p1_currentAge = nextAgeData.ageType;
+        }
+        else // teamTag == "P2"
+        {
+            nextAgeData = ageManager.GetNextAgeData(p2_currentAge);
+            if (nextAgeData != null) p2_currentAge = nextAgeData.ageType;
+        }
+
+        if (nextAgeData == null)
+        {
+            Debug.LogError("다음 시대 데이터를 찾을 수 없습니다!");
+            return;
+        }
+
+        // 2. 해당하는 기지(BaseController)를 찾아 모델 변경 함수를 '직접' 호출
+        BaseController targetBase = (teamTag == "P1") ? p1_Base : p2_Base;
+        if (targetBase != null)
+        {
+            targetBase.UpgradeBaseByAge(nextAgeData);
         }
         else
         {
-            Debug.Log($"다른 플레이어({targetPlayerActorNumber}, 팀: {teamTag})의 시대 발전을 확인했습니다.");
+            Debug.LogError($"{teamTag}의 기지를 찾을 수 없어 모델을 변경할 수 없습니다.");
+        }
+
+        // 3. UI 업데이트 등 후속 처리 (로컬 플레이어인 경우에만)
+        string localPlayerTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+
+        // 시대 발전을 한 플레이어가 '나' 자신인지 팀 태그로 확인합니다.
+        if (teamTag == localPlayerTeamTag)
+        {
+            // 경험치 차감 또는 초기화 로직이 필요하다면 여기에 추가
+            // 예: SpendExp(ageManager.GetRequiredExpForNextAge(...));
+
+            // UI 업데이트
+            unitPanelManager.UpdateAge(nextAgeData);
+            OnAgeEvolved?.Invoke(nextAgeData);
+            CheckForAgeUp(); // 발전 버튼 상태 다시 체크
+
+            Debug.Log($"로컬 플레이어({localPlayerTeamTag})의 시대가 {nextAgeData.ageType}으로 발전하여 UI를 업데이트합니다.");
         }
     }
-
-    private void HandleAgeChanged(string teamtag, KYG.AgeData newAgeData)
-    {
-        Debug.Log($"[InGameManager] AgeData 수신. 유닛 수: {newAgeData.spawnableUnits.Count}");
-
-        // UnitPanelManager는 UI 요소이므로, 직접 제어하기보다 이벤트로 처리하는 것이 이상적이나,
-        // 현재 구조상 AgeData를 직접 전달해야 하므로 이 부분은 유지합니다.
-        unitPanelManager.UpdateAge(newAgeData);
-
-        OnAgeEvolved?.Invoke(newAgeData);
-        CheckForAgeUp();
-    }
+    //private void HandleAgeChanged(string teamtag, KYG.AgeData newAgeData)
+    //{
+    //    Debug.Log($"[InGameManager] AgeData 수신. 유닛 수: {newAgeData.spawnableUnits.Count}");
+    //
+    //    // UnitPanelManager는 UI 요소이므로, 직접 제어하기보다 이벤트로 처리하는 것이 이상적이나,
+    //    // 현재 구조상 AgeData를 직접 전달해야 하므로 이 부분은 유지합니다.
+    //    unitPanelManager.UpdateAge(newAgeData);
+    //
+    //    OnAgeEvolved?.Invoke(newAgeData);
+    //    CheckForAgeUp();
+    //}
 
     private void CheckForAgeUp()
     {
-        bool canUpgrade = ageManager.CanUpgrade(GetLocalPlayerExp()); // 로컬 플레이어 경험치로 체크
-        OnEvolveStatusChanged?.Invoke(canUpgrade); // 시대 발전 가능 여부를 이벤트로 알림
+        // 로컬 플레이어의 현재 시대를 기준으로 발전 가능 여부 체크
+        string localTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        AgeType localPlayerAge = (localTeamTag == "P1") ? p1_currentAge : p2_currentAge;
+        bool canUpgrade = ageManager.CanUpgrade(localPlayerAge, GetLocalPlayerExp());
+        OnEvolveStatusChanged?.Invoke(canUpgrade);
 
         if (canUpgrade)
         {
@@ -392,9 +427,15 @@ public class InGameManager : MonoBehaviourPunCallbacks
             // ageManager가 할당되어 있는지 확인
             if (ageManager != null)
             {
-                // 현재 시대에 따라 지급할 골드량을 결정합니다.
-                // (AgeType 이름은 실제 프로젝트의 enum 이름에 맞게 조정해야 할 수 있습니다)
-                switch (ageManager.CurrentAge)
+                // --- 이 부분이 핵심적인 변경점입니다 ---
+                // 1. 로컬 플레이어(나)의 팀 태그를 확인합니다.
+                string localTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+
+                // 2. 팀 태그에 맞는 현재 시대 변수를 가져옵니다.
+                AgeType localPlayerAge = (localTeamTag == "P1") ? p1_currentAge : p2_currentAge;
+
+                // 3. 로컬 플레이어의 현재 시대를 기준으로 골드 지급량을 결정합니다.
+                switch (localPlayerAge)
                 {
                     case AgeType.Ancient:
                         goldToAdd = 15;
@@ -408,9 +449,6 @@ public class InGameManager : MonoBehaviourPunCallbacks
                         goldToAdd = 100;
                         break;
 
-                    // 필요하다면 다른 시대에 대한 case 추가
-                    // ...
-
                     default:
                         goldToAdd = 0; // 해당하는 시대가 없으면 지급 안함
                         break;
@@ -420,7 +458,6 @@ public class InGameManager : MonoBehaviourPunCallbacks
             if (goldToAdd > 0)
             {
                 AddGold(goldToAdd);
-                // OnInfoMessage?.Invoke($"+{goldToAdd} Gold"); // 골드 획득을 알리는 메시지 (선택 사항)
             }
         }
     }
