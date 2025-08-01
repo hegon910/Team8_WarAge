@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AncientTurretData1
   m_EditorClassIdentifier: 
   turretName: 
-  turretPrefab: {fileID: 0}
+  turretPrefab: {fileID: 587895179793134548, guid: 17bcc5ac16573c145868ba0887674ea1, type: 3}
   cost: 0
   sellPrice: 0
   attackRange: 0
