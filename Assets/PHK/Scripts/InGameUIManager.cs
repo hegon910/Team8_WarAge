@@ -167,7 +167,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
-        Debug.LogError($"--- PLAYER UI UPDATED --- 체력: {currentHp}/{maxHp}");
+        Debug.Log($"--- PLAYER UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
@@ -176,7 +176,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateGuestBaseUI(int currentHp, int maxHp)
     {
-        Debug.LogWarning($"--- OPPONENT UI UPDATED --- 체력: {currentHp}/{maxHp}");
+        Debug.Log($"--- OPPONENT UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (GuestBaseHpSlider != null && maxHp > 0)
         {
             GuestBaseHpSlider.value = (float)currentHp / maxHp;

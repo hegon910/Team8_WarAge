@@ -44,10 +44,13 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             spriteRenderer.flipX = !spriteRenderer.flipX;
         }
 
-        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
+        if (gameObject.CompareTag("P1"))
         {
-            if (gameObject.CompareTag("P1")) unitLayer = LayerMask.GetMask("P1Unit");
-            else if (gameObject.CompareTag("P2")) unitLayer = LayerMask.GetMask("P2Unit");
+            unitLayer = LayerMask.GetMask("P1Unit");
+        }
+        else if (gameObject.CompareTag("P2"))
+        {
+            unitLayer = LayerMask.GetMask("P2Unit");
         }
     }
 
@@ -190,7 +193,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 PhotonView basePV = targetBase.GetComponent<PhotonView>();
                 if (basePV != null)
                 {
-                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
+                    basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage, this.tag);
                 }
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;

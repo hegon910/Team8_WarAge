@@ -61,14 +61,14 @@ namespace KYG
         public void OnPhotonInstantiate(PhotonMessageInfo info)
         {
             // 1. TestNetworkManager가 보낸 InstantiationData에서 팀 태그를 받아옵니다.
-            this.teamTag = (string)info.photonView.InstantiationData[0];
+            this.TeamTag = (string)info.photonView.InstantiationData[0];
 
             // 2. GameObject의 태그를 받아온 팀 태그로 설정합니다.
-            this.gameObject.tag = this.teamTag;
+            this.gameObject.tag = this.TeamTag;
             Debug.Log($"기지가 생성되었습니다. 팀: {this.teamTag}, GameObject 태그: {this.gameObject.tag}");
 
             // 3. 팀 태그가 "BaseP2"인 경우, 스프라이트와 콜라이더를 반전시킵니다.
-            if (this.teamTag == "BaseP2")
+            if (this.TeamTag == "BaseP2")
             {
                 // 객체의 로컬 스케일의 x값을 -1로 바꿔 한 번에 뒤집습니다.
                 // 이 방법이 스프라이트와 콜라이더를 각각 제어하는 것보다 간단하고 효율적입니다.
@@ -82,7 +82,7 @@ namespace KYG
             // 4. InGameManager에 자기 자신을 등록합니다.
             if (InGameManager.Instance != null)
             {
-                InGameManager.Instance.RegisterBase(this, this.teamTag);
+                InGameManager.Instance.RegisterBase(this, this.TeamTag);
             }
             else
             {
@@ -103,12 +103,12 @@ namespace KYG
             }
             InitBase(); // 기지 초기화
          
-            if (AgeManager.Instance != null)
-                AgeManager.Instance.OnAgeChangedByTeam += (teamTag, nextAgeData) =>
-                {
-                    if (teamTag == TeamTag)
-                        UpgradeBaseByAge(nextAgeData); // 시대 변경 이벤트 받아 자동 업그레이드 처리
-                };
+           // if (AgeManager.Instance != null)
+           //     AgeManager.Instance.OnAgeChangedByTeam += (teamTag, nextAgeData) =>
+           //     {
+           //         if (teamTag == TeamTag)
+           //             UpgradeBaseByAge(nextAgeData); // 시대 변경 이벤트 받아 자동 업그레이드 처리
+           //     };
         }
         public void InitializeTeam(string team)
         {
@@ -232,7 +232,7 @@ namespace KYG
         /// 추후 시대 변화 시스템과 연동 하여 시대가 변화 할때 기지도 변화
         /// 기지는 부모 해당 시대의 기지는 자식관계로 놓고 해당 시대가 되면 SetActive?
         /// </summary>
-        private void UpgradeBaseByAge(AgeData nextAgeData)
+        public void UpgradeBaseByAge(AgeData nextAgeData)
         {
             Debug.LogError($"--- UpgradeBaseByAge CALLED for {gameObject.name} ---");
             // TODO 업그래이드 기능 구현
