@@ -2,7 +2,7 @@ using PHK;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using KYG;
 // �ΰ����� �������� UI�� �����ϴ� ��ũ��Ʈ.
 // �ٸ� �Ŵ�����κ��� �̺�Ʈ�� �޾� UI�� �����ϰ�, UI ��ư �Է��� �޾� �ٸ� �Ŵ������� ��û.
 public class InGameUIManager : MonoBehaviour
@@ -19,6 +19,7 @@ public class InGameUIManager : MonoBehaviour
     public Button evolveButton; // �ô� ���� ��ư ����
     public GameObject winnerPanel;
     public GameObject loserPanel;
+    public TurretData turretDataToPlace;
 
     [Header("���� ���� ť")]
     public Slider productionSlider;
@@ -243,10 +244,10 @@ public class InGameUIManager : MonoBehaviour
 
     #region �ͷ� ���� UI �� ���� ����
     // �ͷ� �Ǽ� ��ư���� ȣ��
-    public void EnterTurretPlaceMode(GameObject turretPrefab)
+    public void EnterTurretPlaceMode(TurretData data)
     {
         currentState = PlayerActionState.PlacingTurret;
-        turretPrefabToPlace = turretPrefab;
+        turretDataToPlace = data;
         ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
     }
 

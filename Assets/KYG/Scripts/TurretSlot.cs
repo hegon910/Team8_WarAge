@@ -13,25 +13,48 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
         
         public bool IsEmpty => currentTurret == null; // 현재 설치된 터렛이 없는지 확인
         
-    
+        /// <summary>
+        /// BaseController에서 슬롯 활성화 시 호출되어 팀 태그 설정
+        /// </summary>
         public void Init(string teamTag)
         {
             TeamTag = teamTag;
         }
         
-        
-        public void InstallTurret(TurretData data) // 터렛 설치
+        /// <summary>
+        /// 터렛 설치
+        /// </summary>
+        public void InstallTurret(TurretData data)
         {
             if (!IsEmpty) return;
-            
-            // PhotonNetwork로 터렛 설치 → 모든 클라이언트에 동기화됨
-            GameObject turretObj =
-                PhotonNetwork.Instantiate(data.turretPrefab.name, transform.position, Quaternion.identity);
-                
-            // 터렛 컨트롤러 초기화
-                currentTurret = turretObj.GetComponent<TurretController>();
-                currentTurret.Init(data, this, TeamTag); // 팀 정보 전달
-                // TODO UI 버튼 연동
+
+            if (data == null || data.turretPrefab == null)
+            {
+                Debug.LogError("TurretData가 비어 있거나 turretPrefab이 없습니다!");
+                return;
+            }
+
+            GameObject turretObj;
+
+            // 디버그 모드 혹은 Photon 미연결 상태 → Instantiate
+            if (InGameManager.Instance.isDebugMode || !PhotonNetwork.IsConnected)
+            {
+                turretObj = Instantiate(data.turretPrefab, transform.position, Quaternion.identity);
+            }
+            else
+            {
+                turretObj = PhotonNetwork.Instantiate(data.turretPrefab.name, transform.position, Quaternion.identity);
+            }
+
+            currentTurret = turretObj.GetComponent<TurretController>();
+            if (currentTurret == null)
+            {
+                Debug.LogError("TurretController가 터렛 프리팹에 없습니다!");
+                return;
+            }
+
+            // 터렛 초기화 시 TeamTag 전달
+            currentTurret.Init(data, this, TeamTag);
         }
 
         public void SellTurret() // 터렛 판매
@@ -43,35 +66,22 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
             currentTurret = null;
             // TODO UI 버튼 연동
         }
-        
+        /// <summary>
+        /// 슬롯 클릭 시 설치 모드 확인 후 설치
+        /// </summary>
         private void OnMouseDown()
         {
-            var ui = InGameUIManager.Instance;
-
-            if (ui == null) return;
-
-            if (ui.currentState == InGameUIManager.PlayerActionState.PlacingTurret)
+            if (InGameUIManager.Instance.currentState == InGameUIManager.PlayerActionState.PlacingTurret)
             {
-                var prefab = ui.turretPrefabToPlace;
-                if (prefab != null)
+                TurretData data = InGameUIManager.Instance.turretDataToPlace;
+                if (data != null && InGameManager.Instance.SpendGold(data.cost))
                 {
-                    // 터렛 설치 로직
-                    TurretData data = prefab.GetComponent<TurretController>().data;
-                    if (InGameManager.Instance.SpendGold(data.cost))
-                    {
-                        InstallTurret(data);
-                        ui.CancelPlayerAction();
-                    }
-                    else
-                    {
-                        ui.ShowInfoText("Not enough gold!");
-                    }
+                    InstallTurret(data);
                 }
             }
-            else if (ui.currentState == InGameUIManager.PlayerActionState.SellingTurret)
+            else if (InGameUIManager.Instance.currentState == InGameUIManager.PlayerActionState.SellingTurret)
             {
                 SellTurret();
-                ui.CancelPlayerAction();
             }
         }
 
