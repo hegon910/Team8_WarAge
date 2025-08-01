@@ -10,6 +10,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Animator animator;
 
     public int currentHealth;
     private Transform currentTarget;
@@ -23,12 +24,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     public bool IsMine => photonView.IsMine;
     private InGameManager gm;
 
+    private static readonly int IsMoving = Animator.StringToHash("isMoving");
+    private static readonly int IsDead = Animator.StringToHash("isDead"); // isDead bool 파라미터
+    private static readonly int IsAttack = Animator.StringToHash("isAttack"); // isAttack Trigger 파라미터
+
     private void Awake()
     {
         currentHealth = unitdata.health;
         gm = InGameManager.Instance;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
 
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
@@ -41,7 +47,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (gameObject.tag == "P2")
         {
-            spriteRenderer.flipX = !spriteRenderer.flipX;
+            transform.rotation = Quaternion.Euler(0, 180, 0);
         }
 
         if (gameObject.CompareTag("P1"))
@@ -51,6 +57,12 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         else if (gameObject.CompareTag("P2"))
         {
             unitLayer = LayerMask.GetMask("P2Unit");
+        }
+
+        if (animator != null)
+        {
+            animator.SetBool(IsMoving, true); 
+            animator.SetBool(IsDead, false);   
         }
     }
 
@@ -78,6 +90,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             Attack(currentTarget);
+            
         }
     }
 
@@ -95,6 +108,11 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 stream.SendNext(-1);
             }
+
+            if (animator != null)
+            {
+                stream.SendNext(animator.GetBool(IsMoving)); 
+            }
         }
         else
         {
@@ -109,13 +127,21 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 currentTarget = null;
             }
+
+            if (animator != null)
+            {
+                if (stream.Count >= 3) 
+                {
+                    animator.SetBool(IsMoving, (bool)stream.ReceiveNext()); 
+                }
+            }
         }
     }
 
     private void Move()
     {
         if (currentHealth <= 0) return;
-
+        if (animator != null) animator.SetBool(IsMoving, true);
         Vector2 checkDirection = moveDirection;
         Collider2D myCollider = GetComponent<Collider2D>();
         Vector2 raycastOrigin = (Vector2)transform.position + checkDirection * (myCollider.bounds.extents.x + 0.05f);
@@ -179,6 +205,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         rb.velocity = Vector2.zero;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
+        photonView.RPC("RpcPlayAttackAnimation", RpcTarget.All);
+
         // 근접 공격
         if (unitdata.unitType == UnitType.Melee && distanceToTarget <= unitdata.MeleeRange)
         {
@@ -215,7 +243,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     PhotonView basePV = targetBase.GetComponent<PhotonView>();
                     if (basePV != null)
                     {
-                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
+                        basePV.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage,this.tag);
                     }
                 }
             }
@@ -253,6 +281,15 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     [PunRPC]
+    private void RpcPlayAttackAnimation()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger(IsAttack);
+        }
+    }
+
+    [PunRPC]
     private void RpcDie()
     {
         string GiveExpTag = CompareTag("P1") ? "P2" : "P1";
@@ -263,6 +300,14 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         currentHealth = -1; // 사망 상태로 확실히 변경 (중복 실행 방지)
         GetComponent<Collider2D>().enabled = false;
+        rb.velocity = Vector2.zero;
+
+        if (animator != null)
+        {
+            animator.SetBool(IsDead, true); 
+        }
+
+        
 
         if (PhotonNetwork.IsMasterClient && gm != null)
         {
