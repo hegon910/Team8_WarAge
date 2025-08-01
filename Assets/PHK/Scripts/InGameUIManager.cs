@@ -279,10 +279,32 @@ public class InGameUIManager : MonoBehaviour
             ShowInfoText("Not Enough Gold to Add Turret Slot!");
         }
     }
+    private void HideAllInGameUI()
+    {
+        if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
+        if (UnitInfoText != null) UnitInfoText.gameObject.SetActive(false);
+        if (goldText != null) goldText.gameObject.SetActive(false);
+        if (expText != null) expText.gameObject.SetActive(false);
+        if (baseHpSlider != null) baseHpSlider.gameObject.SetActive(false);
+        if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
+        if (evolveButton != null) evolveButton.gameObject.SetActive(false);
+
+        // 유닛 생산 관련 UI도 숨깁니다.
+        if (productionSlider != null) productionSlider.gameObject.SetActive(false);
+        if (queueSlots != null)
+        {
+            foreach (var slot in queueSlots)
+            {
+                if (slot != null) slot.gameObject.SetActive(false);
+            }
+        }
+    }
+
     private void ShowWinnerPanel()
     {
         if (winnerPanel != null)
         {
+            HideAllInGameUI(); // 다른 인게임 UI 숨기기
             winnerPanel.SetActive(true);
         }
     }
@@ -290,6 +312,7 @@ public class InGameUIManager : MonoBehaviour
     {
         if (loserPanel != null)
         {
+            HideAllInGameUI(); // 다른 인게임 UI 숨기기
             loserPanel.SetActive(true);
         }
     }

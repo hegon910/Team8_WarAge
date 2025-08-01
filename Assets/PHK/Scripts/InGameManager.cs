@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using KYG;
 using Photon.Pun;
 using Photon.Realtime;
@@ -52,6 +53,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     public event Action OnGameLost;
     #endregion
 
+    #region 초기설정 및 Update()
     private void Awake()
     {
         if (Instance == null)
@@ -120,7 +122,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void OnDestroy()
     {
-       
+
         if (p1_Base != null)
         {
             p1_Base.OnHpChanged -= HandleP1BaseHpChanged;
@@ -166,6 +168,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
             AddExp(this.teamTag, 500); // 테스트용 경험치 추가
         }
     }
+    #endregion
 
     #region 자원 및 체력 관리 함수
 
@@ -461,6 +464,9 @@ public class InGameManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
+
+    #region 게임오버 시퀀스
     private void GameOver(string losingTeamTag)
     {
         if (isGameOver) return; // 게임오버가 이미 처리되었다면 중복 실행 방지
@@ -500,5 +506,41 @@ public class InGameManager : MonoBehaviourPunCallbacks
             OnGameWon?.Invoke();
             Debug.Log("Result: You Won");
         }
+        // 패배한 팀과 자신의 팀을 비교하여 승/패 이벤트 호출 및 전적 기록 신호 전송
+        if (myTeamTag == losingTeamTag)
+        {
+            OnGameLost?.Invoke();
+            SendMatchResult(false); // 패배 결과 전송
+        }
+        else
+        {
+            OnGameWon?.Invoke();
+            SendMatchResult(true); // 승리 결과 전송
+        }
     }
+
+    /// <summary>
+    /// 게임 결과를 기록하기 위해 네트워크 서비스에 신호
+    /// 이 함수는 각 클라이언트(플레이어)에서 자신의 결과에 대해 한 번씩 호출
+    /// </summary>
+    /// <param name="isWinner">로컬 플레이어의 승리 여부.</param>
+    private void SendMatchResult(bool isWinner)
+    {
+        // 네트워크 담당자가 전적 기록 시스템을 구현
+        // 현재는 플레이어 정보와 승패 결과를 로그로 출력
+        FirebaseUser user = UserAuthService.Auth?.CurrentUser;
+        if (user == null)
+        {
+            Debug.LogError("전적 기록 실패: 현재 로그인된 Firebase 유저가 없습니다.");
+            return;
+        }
+
+        string resultLog = isWinner ? "승리" : "패배";
+        Debug.Log($"[전적 기록 신호] 플레이어: {user.DisplayName} ({user.UserId}), 결과: {resultLog}");
+
+        // TODO: 네트워크 담당자는 이 신호를 받아 DB에 전적을 기록
+        // 래더 점수를 업데이트하는 로직을 구현
+
+    }
+    #endregion
 }
