@@ -9,7 +9,7 @@ namespace KYG
     
     public class TurretController : MonoBehaviourPun
     {
-        private TurretData data; // 터렛 데이터
+        public TurretData data; // 터렛 데이터
         private TurretSlot parentSlot; // 설치된 슬롯 참조
 
         private Transform target; // 현재 공격 중인 타겟

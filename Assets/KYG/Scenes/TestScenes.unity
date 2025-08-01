@@ -184,8 +184,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 500
+  mySpriteRenderer: {fileID: 0}
   spawnerPoint: {fileID: 1056482676}
-  unitPrefab: {fileID: 261623865055080972, guid: 33e744abe194c994c9bcab10eed043c6, type: 3}
+  currentBaseModel: {fileID: 0}
+  defaultUnitPrefab: {fileID: 0}
+  turretSlotPrefab: {fileID: 0}
+  turretSlotParent: {fileID: 0}
+  maxTurretSlots: 4
 --- !u!212 &1285433588
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -252,6 +257,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1056482676}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1480294528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1480294529}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1480294529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480294528}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.1290617, y: -1.5765364, z: -0.05154797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2087417535
@@ -352,3 +388,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 2087417538}
   - {fileID: 1285433589}
+  - {fileID: 1480294529}

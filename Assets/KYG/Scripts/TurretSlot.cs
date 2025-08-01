@@ -10,13 +10,15 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
 {
         private TurretController currentTurret; // 현재 설치된 터렛
         public string TeamTag { get; private set; }
+        
+        public bool IsEmpty => currentTurret == null; // 현재 설치된 터렛이 없는지 확인
+        
     
         public void Init(string teamTag)
         {
             TeamTag = teamTag;
         }
         
-        public bool IsEmpty => currentTurret == null; // 현재 설치된 터렛이 없는지 확인
         
         public void InstallTurret(TurretData data) // 터렛 설치
         {
@@ -40,6 +42,37 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
             PhotonNetwork.Destroy(currentTurret.gameObject);
             currentTurret = null;
             // TODO UI 버튼 연동
+        }
+        
+        private void OnMouseDown()
+        {
+            var ui = InGameUIManager.Instance;
+
+            if (ui == null) return;
+
+            if (ui.currentState == InGameUIManager.PlayerActionState.PlacingTurret)
+            {
+                var prefab = ui.turretPrefabToPlace;
+                if (prefab != null)
+                {
+                    // 터렛 설치 로직
+                    TurretData data = prefab.GetComponent<TurretController>().data;
+                    if (InGameManager.Instance.SpendGold(data.cost))
+                    {
+                        InstallTurret(data);
+                        ui.CancelPlayerAction();
+                    }
+                    else
+                    {
+                        ui.ShowInfoText("Not enough gold!");
+                    }
+                }
+            }
+            else if (ui.currentState == InGameUIManager.PlayerActionState.SellingTurret)
+            {
+                SellTurret();
+                ui.CancelPlayerAction();
+            }
         }
 
     
