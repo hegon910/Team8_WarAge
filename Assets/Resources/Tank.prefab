@@ -173,9 +173,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitdata: {fileID: 11400000, guid: 37c23673d250a014fbc948b6806cee8e, type: 2}
+  unitdata: {fileID: 11400000, guid: 53e47e8a78b834841a66e156661fb300, type: 2}
   rb: {fileID: 631968976436225276}
   spriteRenderer: {fileID: 0}
+  currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
     serializedVersion: 2

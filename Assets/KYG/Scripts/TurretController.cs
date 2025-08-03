@@ -9,7 +9,7 @@ namespace KYG
     
     public class TurretController : MonoBehaviourPun
     {
-        private TurretData data; // 터렛 데이터
+        public TurretData data; // 터렛 데이터
         private TurretSlot parentSlot; // 설치된 슬롯 참조
 
         private Transform target; // 현재 공격 중인 타겟
@@ -28,24 +28,34 @@ namespace KYG
             this.parentSlot = slot;
             this.TeamTag = teamTag;
             
-            // Layer 설정 (유닛과 동일한 팀에 맞춤)
-            if (TeamTag == "P1")
+            // 태그, 레이어 자동 설정
+            if (TeamTag == "BaseP1")
+            {
+                gameObject.tag = "P1Turret";
                 gameObject.layer = LayerMask.NameToLayer("P1Turret");
-            else if (TeamTag == "P2")
+            }
+            else if (TeamTag == "BaseP2")
+            {
+                gameObject.tag = "P2Turret";
                 gameObject.layer = LayerMask.NameToLayer("P2Turret");
+            }
             
         }
 
         private void Update()
         {   
-            // Photon 소유자가 아니면 Update 비활성
-            if(!photonView.IsMine) return;
-            
-            // 타겟이 없거나 사거리 벗어나면 다시 탐색
+            if (data == null)
+            {
+                Debug.LogWarning($"{gameObject.name}: TurretData가 초기화되지 않았습니다!");
+                return;
+            }
+
+            // 타겟이 없거나 사거리 밖이면 다시 찾기
             if (target == null || Vector3.Distance(transform.position, target.position) > data.attackRange)
-            
+            {
                 target = FindNearestEnemy();
-            // 타겟 발견시 공격 타이머 증가
+            }
+
             if (target != null)
             {
                 attackTimer += Time.deltaTime;
@@ -53,7 +63,6 @@ namespace KYG
                 {
                     FireProjectile();
                     attackTimer = 0f;
-                    
                 }
             }
         }
@@ -64,33 +73,57 @@ namespace KYG
         /// <returns></returns>
         private Transform FindNearestEnemy()
         {
-            // 팀별로 적 Layer만 탐색하도록 변경
-            string enemyLayer = TeamTag == "P1" ? "P2Unit" : "P1Unit";
-            Collider[] hits = Physics.OverlapSphere(transform.position, data.attackRange, LayerMask.GetMask(enemyLayer));
+            string enemyTag = GetEnemyTag();
 
-            // 추가: 기지도 타겟으로
-            string enemyBaseLayer = TeamTag == "P1" ? "P2Base" : "P1Base";
-            Collider[] baseHits = Physics.OverlapSphere(transform.position, data.attackRange, LayerMask.GetMask(enemyBaseLayer));
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
+            Transform nearest = null;
+            float minDist = float.MaxValue;
 
-            if (hits.Length > 0) return hits[0].transform;
-            if (baseHits.Length > 0) return baseHits[0].transform;
+            foreach (var enemy in enemies)
+            {
+                if (enemy == null) continue;
+                float dist = Vector3.Distance(transform.position, enemy.transform.position);
 
-            return null;
+                if (dist < minDist && dist <= data.attackRange)
+                {
+                    minDist = dist;
+                    nearest = enemy.transform;
+                }
+            }
+
+            return nearest;
         }
         
         /// <summary>
-        /// 발사체 생성 타겟 발사
+        /// 팀 태그에 따라 적 태그 반환
+        /// </summary>
+        private string GetEnemyTag()
+        {
+            return TeamTag == "BaseP1" ? "P2Unit" : "P1Unit";
+        }
+        
+        /// <summary>
+        /// 발사체 발사
         /// </summary>
         private void FireProjectile()
         {
-            // Photon 네트워크로 발사체 생성(모든 크라이언트 초기화)
-            if(target == null) return;
-            
-            // ProjectileController 초기화
-            GameObject projObj = PhotonNetwork.Instantiate(data.projectilePrefab.name, transform.position, Quaternion.identity);
-            if (projObj.TryGetComponent(out ProjectileController projectile))
+            if (target == null || data.projectilePrefab == null) return;
+
+            GameObject projectile;
+
+            if (InGameManager.Instance.isDebugMode || !PhotonNetwork.IsConnected)
             {
-                projectile.Init(target, data.attackDamage, data.projectileSpeed, TeamTag); // TeamTag 전달
+                projectile = Instantiate(data.projectilePrefab, transform.position, Quaternion.identity);
+            }
+            else
+            {
+                projectile = PhotonNetwork.Instantiate(data.projectilePrefab.name, transform.position, Quaternion.identity);
+            }
+
+            var controller = projectile.GetComponent<ProjectileController>();
+            if (controller != null)
+            {
+                controller.Init(target, data.attackDamage, data.projectileSpeed, TeamTag);
             }
         }
     }

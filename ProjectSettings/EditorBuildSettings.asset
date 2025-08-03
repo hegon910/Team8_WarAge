@@ -14,6 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/JWH/JWH_Scene/JWH_LobbyScene.unity
     guid: 8f37508c19c1d684191ea5447a5bf53e
+
   - enabled: 0
     path: Assets/JWH/JWH_Scene/JWH_GameScene.unity
     guid: c33f7221d30e89c4c87892cc6fd00289

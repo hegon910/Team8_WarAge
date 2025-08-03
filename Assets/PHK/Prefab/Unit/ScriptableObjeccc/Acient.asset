@@ -19,5 +19,7 @@ MonoBehaviour:
   baseModelPrefab: {fileID: 1669524953809846975, guid: ca304959f6f018f40ac798ec916296f6, type: 3}
   spawnableUnits:
   - {fileID: 7729183574821180569, guid: 59b35643b2486c84a80427a71eecd65b, type: 3}
-  - {fileID: 4894062003126303280, guid: e685be98b3bc40242a4a5c1af1b1c880, type: 3}
-  - {fileID: 7880611672624073045, guid: d996f83ae9c361a4a8b1c3e81bae1d0f, type: 3}
+  - {fileID: 4894062003126303280, guid: 8d86a68cff383fc44b06dec9b1091608, type: 3}
+  - {fileID: 7880611672624073045, guid: a18afd32c39e9a44ea5a1165ae533fd4, type: 3}
+
+  availableTurrets: []

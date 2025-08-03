@@ -1,46 +1,59 @@
+using Firebase.Auth;
 using KYG;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// °ÔÀÓÀÇ ÇÙ½É ±ÔÄ¢(ÀÚ¿ø, Ã¼·Â, ½Ã´ë)°ú »óÅÂ¸¦ °ü¸®ÇÏ´Â ½Ì±ÛÅÏ ¸Å´ÏÀú Å¬·¡½º.
-/// UI¸¦ Á÷Á¢ Á¦¾îÇÏÁö ¾Ê°í, »óÅÂ º¯°æ ½Ã ÀÌº¥Æ®¸¦ ÅëÇØ ¿ÜºÎ¿¡ ¾Ë¸³´Ï´Ù.
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½Ä¢(ï¿½Ú¿ï¿½, Ã¼ï¿½ï¿½, ï¿½Ã´ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ì±ï¿½ï¿½ï¿½ ï¿½Å´ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½.
+/// UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ÜºÎ¿ï¿½ ï¿½Ë¸ï¿½ï¿½Ï´ï¿½.
 /// </summary>
 public class InGameManager : MonoBehaviourPunCallbacks
 {
-    #region º¯¼ö
+    #region ï¿½ï¿½ï¿½ï¿½
     public static InGameManager Instance { get; private set; }
 
-    [Header("µð¹ö±× ¿É¼Ç")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½")]
     public bool isDebugMode = false;
     public bool isDebugHost = true;
 
-    [Header("°ü¸®´ë»ó")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     public KYG.AgeManager ageManager;
-    public PHK.UnitPanelManager unitPanelManager; // ½Ã´ë ¹ßÀü ¹öÆ° »óÅÂ º¯°æÀ» À§ÇØ ÂüÁ¶ À¯Áö
-    public KYG.BaseController p1_Base;
-    public KYG.BaseController p2_Base;
+    public PHK.UnitPanelManager unitPanelManager; // ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public BaseController p1_Base { get; private set; }
+    public BaseController p2_Base { get; private set; }
 
-    [Header("°ÔÀÓ ±âº» ¼³Á¤")]
+
+
+
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½âº» ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] private int startingGold = 175;
-    [SerializeField] private int maxBaseHealth = 1000;
 
-    // ÇöÀç °ÔÀÓ »óÅÂ º¯¼ö
+    private const string PLAYER_EXP_KEY = "PlayerExp"; // Photon Custom Properties Å°
+
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     private int currentGold;
-    private int currentEXP;
-    private int currentBaseHealth;
+    //private int currentEXP; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Photon Custom Properties ï¿½ï¿½ï¿½
     private PhotonView photonView;
     private string teamTag;
+    private bool isGameOver = false;
+    private AgeType p1_currentAge = AgeType.Ancient;
+    private AgeType p2_currentAge = AgeType.Ancient;
 
-    // --- ÀÌº¥Æ® ---
+    // --- ï¿½Ìºï¿½Æ® ---
     public event Action<KYG.AgeData> OnAgeEvolved;
     public event Action<int, int> OnResourceChanged;
-    public event Action<int, int> OnBaseHealthChanged;
-    public event Action<string> OnInfoMessage; // UI¿¡ ÀÏ¹Ý ¸Þ½ÃÁö¸¦ Àü´ÞÇÏ±â À§ÇÑ ÀÌº¥Æ®
-    public event Action<bool> OnEvolveStatusChanged; // ½Ã´ë ¹ßÀü °¡´É »óÅÂ º¯°æ ÀÌº¥Æ®
+    public event Action<int, int> OnPlayerBaseHealthChanged;    // P1(ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    public event Action<int, int> OnOpponentBaseHealthChanged;  // P2(ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    public event Action<string> OnInfoMessage; // UIï¿½ï¿½ ï¿½Ï¹ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    public event Action<bool> OnEvolveStatusChanged; // ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    public event Action OnGameWon;
+    public event Action OnGameLost;
     #endregion
 
+    #region ï¿½Ê±â¼³ï¿½ï¿½ ï¿½ï¿½ Update()
     private void Awake()
     {
         if (Instance == null)
@@ -53,62 +66,125 @@ public class InGameManager : MonoBehaviourPunCallbacks
             Destroy(gameObject);
         }
     }
+    public void RegisterBase(BaseController baseController, string team)
+    {
+        if (team == "BaseP1")
+        {
+            p1_Base = baseController;
+            // ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½ï¿½ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.
+            if (p1_Base != null) p1_Base.OnHpChanged += HandleP1BaseHpChanged;
+            Debug.Log("P1 Baseï¿½ï¿½ InGameManagerï¿½ï¿½ ï¿½ï¿½ÏµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+        }
+        else if (team == "BaseP2")
+        {
+            p2_Base = baseController;
+            // ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½ï¿½ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.
+            if (p2_Base != null) p2_Base.OnHpChanged += HandleP2BaseHpChanged;
+            Debug.Log("P2 Baseï¿½ï¿½ InGameManagerï¿½ï¿½ ï¿½ï¿½ÏµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+        }
+    }
 
     private void Start()
     {
-        // °ÔÀÓ »óÅÂ ÃÊ±âÈ­
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
         currentGold = startingGold;
-        currentEXP = 0;
-        currentBaseHealth = maxBaseHealth;
-        if(isDebugMode) teamTag = isDebugHost ? "P1" : "P2";
-        else teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
-
-        // ÃÊ±â °ÔÀÓ »óÅÂ¸¦ ÀÌº¥Æ®·Î UI¿¡ ¹Ý¿µ
-        OnResourceChanged?.Invoke(currentGold, currentEXP);
-        OnBaseHealthChanged?.Invoke(currentBaseHealth, maxBaseHealth);
-        OnInfoMessage?.Invoke("Game Started!");
-
-        if (ageManager != null)
+        // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ä¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼ ï¿½Ê±ï¿½È­ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        if (!PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(PLAYER_EXP_KEY))
         {
-            ageManager.OnAgeChangedByTeam += HandleAgeChanged;
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, 0 } });
         }
         else
         {
-            Debug.LogError("AgeManager°¡ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù! InGameManagerÀÇ Inspector¿¡¼­ ÇÒ´çÇØÁÖ¼¼¿ä.");
+            // ï¿½Ì¹ï¿½ Å°ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+            PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, 0 } });
+        }
+        if (p1_Base != null) p1_Base.InitializeTeam("P1");
+        if (p2_Base != null) p2_Base.InitializeTeam("P2");
+        if (isDebugMode)
+        {
+            teamTag = isDebugHost ? "P1" : "P2";
+        }
+        else
+        {
+            teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
         }
 
-        // °ÔÀÓ ½ÃÀÛ ½Ã ½Ã´ë ¹ßÀü ¹öÆ°Àº ºñÈ°¼ºÈ­ »óÅÂ·Î ½ÃÀÛ
+
+        // ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® (ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ CustomPropertiesï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+        OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp());
+        OnInfoMessage?.Invoke("Game Started!");
+
+
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½ï¿½ï¿½
         OnEvolveStatusChanged?.Invoke(false);
+        StartCoroutine(PassiveGoldGeneration());
     }
 
     private void OnDestroy()
     {
-        if (ageManager != null)
+
+        if (p1_Base != null)
         {
-            ageManager.OnAgeChangedByTeam -= HandleAgeChanged;
+            p1_Base.OnHpChanged -= HandleP1BaseHpChanged;
+        }
+        if (p2_Base != null)
+        {
+            p2_Base.OnHpChanged -= HandleP2BaseHpChanged;
+        }
+    }
+
+    // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ä¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ý¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ ï¿½ï¿½
+        if (changedProps.ContainsKey(PLAYER_EXP_KEY))
+        {
+            int updatedExp = (int)changedProps[PLAYER_EXP_KEY];
+
+            if (targetPlayer == PhotonNetwork.LocalPlayer)
+            {
+                // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å©
+                OnResourceChanged?.Invoke(currentGold, updatedExp); // ï¿½ï¿½ï¿½ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+                CheckForAgeUp();
+                Debug.Log($"ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®: {updatedExp}");
+            }
+            else
+            {
+                // ï¿½Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ InGameManagerï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ê¿ï¿½ ï¿½ï¿½ ï¿½ß°ï¿½)
+                Debug.Log($"ï¿½Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½({targetPlayer.NickName})ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®: {updatedExp}");
+            }
         }
     }
 
     private void Update()
     {
-        if (isDebugMode)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                AddGold(50); // Å×½ºÆ®¿ë °ñµå Ãß°¡
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                AddExp(500); // Å×½ºÆ®¿ë °æÇèÄ¡ Ãß°¡
-            }
+            AddGold(50); // ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            // 'G' Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ß°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ActorNumber ï¿½ï¿½ï¿½
+            AddExp(this.teamTag, 500); // ï¿½×½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ß°ï¿½
         }
     }
+    #endregion
 
-    #region ÀÚ¿ø ¹× Ã¼·Â °ü¸® ÇÔ¼ö
+    #region ï¿½Ú¿ï¿½ ï¿½ï¿½ Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
+
+    public int GetLocalPlayerExp() // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ CustomPropertiesï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    {
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            return (int)expValue;
+        }
+        return 0;
+    }
+
     public void AddGold(int amount)
     {
         currentGold += amount;
-        OnResourceChanged?.Invoke(currentGold, currentEXP);
+        OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp()); // ï¿½ï¿½ï¿½ï¿½Ä¡ UIï¿½ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     }
 
     public bool SpendGold(int amount)
@@ -116,86 +192,223 @@ public class InGameManager : MonoBehaviourPunCallbacks
         if (currentGold >= amount)
         {
             currentGold -= amount;
-            OnResourceChanged?.Invoke(currentGold, currentEXP);
+            OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp()); // ï¿½ï¿½ï¿½ï¿½Ä¡ UIï¿½ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
             return true;
         }
         return false;
     }
-
-    public void AddExp(int amount)
+    /// <summary>
+    /// Æ¯ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½È­.
+    /// ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ È¹ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½Ç´ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½Ç¾ï¿½ï¿½ ï¿½ï¿½.
+    /// ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ Ã³Ä¡ ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³Ä¡ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
+    /// </summary>
+    /// <param name="targetPlayerActorNumber">ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ È¹ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ActorNumber.</param>
+    /// <param name="amount">ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½.</param>
+    public void AddExp(string targetTeamTag, int amount)
     {
-        if (ageManager.GetNextAgeData() != null)
+        // ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½å¿¡ï¿½ï¿½ï¿½ï¿½ RPCï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½Ã»
+        if (!isDebugMode)
         {
-            currentEXP += amount;
-            OnResourceChanged?.Invoke(currentGold, currentEXP);
-            CheckForAgeUp();
-            Debug.Log($"{amount} °æÇèÄ¡ È¹µæ. ÇöÀç °æÇèÄ¡ : {currentEXP}");
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½Ã»
+            photonView.RPC("RPC_AddExp", RpcTarget.MasterClient, targetTeamTag, amount);
+            Debug.Log($"ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ß°ï¿½ ï¿½ï¿½Ã»: ï¿½ï¿½ {targetTeamTag}, ï¿½ï¿½: {amount}");
         }
-    }
-
-    public void TakeBaseDamage(int damage)
-    {
-        currentBaseHealth -= damage;
-        currentBaseHealth = Mathf.Max(currentBaseHealth, 0);
-        OnBaseHealthChanged?.Invoke(currentBaseHealth, maxBaseHealth);
-
-        if (currentBaseHealth <= 0) GameOver();
-    }
-    #endregion
-
-    #region ½Ã´ë ¹ßÀü °ü·Ã
-    public void AttemptEvolve()
-    {
-        if (isDebugMode)
+        else // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å¿¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
         {
-            ageManager.TryUpgradeAge(teamTag, currentEXP);
-        }
-        else
-        {
-            photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
-            Debug.Log("¸¶½ºÅÍ Å¬¶óÀÌ¾ðÆ®¿¡°Ô ½Ã´ë ¹ßÀüÀ» ¿äÃ»ÇÕ´Ï´Ù.");
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½å¿¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Õ´Ï´ï¿½.
+            string myTeamTag = isDebugHost ? "P1" : "P2";
+            if (myTeamTag == targetTeamTag)
+            {
+                int newExp = GetLocalPlayerExp() + amount;
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, newExp } });
+                Debug.Log($"[DebugMode] ï¿½ï¿½ {targetTeamTag}ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ {amount} ï¿½ß°ï¿½. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡: {newExp}");
+            }
         }
     }
 
     [PunRPC]
-    private void RPC_RequestEvolve(int requestingPlayerActorNumber)
+    private void RPC_AddExp(string targetTeamTag, int amount, PhotonMessageInfo info)
+    {
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ RPCï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // ï¿½ï¿½ ï¿½Â±×¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ActorNumberï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. (P1=1, P2=2)
+        int targetPlayerActorNumber = (targetTeamTag == "P1") ? 1 : 2;
+
+        Player targetPlayer = PhotonNetwork.CurrentRoom.GetPlayer(targetPlayerActorNumber);
+        if (targetPlayer == null)
+        {
+            Debug.LogError($"RPC_AddExp: ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ (ï¿½ï¿½: {targetTeamTag}, ActorNumber: {targetPlayerActorNumber})ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+            return;
+        }
+
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®.
+        int currentExp = 0;
+        if (targetPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            currentExp = (int)expValue;
+        }
+
+        int newExp = currentExp + amount;
+
+        // ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® (ï¿½ï¿½ ï¿½Úµå°¡ ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ OnPlayerPropertiesUpdateï¿½ï¿½ È£ï¿½ï¿½Ë´Ï´ï¿½)
+        targetPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { PLAYER_EXP_KEY, newExp } });
+
+        Debug.Log($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®: ï¿½ï¿½ {targetTeamTag}ï¿½ï¿½ï¿½ï¿½ {amount} ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ß°ï¿½, ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡: {newExp}");
+    }
+    private void HandleP1BaseHpChanged(int currentHp, int maxHp)
+    {
+        // P1 ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ P1ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ß»ï¿½ï¿½ï¿½Å´
+        OnPlayerBaseHealthChanged?.Invoke(currentHp, maxHp);
+        if (currentHp <= 0 && PhotonNetwork.IsMasterClient)
+        {
+            GameOver("P1");
+        }
+    }
+    private void HandleP2BaseHpChanged(int currentHp, int maxHp)
+    {
+        // P2 ï¿½ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ P2ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ ï¿½ß»ï¿½ï¿½ï¿½Å´
+        OnOpponentBaseHealthChanged?.Invoke(currentHp, maxHp);
+        if (currentHp <= 0 && PhotonNetwork.IsMasterClient)
+        {
+            GameOver("P2");
+
+        }
+    }
+    #endregion
+
+    #region ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public void AttemptEvolve()
+    {
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Â±×¿ï¿½ ï¿½Ã´ë¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.
+        string localPlayerTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        AgeType localPlayerAge = (localPlayerTag == "P1") ? p1_currentAge : p2_currentAge;
+
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¸ï¿½ È®ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+        if (ageManager.CanUpgrade(localPlayerAge, GetLocalPlayerExp()))
+        {
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+            if (isDebugMode)
+            {
+                Debug.Log($"ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½: {localPlayerTag}ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.");
+                // isDebugHostï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¹Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ActorNumberï¿½ï¿½ ï¿½Ã¹Ä·ï¿½ï¿½Ì¼ï¿½ï¿½Ï¿ï¿½ RPCï¿½ï¿½ È£ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+                int localActorNumber = isDebugHost ? 1 : 2;
+                RPC_ConfirmEvolve(localActorNumber);
+            }
+            // ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+            else
+            {
+                photonView.RPC("RPC_RequestEvolve", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber);
+            }
+        }
+        else
+        {
+            Debug.Log("ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½");
+        }
+    }
+
+    [PunRPC]
+    private void RPC_RequestEvolve(int requestingPlayerActorNumber, PhotonMessageInfo info)
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        Debug.Log($"{requestingPlayerActorNumber}¹ø ÇÃ·¹ÀÌ¾îÀÇ ½Ã´ë ¹ßÀü ¿äÃ»À» ¼ö½Å ¹× °ËÁõ (ÇöÀç´Â ÀÚµ¿ Åë°ú)");
-        photonView.RPC("RPC_ConfirmEvolve", RpcTarget.All, requestingPlayerActorNumber);
+
+        Player requestingPlayer = PhotonNetwork.CurrentRoom.GetPlayer(requestingPlayerActorNumber);
+        if (requestingPlayer == null) return;
+
+        string teamTag = (requestingPlayer.ActorNumber == 1) ? "P1" : "P2";
+        AgeType playerAge = (teamTag == "P1") ? p1_currentAge : p2_currentAge;
+
+        int actualExp = 0;
+        if (requestingPlayer.CustomProperties.TryGetValue(PLAYER_EXP_KEY, out object expValue))
+        {
+            actualExp = (int)expValue;
+        }
+
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½Ñ¹ï¿½ ï¿½ï¿½ï¿½ï¿½
+        if (ageManager.CanUpgrade(playerAge, actualExp))
+        {
+            photonView.RPC("RPC_ConfirmEvolve", RpcTarget.All, requestingPlayerActorNumber);
+        }
+        else
+        {
+            Debug.LogWarning($"ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ {requestingPlayer.NickName} ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½)");
+        }
     }
+
+
 
     [PunRPC]
     private void RPC_ConfirmEvolve(int targetPlayerActorNumber)
     {
-        Debug.Log($"{targetPlayerActorNumber}¹ø ÇÃ·¹ÀÌ¾îÀÇ ½Ã´ë ¹ßÀü È®Á¤ RPC ¼ö½Å");
+        Debug.Log($"{targetPlayerActorNumber}ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ RPC ï¿½ï¿½ï¿½ï¿½");
         string teamTag = (targetPlayerActorNumber == 1) ? "P1" : "P2";
-        if (targetPlayerActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+
+        // 1. InGameManagerï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+        AgeData nextAgeData = null;
+        if (teamTag == "P1")
         {
-            ageManager.TryUpgradeAge(teamTag, currentEXP);
+            nextAgeData = ageManager.GetNextAgeData(p1_currentAge);
+            if (nextAgeData != null) p1_currentAge = nextAgeData.ageType;
+        }
+        else // teamTag == "P2"
+        {
+            nextAgeData = ageManager.GetNextAgeData(p2_currentAge);
+            if (nextAgeData != null) p2_currentAge = nextAgeData.ageType;
+        }
+
+        if (nextAgeData == null)
+        {
+            Debug.LogError("ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!");
+            return;
+        }
+
+        // 2. ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½(BaseController)ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ 'ï¿½ï¿½ï¿½ï¿½' È£ï¿½ï¿½
+        BaseController targetBase = (teamTag == "P1") ? p1_Base : p2_Base;
+        if (targetBase != null)
+        {
+            targetBase.UpgradeBaseByAge(nextAgeData);
         }
         else
         {
-            Debug.Log($"´Ù¸¥ ÇÃ·¹ÀÌ¾î({targetPlayerActorNumber}, ÆÀ: {teamTag})ÀÇ ½Ã´ë ¹ßÀüÀ» È®ÀÎÇß½À´Ï´Ù.");
+            Debug.LogError($"{teamTag}ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+        }
+
+        // 3. UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ ï¿½Ä¼ï¿½ Ã³ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ì¿¡ï¿½ï¿½)
+        string localPlayerTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+
+        // ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ 'ï¿½ï¿½' ï¿½Ú½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Â±×·ï¿½ È®ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+        if (teamTag == localPlayerTeamTag)
+        {
+            // ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½Ê±ï¿½È­ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ ï¿½ï¿½ï¿½â¿¡ ï¿½ß°ï¿½
+            // ï¿½ï¿½: SpendExp(ageManager.GetRequiredExpForNextAge(...));
+
+            // UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+            unitPanelManager.UpdateAge(nextAgeData);
+            OnAgeEvolved?.Invoke(nextAgeData);
+            CheckForAgeUp(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ Ã¼Å©
+
+            Debug.Log($"ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½({localPlayerTeamTag})ï¿½ï¿½ ï¿½Ã´ë°¡ {nextAgeData.ageType}ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½Õ´Ï´ï¿½.");
         }
     }
-
-    private void HandleAgeChanged(string teamtag, KYG.AgeData newAgeData)
-    {
-        Debug.Log($"[InGameManager] AgeData ¼ö½Å. À¯´Ö ¼ö: {newAgeData.spawnableUnits.Count}");
-
-        // UnitPanelManager´Â UI ¿ä¼ÒÀÌ¹Ç·Î, Á÷Á¢ Á¦¾îÇÏ±âº¸´Ù ÀÌº¥Æ®·Î Ã³¸®ÇÏ´Â °ÍÀÌ ÀÌ»óÀûÀÌ³ª,
-        // ÇöÀç ±¸Á¶»ó AgeData¸¦ Á÷Á¢ Àü´ÞÇØ¾ß ÇÏ¹Ç·Î ÀÌ ºÎºÐÀº À¯ÁöÇÕ´Ï´Ù.
-        unitPanelManager.UpdateAge(newAgeData);
-
-        OnAgeEvolved?.Invoke(newAgeData);
-        CheckForAgeUp();
-    }
+    //private void HandleAgeChanged(string teamtag, KYG.AgeData newAgeData)
+    //{
+    //    Debug.Log($"[InGameManager] AgeData ï¿½ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½: {newAgeData.spawnableUnits.Count}");
+    //
+    //    // UnitPanelManagerï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½Ì¹Ç·ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±âº¸ï¿½ï¿½ ï¿½Ìºï¿½Æ®ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ï¿½Ì³ï¿½,
+    //    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AgeDataï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Ï¹Ç·ï¿½ ï¿½ï¿½ ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    //    unitPanelManager.UpdateAge(newAgeData);
+    //
+    //    OnAgeEvolved?.Invoke(newAgeData);
+    //    CheckForAgeUp();
+    //}
 
     private void CheckForAgeUp()
     {
-        bool canUpgrade = ageManager.CanUpgrade(currentEXP);
-        OnEvolveStatusChanged?.Invoke(canUpgrade); // ½Ã´ë ¹ßÀü °¡´É ¿©ºÎ¸¦ ÀÌº¥Æ®·Î ¾Ë¸²
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ë¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å©
+        string localTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        AgeType localPlayerAge = (localTeamTag == "P1") ? p1_currentAge : p2_currentAge;
+        bool canUpgrade = ageManager.CanUpgrade(localPlayerAge, GetLocalPlayerExp());
+        OnEvolveStatusChanged?.Invoke(canUpgrade);
 
         if (canUpgrade)
         {
@@ -203,11 +416,139 @@ public class InGameManager : MonoBehaviourPunCallbacks
         }
     }
     #endregion
-
-    private void GameOver()
+    private IEnumerator PassiveGoldGeneration()
     {
-        Debug.Log("°ÔÀÓ ¿À¹ö Ã³¸® Ãß°¡ ÀÛ¾÷ ÇÊ¿ä");
-        OnInfoMessage?.Invoke("GAME OVER");
-        Time.timeScale = 0f;
+        // 5ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½Ê¿ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ ï¿½Ò´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö½ï¿½ï¿½Ï´ï¿½.
+        var fiveSecondWait = new WaitForSeconds(5f);
+
+        while (true) // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ýºï¿½
+        {
+            yield return fiveSecondWait; // 5ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½
+
+            int goldToAdd = 0;
+
+            // ageManagerï¿½ï¿½ ï¿½Ò´ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+            if (ageManager != null)
+            {
+                // --- ï¿½ï¿½ ï¿½Îºï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½ ---
+                // 1. ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½(ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ ï¿½Â±×¸ï¿½ È®ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+                string localTeamTag = isDebugMode ? (isDebugHost ? "P1" : "P2") : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+
+                // 2. ï¿½ï¿½ ï¿½Â±×¿ï¿½ ï¿½Â´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½É´Ï´ï¿½.
+                AgeType localPlayerAge = (localTeamTag == "P1") ? p1_currentAge : p2_currentAge;
+
+                // 3. ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ë¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+                switch (localPlayerAge)
+                {
+                    case AgeType.Ancient:
+                        goldToAdd = 15;
+                        break;
+
+                    case AgeType.Medieval: // ï¿½ß¼ï¿½ ï¿½Ã´ë°¡ ï¿½Ö´Ù¸ï¿½
+                        goldToAdd = 40;
+                        break;
+
+                    case AgeType.Modern: // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã´ë°¡ ï¿½Ö´Ù¸ï¿½
+                        goldToAdd = 100;
+                        break;
+
+                    default:
+                        goldToAdd = 0; // ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½Ã´ë°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                        break;
+                }
+            }
+
+            if (goldToAdd > 0)
+            {
+                AddGold(goldToAdd);
+            }
+        }
     }
+
+    
+    public BaseController GetLocalPlayerBase()
+    {
+        string myTeamTag = isDebugMode 
+            ? (isDebugHost ? "BaseP1" : "BaseP2")
+            : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "BaseP1" : "BaseP2");
+
+        return myTeamTag == "BaseP1" ? p1_Base : p2_Base;
+    }
+    
+    private void GameOver(string losingTeamTag)
+    {
+        if (isGameOver) return; // ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ Ã³ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½Ù¸ï¿½ ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        isGameOver = true;
+
+        Debug.Log($"Game Over. Losing team: {losingTeamTag}. MasterClient will send RPC.");
+        // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ RPCï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        photonView.RPC("RPC_ShowResultPanels", RpcTarget.All, losingTeamTag);
+    }
+
+    [PunRPC]
+    private void RPC_ShowResultPanels(string losingTeamTag)
+    {
+        // ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        Time.timeScale = 0f;
+        OnInfoMessage?.Invoke("GAME OVER"); // ï¿½ï¿½ï¿½ï¿½ GameOver ï¿½Þ½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
+
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½å¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Â±×¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+        string myTeamTag;
+        if (isDebugMode)
+        {
+            myTeamTag = isDebugHost ? "P1" : "P2";
+        }
+        else
+        {
+            myTeamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
+        }
+
+        // ï¿½Ð¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½/ï¿½ï¿½ ï¿½Ìºï¿½Æ® È£ï¿½ï¿½
+        if (myTeamTag == losingTeamTag)
+        {
+            OnGameLost?.Invoke();
+            Debug.Log("Result: You Lost");
+        }
+        else
+        {
+            OnGameWon?.Invoke();
+            Debug.Log("Result: You Won");
+        }
+        // ï¿½Ð¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½/ï¿½ï¿½ ï¿½Ìºï¿½Æ® È£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½È£ ï¿½ï¿½ï¿½ï¿½
+        if (myTeamTag == losingTeamTag)
+        {
+            OnGameLost?.Invoke();
+            SendMatchResult(false); // ï¿½Ð¹ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        }
+        else
+        {
+            OnGameWon?.Invoke();
+            SendMatchResult(true); // ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        }
+    }
+
+    /// <summary>
+    /// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ñ½º¿ï¿½ ï¿½ï¿½È£
+    /// ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®(ï¿½Ã·ï¿½ï¿½Ì¾ï¿½)ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
+    /// </summary>
+    /// <param name="isWinner">ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Â¸ï¿½ ï¿½ï¿½ï¿½ï¿½.</param>
+    private void SendMatchResult(bool isWinner)
+    {
+        // ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½
+        FirebaseUser user = UserAuthService.Auth?.CurrentUser;
+        if (user == null)
+        {
+            Debug.LogError("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ï¿½Îµï¿½ Firebase ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+            return;
+        }
+
+        string resultLog = isWinner ? "ï¿½Â¸ï¿½" : "ï¿½Ð¹ï¿½";
+        Debug.Log($"[ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½È£] ï¿½Ã·ï¿½ï¿½Ì¾ï¿½: {user.DisplayName} ({user.UserId}), ï¿½ï¿½ï¿½: {resultLog}");
+
+        // TODO: ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ ï¿½ï¿½ ï¿½ï¿½È£ï¿½ï¿½ ï¿½Þ¾ï¿½ DBï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+
+    }
+    #endregion
 }

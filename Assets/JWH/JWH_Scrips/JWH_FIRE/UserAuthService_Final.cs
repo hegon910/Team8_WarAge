@@ -74,6 +74,7 @@ public class UserAuthService : MonoBehaviour
                 else
                 {
                     Debug.Log("로그인 성공");
+                    UserRank.Instance.InitializeNewUser();
                     callback?.Invoke(true, task.Result.User);
                 }
             });

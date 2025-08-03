@@ -21,7 +21,7 @@ public class Arrow : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange)
+    public void InitializeArrow(string spawnerTag, Vector3 moveDirection, int arrowDamage, float maxRange) 
     {
         ownerTag = spawnerTag;
         damage = arrowDamage;
@@ -66,9 +66,9 @@ public class Arrow : MonoBehaviourPun
         {
 
         }
-        else 
+        else
         {
-            if (!photonView.IsMine) return; 
+            if (!photonView.IsMine) return;
         }
 
 
@@ -85,17 +85,17 @@ public class Arrow : MonoBehaviourPun
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 유닛 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
-            else if (targetBase != null) 
+            else if (targetBase != null)
             {
                 string opponentBaseTag = (ownerTag == "P1") ? "BaseP2" : "BaseP1";
                 if (other.CompareTag(opponentBaseTag))
                 {
-                    targetBase.TakeDamage(damage,ownerTag);
+                    // BaseController는 건드리지 않는다는 지침에 따라 attackerActorNumber를 전달하지 않습니다.
+                    targetBase.RpcTakeDamage(damage, ownerTag);
                     Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 베이스 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
                 }
             }
-            Debug.Log($"{gameObject.name} (발사자: {ownerTag})이 {other.name} (태그: {other.tag})에게 {damage} 데미지를 주었습니다.");
-            if (photonView.IsMine) 
+            if (photonView.IsMine)
             {
                 PhotonNetwork.Destroy(gameObject);
             }
