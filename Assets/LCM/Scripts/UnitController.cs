@@ -9,7 +9,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 {
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Animator animator;
 
     public int currentHealth;
@@ -25,15 +24,14 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     private InGameManager gm;
 
     private static readonly int IsMoving = Animator.StringToHash("isMoving");
-    private static readonly int IsDead = Animator.StringToHash("isDead"); // isDead bool 파라미터
-    private static readonly int IsAttack = Animator.StringToHash("isAttack"); // isAttack Trigger 파라미터
+    private static readonly int IsDead = Animator.StringToHash("isDead"); 
+    private static readonly int IsAttack = Animator.StringToHash("isAttack"); 
 
     private void Awake()
     {
         currentHealth = unitdata.health;
         gm = InGameManager.Instance;
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
 
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
@@ -62,7 +60,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (animator != null)
         {
             animator.SetBool(IsMoving, true); 
-            animator.SetBool(IsDead, false);   
+            animator.SetBool(IsDead, false);
+            animator.SetBool(IsAttack, false);
         }
     }
 
@@ -75,22 +74,32 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
         if (!photonView.IsMine) return; // 내가 소유한 유닛만 행동 로직 실행
 
+        if (currentHealth <= 0) // 유닛이 죽었으면 어떤 행동도 하지 않음
+        {
+            SetAnimationState(false, false, true); // <<< 이 부분에서 다시 IsDead를 true로 설정
+            rb.velocity = Vector2.zero;
+            return; // <<< 이 return이 중요합니다. 죽었으면 더 이상 아래 로직을 실행하지 않아야 합니다.
+        }
+
+
         if (currentTarget == null || !IsTargetInRange())
         {
             FindTarget();
             if (currentTarget == null)
             {
+                SetAnimationState(true, false, false); 
                 Move();
             }
             else
             {
-                Attack(currentTarget);
+                SetAnimationState(true, false, false);
+                Move();
             }
         }
         else
         {
-            Attack(currentTarget);
-            
+            SetAnimationState(false, true, false);
+            Attack(currentTarget);   
         }
     }
 
@@ -111,7 +120,9 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (animator != null)
             {
-                stream.SendNext(animator.GetBool(IsMoving)); 
+                stream.SendNext(animator.GetBool(IsMoving));
+                stream.SendNext(animator.GetBool(IsAttack));
+                stream.SendNext(animator.GetBool(IsDead));
             }
         }
         else
@@ -132,7 +143,9 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 if (stream.Count >= 3) 
                 {
-                    animator.SetBool(IsMoving, (bool)stream.ReceiveNext()); 
+                    animator.SetBool(IsMoving, (bool)stream.ReceiveNext());
+                    animator.SetBool(IsAttack, (bool)stream.ReceiveNext());
+                    animator.SetBool(IsDead, (bool)stream.ReceiveNext());
                 }
             }
         }
@@ -141,7 +154,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     private void Move()
     {
         if (currentHealth <= 0) return;
-        if (animator != null) animator.SetBool(IsMoving, true);
         Vector2 checkDirection = moveDirection;
         Collider2D myCollider = GetComponent<Collider2D>();
         Vector2 raycastOrigin = (Vector2)transform.position + checkDirection * (myCollider.bounds.extents.x + 0.05f);
@@ -152,6 +164,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (hit.collider != null && hit.collider.gameObject != gameObject)
         {
             rb.velocity = Vector2.zero;
+            SetAnimationState(false, false, false);
             return;
         }
         rb.MovePosition(transform.position + moveDirection * unitdata.moveSpeed * Time.deltaTime);
@@ -205,9 +218,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         rb.velocity = Vector2.zero;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-        photonView.RPC("RpcPlayAttackAnimation", RpcTarget.All);
 
-        // 근접 공격
         if (unitdata.unitType == UnitType.Melee && distanceToTarget <= unitdata.MeleeRange)
         {
             var targetUnit = target.GetComponent<UnitController>();
@@ -217,7 +228,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                 targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
             else if (targetBase != null)
             {
-                // [HOTFIX] 베이스 공격을 RPC로 변경
                 PhotonView basePV = targetBase.GetComponent<PhotonView>();
                 if (basePV != null)
                 {
@@ -226,10 +236,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;
         }
-        // 원거리 공격
         else if (unitdata.unitType == UnitType.Ranged && distanceToTarget <= unitdata.rangedrange)
         {
-            // 근접으로 붙었을 때의 처리
             if (distanceToTarget <= meleeSwitchRange && unitdata.attackDamage > 0)
             {
                 var targetUnit = target.GetComponent<UnitController>();
@@ -239,7 +247,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     targetUnit.photonView.RPC("RpcTakeDamage", RpcTarget.All, unitdata.attackDamage);
                 else if (targetBase != null)
                 {
-                    // [HOTFIX] 베이스 공격을 RPC로 변경
                     PhotonView basePV = targetBase.GetComponent<PhotonView>();
                     if (basePV != null)
                     {
@@ -247,7 +254,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
                     }
                 }
             }
-            // 원거리 공격
             else
             {
                 string spawnerTag = gameObject.tag;
@@ -266,6 +272,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         {
             Move();
         }
+
+        StartCoroutine(ResetAttackStateAfterAnimation());
     }
 
     [PunRPC]
@@ -277,15 +285,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (currentHealth <= 0 && PhotonNetwork.IsMasterClient)
         {
             photonView.RPC("RpcDie", RpcTarget.All);
-        }
-    }
-
-    [PunRPC]
-    private void RpcPlayAttackAnimation()
-    {
-        if (animator != null)
-        {
-            animator.SetTrigger(IsAttack);
         }
     }
 
@@ -302,12 +301,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         GetComponent<Collider2D>().enabled = false;
         rb.velocity = Vector2.zero;
 
-        if (animator != null)
-        {
-            animator.SetBool(IsDead, true); 
-        }
-
-        
+        SetAnimationState(false, false, true);
 
         if (PhotonNetwork.IsMasterClient && gm != null)
         {
@@ -316,5 +310,24 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         Destroy(gameObject, 2f);
+    }
+
+    private void SetAnimationState(bool isMoving, bool isAttacking, bool isDead)
+    {
+        if (animator == null) return;
+        animator.SetBool(IsMoving, isMoving);
+        animator.SetBool(IsAttack, isAttacking);
+        animator.SetBool(IsDead, isDead);
+    }
+
+    // 공격 애니메이션이 끝난 후 IsAttacking 불린을 false로 되돌리는 코루틴
+    private IEnumerator ResetAttackStateAfterAnimation()
+    {
+        yield return new WaitForSeconds(0.5f); 
+
+        if (currentHealth > 0)
+        {
+            SetAnimationState(false, false, false);
+        }
     }
 }
