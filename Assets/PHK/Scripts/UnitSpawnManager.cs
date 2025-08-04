@@ -40,119 +40,118 @@ public class UnitSpawnManager : MonoBehaviour
     /// 
     public void RequestUnitProduction(GameObject unitPrefab, string ownerTag)
     {
-        Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+        // 요청자가 AI("P2")이고 디버그 모드일 경우, 별도의 AI 생산 로직을 즉시 실행
+        if (ownerTag == "P2" && InGameManager.isDebugMode)
+        {
+            SpawnAIUnit(unitPrefab);
+            return; // AI 생산 로직을 실행했으므로 아래 플레이어 로직은 건너뜁니다.
+        }
 
-        // 현재 유닛이 생산 중인지 아닌지에 따라 로직을 분리
+        bool isPlayerRequest = (ownerTag == "P1");
+
         if (isProducing)
         {
-            // --- 이미 다른 유닛이 생산 중일 경우: 대기열(Queue)에 추가 ---
-            if (productionQueue.Count < 5) // 큐는 5칸
+            if (productionQueue.Count < 5)
             {
-
-                if (InGameManager.SpendGold(unitData.goldCost))
+                productionQueue.Enqueue((unitPrefab, ownerTag));
+                if (isPlayerRequest)
                 {
-                    productionQueue.Enqueue((unitPrefab, ownerTag));
                     OnQueueChanged?.Invoke(productionQueue.Count);
-                    // UI 텍스트를 "대기열에 추가됨"으로 명확히 표시합니다.
                     InGameUIManager.Instance.UnitInfoText.text = $"{unitPrefab.name} added to queue.";
-                }
-                else
-                {
-                    // 골드 부족 시 UI에 피드백을 줍니다.
-
-                    InGameUIManager.Instance.UnitInfoText.text = $"Faild to Spawn {unitPrefab.name}...";
-                    InGameUIManager.Instance.inGameInfoText.text = "Not enough gold!";
                 }
             }
             else
             {
-                InGameUIManager.Instance.inGameInfoText.text = "Production Queue is Full!"; // 대기열이 가득 찼을 때 알림
+                if (isPlayerRequest)
+                {
+                    InGameUIManager.Instance.inGameInfoText.text = "Production Queue is Full!";
+                }
             }
         }
         else
         {
-            // --- 생산 라인이 비어있을 경우: 바로 생산 시작 ---
-            // 골드 지불을 먼저 시도하고 성공하면 생산을 시작
-            if (InGameManager.SpendGold(unitData.goldCost))
-            {
-                StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag));
-            }
-            else
-            {
-                // 골드 부족 시 UI에 피드백을.
-                InGameUIManager.Instance.inGameInfoText.text = "Not enough gold!";
-            }
+            StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag, isPlayerRequest));
         }
+    }
+    private void SpawnAIUnit(GameObject prefabToProduce)
+    {
+        Transform spawnPoint = p2_spawnPoint;
+        if (spawnPoint == null) return;
 
+        Quaternion initialRotation = Quaternion.Euler(0, 180, 0); // P2 유닛은 항상 뒤집어서 생성
+        GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, initialRotation);
+
+        newUnit.tag = "P2";
+        newUnit.layer = LayerMask.NameToLayer("P2Unit");
+
+        UnitController controller = newUnit.GetComponent<UnitController>();
+        if (controller != null)
+        {
+            controller.moveDirection = Vector3.left;
+        }
     }
     /// <summary>
     /// 유닛 '한 개'를 생산하고, 완료되면 대기열에서 다음 유닛을 가져와 다시 이 코루틴을 실행
     /// </summary>
-    private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag)
+    private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag, bool isPlayerRequest)
     {
 
-
         Vector3 initialMoveDirection = (ownerTag == "P1") ? Vector3.right : Vector3.left;
-        // --- 생산 시작 처리 ---
         isProducing = true;
-        OnProductionStatusChanged?.Invoke(true); // 슬라이더 활성화
-        OnProductionProgress?.Invoke(0f);      // 슬라이더 0%에서 시작
+
+        if (isPlayerRequest)
+        {
+            OnProductionStatusChanged?.Invoke(true);
+            OnProductionProgress?.Invoke(0f);
+        }
 
         Unit unitData = prefabToProduce.GetComponent<UnitController>().unitdata;
 
-        // --- 생산 시간 동안 대기 ---
         if (unitData.SpawnTime > 0)
         {
             float timer = 0f;
             while (timer < unitData.SpawnTime)
             {
                 timer += Time.deltaTime;
-                OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
-                int percent = (int)((timer / unitData.SpawnTime) * 100f);
-                InGameUIManager.Instance.UnitInfoText.text = $" Spawning : {prefabToProduce.name}. . . .{percent}%";
+                if (isPlayerRequest)
+                {
+                    OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
+                    int percent = (int)((timer / unitData.SpawnTime) * 100f);
+                    InGameUIManager.Instance.UnitInfoText.text = $" Spawning : {prefabToProduce.name}. . . .{percent}%";
+                }
                 yield return null;
             }
         }
-        OnProductionProgress?.Invoke(1f); // 100% 채우기
+        if (isPlayerRequest) OnProductionProgress?.Invoke(1f);
 
         Transform spawnPoint = (ownerTag == "P1") ? p1_spawnPoint : p2_spawnPoint;
         if (spawnPoint != null)
         {
-            // 디버그 모드와 실제 네트워크 환경을 분기
             if (InGameManager.isDebugMode)
             {
-                // --- 디버그 모드: 일반 Instantiate 사용 ---
-                GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, spawnPoint.rotation);
+                // 디버그 모드에서 P2 유닛의 방향을 직접 설정합니다.
+                Quaternion initialRotation = (ownerTag == "P2") ? Quaternion.Euler(0, 180, 0) : spawnPoint.rotation;
+                GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, initialRotation);
+
                 newUnit.tag = ownerTag;
-                if (ownerTag == "P1")
-                {
-                    newUnit.layer = LayerMask.NameToLayer("P1Unit");
-                }
-                else if (ownerTag == "P2")
-                {
-                    newUnit.layer = LayerMask.NameToLayer("P2Unit");
-                }
-                // UnitController의 public 변수에 직접 접근하여 방향을 설정
+                newUnit.layer = (ownerTag == "P1") ? LayerMask.NameToLayer("P1Unit") : LayerMask.NameToLayer("P2Unit");
+
                 UnitController controller = newUnit.GetComponent<UnitController>();
                 if (controller != null)
                 {
                     controller.moveDirection = initialMoveDirection;
                 }
-
             }
             else
             {
-                // --- 실제 네트워크 환경: PhotonNetwork.Instantiate 사용 ---
                 object[] data = new object[] { ownerTag, initialMoveDirection };
-
-                // 1. Photon으로 유닛을 생성하고, 생성된 게임오브젝트를 변수에 저장합니다.
                 GameObject newUnit = PhotonNetwork.Instantiate(prefabToProduce.name, spawnPoint.position, spawnPoint.rotation, 0, data);
 
-                // 2. 생성된 유닛의 PhotonView를 가져옵니다.
+                // 생성된 유닛의 PhotonView를 가져옵니다.
                 PhotonView newUnitPV = newUnit.GetComponent<PhotonView>();
                 if (newUnitPV != null)
                 {
-                    // 3. 모든 클라이언트에게 태그와 레이어를 설정하라는 RPC를 호출합니다.
+                    // 모든 클라이언트에게 태그와 레이어를 설정하라는 RPC를 호출합니다.
                     //    (UnitSpawnManager 자신의 PhotonView를 이용해 RPC를 전송)
                     GetComponent<PhotonView>().RPC("RPC_SetUnitTag", RpcTarget.AllBuffered, newUnitPV.ViewID, ownerTag);
                 }
@@ -163,14 +162,19 @@ public class UnitSpawnManager : MonoBehaviour
         if (productionQueue.Count > 0)
         {
             var nextUnit = productionQueue.Dequeue();
-            OnQueueChanged?.Invoke(productionQueue.Count);
-            StartCoroutine(ProcessSingleUnit(nextUnit.prefab, nextUnit.ownerTag));
+            bool isNextPlayerRequest = (nextUnit.ownerTag == "P1");
+            if (isNextPlayerRequest) OnQueueChanged?.Invoke(productionQueue.Count);
+            StartCoroutine(ProcessSingleUnit(nextUnit.prefab, nextUnit.ownerTag, isNextPlayerRequest));
         }
         else
         {
             isProducing = false;
-            OnProductionStatusChanged?.Invoke(false); // 슬라이더 비활성화
-            OnProductionProgress?.Invoke(0f);         // 슬라이더 0%로 리셋
+            if (isPlayerRequest)
+            {
+                OnProductionStatusChanged?.Invoke(false);
+                OnProductionProgress?.Invoke(0f);
+                InGameUIManager.Instance.UnitInfoText.text = $"{prefabToProduce.name} has Spawned!!";
+            }
         }
 
         InGameUIManager.Instance.UnitInfoText.text = $"{prefabToProduce.name} has Spawned!!";

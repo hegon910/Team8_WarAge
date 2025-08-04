@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1057340957095089048}
   - component: {fileID: 8975798674493933629}
   - component: {fileID: 6740842195830166393}
+  - component: {fileID: 3070054824064937255}
   m_Layer: 0
   m_Name: Knight
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: f8e8dfaa2ffe2244c98ad358b7028d3d, type: 2}
   rb: {fileID: 1832948373212696801}
   spriteRenderer: {fileID: 3289552002145345777}
+  animator: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
@@ -223,3 +225,15 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &3070054824064937255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7774089094630300306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

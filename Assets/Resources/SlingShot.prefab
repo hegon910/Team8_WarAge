@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 602539241484354182}
   - component: {fileID: 3727437481558538021}
   - component: {fileID: 8018030339372259264}
+  - component: {fileID: 8319043964421530047}
   m_Layer: 0
   m_Name: SlingShot
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: 6edc6b6d7b3d25442be1a3511fdb933c, type: 2}
   rb: {fileID: 6881765619668112333}
   spriteRenderer: {fileID: 4013987418718315894}
+  animator: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
@@ -223,3 +225,15 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &8319043964421530047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4894062003126303280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

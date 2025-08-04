@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4324142693161570623}
   - component: {fileID: 6758835201598010263}
   - component: {fileID: 8758583309702610426}
+  - component: {fileID: 6641143768829803056}
   m_Layer: 0
   m_Name: Dino
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: b34f081eb733ea84f879701ace973b28, type: 2}
   rb: {fileID: 7388317044795542540}
   spriteRenderer: {fileID: 1106291241721602586}
+  animator: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
@@ -223,3 +225,15 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &6641143768829803056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7880611672624073045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

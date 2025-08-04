@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4656717307654509711}
   - component: {fileID: 2830401064936440807}
   - component: {fileID: -3228297337520047077}
+  - component: {fileID: -7988508274508197806}
   m_Layer: 0
   m_Name: Clubman 1
   m_TagString: Untagged
@@ -224,3 +225,15 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &-7988508274508197806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7729183574821180569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
