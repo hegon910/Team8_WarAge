@@ -1,90 +1,128 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Collections;
 
-namespace KYG
+/// <summary>
+/// Photon과 연동되는 Object Pool Manager
+/// Instantiate/Destroy를 최소화하여 성능 최적화
+/// </summary>
+public class PhotonObjectPool : MonoBehaviourPun
 {
-    /// <summary>
-    /// PhotonNetwork.Instantiate / Destroy를 대체하는 풀링 매니저
-    /// - 네트워크 동기화를 유지하며 오브젝트 재사용 최적화
-    /// - Projectile, Turret, TurretSlot 등 빈번히 생성/삭제되는 오브젝트에 사용
-    /// </summary>
-    public class PhotonObjectPool : MonoBehaviourPunCallbacks
+    public static PhotonObjectPool Instance;
+
+    [System.Serializable]
+    public class PoolItem
     {
-        public static PhotonObjectPool Instance { get; private set; }
+        public string key;                 // Prefab 이름 (Resource Key)
+        public GameObject prefab;          // Prefab 참조
+        public int initialSize = 5;        // 초기 생성 개수
+    }
 
-        // 프리팹 이름을 key로 사용하여 Queue로 오브젝트 관리
-        private Dictionary<string, Queue<GameObject>> poolDict = new Dictionary<string, Queue<GameObject>>();
+    [Header("풀링 프리팹 등록")]
+    [SerializeField] private List<PoolItem> poolPrefabs = new();
 
-        private void Awake()
-        {
-            // 싱글톤 초기화
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
+    private Dictionary<string, Queue<GameObject>> poolDictionary = new();
+
+    private void Awake()
+    {
+        // 싱글톤 초기화
+        if (Instance == null)
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        else
+            Destroy(gameObject);
 
-        /// <summary>
-        /// 특정 프리팹을 미리 Pool에 등록 및 초기화
-        /// </summary>
-        public void RegisterPrefab(string prefabName, int initialCount = 0)
+        InitializePools();
+    }
+
+    /// <summary>
+    /// 등록된 Prefab별로 초기 풀 생성
+    /// </summary>
+    private void InitializePools()
+    {
+        foreach (var item in poolPrefabs)
         {
-            if (poolDict.ContainsKey(prefabName)) return;
+            Queue<GameObject> objectQueue = new Queue<GameObject>();
 
-            poolDict[prefabName] = new Queue<GameObject>();
-
-            // 초기 개수만큼 미리 생성 후 비활성화
-            for (int i = 0; i < initialCount; i++)
+            for (int i = 0; i < item.initialSize; i++)
             {
-                GameObject obj = PhotonNetwork.Instantiate(prefabName, Vector3.zero, Quaternion.identity);
+                GameObject obj = CreateNewObject(item.key, item.prefab);
                 obj.SetActive(false);
-                poolDict[prefabName].Enqueue(obj);
+                objectQueue.Enqueue(obj);
             }
-        }
 
-        /// <summary>
-        /// 오브젝트 가져오기
-        /// - Pool에 존재하면 꺼내서 활성화
-        /// - 없으면 PhotonNetwork.Instantiate로 새로 생성
-        /// </summary>
-        public GameObject Get(string prefabName, Vector3 position, Quaternion rotation, object[] instantiationData = null)
+            poolDictionary[item.key] = objectQueue;
+        }
+    }
+
+    /// <summary>
+    /// 풀에서 Prefab 인스턴스를 꺼내는 함수
+    /// </summary>
+    public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
+    {
+        string key = prefab.name;
+
+        // 풀에 등록되지 않은 프리팹이면 새로 등록
+        if (!poolDictionary.ContainsKey(key))
         {
-            GameObject obj;
-
-            if (poolDict.ContainsKey(prefabName) && poolDict[prefabName].Count > 0)
-            {
-                // Queue에서 꺼내서 위치와 회전값 적용
-                obj = poolDict[prefabName].Dequeue();
-                obj.transform.position = position;
-                obj.transform.rotation = rotation;
-                obj.SetActive(true);
-            }
-            else
-            {
-                // Pool에 없으면 PhotonNetwork.Instantiate로 새로 생성
-                obj = PhotonNetwork.Instantiate(prefabName, position, rotation, 0, instantiationData);
-            }
-
-            return obj;
+            Queue<GameObject> newQueue = new Queue<GameObject>();
+            poolDictionary.Add(key, newQueue);
         }
 
-        /// <summary>
-        /// 오브젝트를 Pool로 반환 (PhotonNetwork.Destroy 대체)
-        /// - 비활성화 후 Queue에 다시 넣음
-        /// </summary>
-        public void ReturnToPool(GameObject obj)
+        GameObject obj;
+
+        // 풀에 남은 객체가 있으면 꺼내기
+        if (poolDictionary[key].Count > 0)
         {
-            string prefabName = obj.name.Replace("(Clone)", "").Trim();
-            obj.SetActive(false);
-
-            if (!poolDict.ContainsKey(prefabName))
-                poolDict[prefabName] = new Queue<GameObject>();
-
-            poolDict[prefabName].Enqueue(obj);
+            obj = poolDictionary[key].Dequeue();
+            obj.transform.position = position;
+            obj.transform.rotation = rotation;
+            obj.SetActive(true);
         }
+        else
+        {
+            // 부족하면 새로 생성
+            obj = CreateNewObject(key, prefab);
+            obj.transform.position = position;
+            obj.transform.rotation = rotation;
+            obj.SetActive(true);
+        }
+
+        return obj;
+    }
+
+    /// <summary>
+    /// 사용 완료된 오브젝트를 풀에 반환
+    /// </summary>
+    public void Release(GameObject obj)
+    {
+        obj.SetActive(false);
+        string key = obj.name.Replace("(Clone)", "").Trim();
+
+        if (!poolDictionary.ContainsKey(key))
+            poolDictionary.Add(key, new Queue<GameObject>());
+
+        poolDictionary[key].Enqueue(obj);
+    }
+
+    /// <summary>
+    /// 특정 시간 후 자동 반환
+    /// </summary>
+    public IEnumerator ReleaseAfterDelay(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Release(obj);
+    }
+
+    /// <summary>
+    /// 새로운 네트워크 객체 생성 (PhotonView 연동)
+    /// </summary>
+    private GameObject CreateNewObject(string key, GameObject prefab)
+    {
+        // PhotonView가 있으면 PhotonNetwork.Instantiate 대신 로컬 Instantiate
+        // 네트워크 관리되는 오브젝트는 RPC로 생성되기 때문에 여기서는 로컬만 사용
+        GameObject obj = Instantiate(prefab, transform);
+        obj.name = key;
+        return obj;
     }
 }

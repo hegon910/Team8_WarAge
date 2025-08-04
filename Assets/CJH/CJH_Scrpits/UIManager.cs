@@ -67,7 +67,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedLogin()
     {
-        lobbyPanel.SetActive(true);
+        nicknamePanel.SetActive(true);
         loginPanel.SetActive(false);
     }
      

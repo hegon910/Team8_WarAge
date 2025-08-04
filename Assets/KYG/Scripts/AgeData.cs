@@ -30,6 +30,9 @@ namespace KYG
         public List<GameObject> spawnableUnits = new(); // 해당 시대의 유닛 리스트
         [Header("시대별 터렛")]
         public List<TurretData> availableTurrets; // 해당 시대의 터렛 리스트
+        
+        [Header("궁극기 데이터")]
+        public UltimateSkillData ultimateSkill;
 
     }
 }

@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class ResultListener : MonoBehaviour
 {
-    //void OnEnable()
-    //{
-    //    InGameManager.OnGameWon += ListenWin;
-    //    InGameManager.OnGameLost += ListenLoss;
-    //}
+    void OnEnable()
+    {
+        InGameManager.Instance.OnGameWon += ListenWin;
+        InGameManager.Instance.OnGameLost += ListenLoss;
+    }
 
-    //void OnDisable()
-    //{
-    //    InGameManager.OnGameWon -= ListenWin;
-    //    InGameManager.OnGameLost -= ListenLoss;
-    //}
+    void OnDisable()
+    {
+        InGameManager.Instance.OnGameWon -= ListenWin;
+        InGameManager.Instance.OnGameLost -= ListenLoss;
+    }
 
-    //void ListenWin() => UserStatsService.Instance.UpdateMatchResult(true);
-    //void ListenLoss() => UserStatsService.Instance.UpdateMatchResult(false);
+    void ListenWin() => UserRank.Instance.UpdateMatchResult(true);
+    void ListenLoss() => UserRank.Instance.UpdateMatchResult(false);
 }
