@@ -5448,7 +5448,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8141406717810571070
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5456,7 +5456,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5009048909534639521}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5611,9 +5611,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainPanel: {fileID: 7309371607715270649}
-  loadingPanel: {fileID: 4263044165392572344}
   loginPanel: {fileID: 414163645124787007}
+  nicknamePanel: {fileID: 0}
   signUpPanel: {fileID: 3335638357787243222}
+  emailPanel: {fileID: 0}
   lobbyPanel: {fileID: 77728196222857087}
   roomPanel: {fileID: 8312490223473774623}
 --- !u!1 &5090795633066221973
