@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections; // 코루틴 사용을 위해 추가
+using System.Collections;
 
 public class InGameSpawnManager : MonoBehaviourPunCallbacks
 {
@@ -13,7 +13,6 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
     public Transform p1_spawnPoint;
     public Transform p2_spawnPoint;
 
-    // --- 수정된 부분 ---
     void Start()
     {
         if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
@@ -21,29 +20,21 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
             Debug.Log("<color=yellow>디버그 모드: 네트워크 연결 없이 로컬 기지를 생성합니다.</color>");
             SpawnBasesLocally();
         }
-        // 네트워크 모드에서는 마스터 클라이언트가 코루틴을 시작
         else if (PhotonNetwork.IsMasterClient)
         {
             StartCoroutine(WaitForPlayersAndSpawn());
         }
     }
 
-    // --- 새로 추가된 코루틴 ---
-    /// <summary>
-    /// 방에 2명이 될 때까지 기다렸다가 모든 기지를 생성하는 코루틴.
-    /// </summary>
     private IEnumerator WaitForPlayersAndSpawn()
     {
-        // 현재 방의 플레이어 수가 2명이 될 때까지 매 프레임 체크하며 기다림
         yield return new WaitUntil(() => PhotonNetwork.CurrentRoom.PlayerCount == 2);
-
-        // 조건이 만족되면 기지 생성 함수를 호출
         Debug.Log("모든 플레이어가 참여했습니다. 기지 생성을 시작합니다.");
         SpawnAllBasesOverNetwork();
     }
 
     /// <summary>
-    /// 디버그 모드용 로컬 기지 생성 메서드 (기존과 동일)
+    /// 디버그 모드용 로컬 기지 생성 메서드
     /// </summary>
     private void SpawnBasesLocally()
     {
@@ -64,37 +55,39 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
         // P1 기지 생성 및 등록
         Vector3 p1SpawnPosition = p1_spawnPoint.position - (p1_spawnPoint.right * offsetDistance);
         GameObject p1BaseObject = Instantiate(basePrefab, p1SpawnPosition, Quaternion.identity);
+
+        // [수정] P1 기지의 태그와 레이어를 명확하게 설정
         p1BaseObject.tag = "BaseP1";
-        KYG.BaseController p1Controller = p1BaseObject.GetComponent<KYG.BaseController>();
+        p1BaseObject.layer = LayerMask.NameToLayer("P1Base");
+
+        KYG.BaseController p1Controller = p1BaseObject.GetComponentInChildren<KYG.BaseController>();
         if (p1Controller != null)
         {
             InGameManager.Instance.RegisterBase(p1Controller, "BaseP1");
             p1Controller.InitializeTeam("P1");
         }
-        Debug.Log("디버그 모드: P1 기지를 생성하고 등록했습니다.");
-
+        Debug.Log("디버그 모드: P1 기지 생성 완료 (Tag: BaseP1, Layer: P1Base)");
 
         // P2 기지 생성 및 등록
         Vector3 p2SpawnPosition = p2_spawnPoint.position - (p2_spawnPoint.right * offsetDistance);
         GameObject p2BaseObject = Instantiate(basePrefab, p2SpawnPosition, Quaternion.identity);
+
+        // [수정] P2 기지의 태그와 레이어를 명확하게 설정
         p2BaseObject.tag = "BaseP2";
-        SpriteRenderer p2Renderer = p2BaseObject.GetComponentInChildren<SpriteRenderer>(true);
-        if (p2Renderer != null)
-        {
-            p2Renderer.flipX = true;
-        }
-        KYG.BaseController p2Controller = p2BaseObject.GetComponent<KYG.BaseController>();
+        p2BaseObject.layer = LayerMask.NameToLayer("P2Base");
+
+        // [수정] 기존 스케일을 유지하면서 x축만 반전시켜 P1과 크기가 동일하게 유지되도록 수정
+        Vector3 originalScale = p2BaseObject.transform.localScale;
+        p2BaseObject.transform.localScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z);
+
+        KYG.BaseController p2Controller = p2BaseObject.GetComponentInChildren<KYG.BaseController>();
         if (p2Controller != null)
         {
             InGameManager.Instance.RegisterBase(p2Controller, "BaseP2");
             p2Controller.InitializeTeam("P2");
         }
-        Debug.Log("디버그 모드: P2 기지를 생성하고 등록했습니다.");
+        Debug.Log("디버그 모드: P2 기지 생성 완료 (Tag: BaseP2, Layer: P2Base)");
     }
-
-    /// <summary>
-    /// 포톤 네트워크를 통한 기지 생성 메서드 (기존과 동일)
-    /// </summary>
     private void SpawnAllBasesOverNetwork()
     {
         Player[] players = PhotonNetwork.PlayerList;
@@ -115,9 +108,25 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
 
             if (p2BaseObject != null)
             {
-                p2BaseObject.GetComponent<PhotonView>().TransferOwnership(players[1]);
+                // P2 기지 뒤집기 (네트워크 환경에서도 localScale을 사용)
+                PhotonView pv = p2BaseObject.GetComponent<PhotonView>();
+                if (pv != null)
+                {
+                    // RPC를 통해 모든 클라이언트에서 P2 기지를 뒤집도록 합니다.
+                    pv.RPC("FlipObjectX", RpcTarget.AllBuffered);
+                }
+
+                pv.TransferOwnership(players[1]);
                 Debug.Log($"P2 기지의 소유권을 {players[1].NickName}에게 이전했습니다.");
             }
         }
+    }
+
+    // 네트워크 동기화를 위한 RPC 메서드 추가
+    [PunRPC]
+    public void FlipObjectX()
+    {
+        // 자신의 localScale.x 값을 -1로 설정하여 뒤집습니다.
+        transform.localScale = new Vector3(-1f, 1f, 1f);
     }
 }

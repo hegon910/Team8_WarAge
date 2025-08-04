@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4061624592644897643}
   - component: {fileID: 3153813285089436875}
   - component: {fileID: 8607020283014395774}
+  - component: {fileID: 3913256788646971358}
   m_Layer: 0
   m_Name: Muscket
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: d3d5c35069395ec4da170e657966fdb9, type: 2}
   rb: {fileID: 2689827998266666564}
   spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
@@ -223,3 +225,15 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &3913256788646971358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3771097195642715906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

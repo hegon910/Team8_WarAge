@@ -168,7 +168,7 @@ GameObject:
   - component: {fileID: 2548587368353892924}
   - component: {fileID: 3676211360173361080}
   - component: {fileID: 4818089090773087196}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: BasePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -759,7 +759,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1326790895538914513}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: P1_SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -826,7 +826,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1378944649665165396}
   - component: {fileID: 6663909004819120286}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: AncientAgeModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

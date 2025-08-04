@@ -6,19 +6,19 @@ using UnityEngine.UI;
 using KYG;
 using Unity.VisualScripting;
 
-
 namespace PHK
 {
-    //인게임의 전반적인 UI를 관리하는 매니저 스크립트
-    //시대 발전, 자원표시, 유닛 UI관리등을 담당
+    // 인게임의 유닛/터렛 패널 UI를 관리하는 매니저 스크립트
+    // 시대 발전에 따라 유닛/터렛 패널을 교체하고 버튼을 설정하는 역할을 담당
     public class UnitPanelManager : MonoBehaviour
     {
-        //시대 (Age)를 명확하게 구분하기 위해 열거형 (enum)으로 정의
+        // 시대 (Age)를 명확하게 구분하기 위해 열거형 (enum)으로 정의
         public AgeType age;
 
         [Header("시대 데이터 (직접 연결)")]
         [SerializeField] private AgeData[] ageDataArray;
         private Dictionary<AgeType, AgeData> ageDataDict;
+
         // 현재 활성화된 패널의 종류를 추적하기 위한 열거형
         private enum ActivePanelType
         {
@@ -28,20 +28,19 @@ namespace PHK
         }
 
         // 현재 게임의 시대를 저장하는 변수, 시작은 '고대'
-        [Header("현재상태")]
+        [Header("현재 상태")]
         public AgeType currentAge = AgeType.Ancient; // 현재 시대를 저장하는 변수, 시작은 '고대'
         private ActivePanelType activePanel = ActivePanelType.Selection;
 
-        [Header("공용패널")]
+        [Header("공용 패널")]
         public GameObject selectPanel; //"Units", "Turrets" 버튼이 있는 초기 선택 패널
 
-
-        //유니티 에디터에서 각 시대에 맞는 유닛 패널을 연결
+        // 유니티 에디터에서 각 시대에 맞는 유닛 패널을 연결
         [Header("유닛 패널")]
         public GameObject ancientUnitPanel;
         public GameObject middleUnitPanel;
         public GameObject modernUnitPanel;
-        public GameObject futureUnitPanel; //만일 쓴다면
+        public GameObject futureUnitPanel; // 만일 쓴다면
 
         [Header("시대별 터렛 패널")]
         public GameObject ancientTurretPanel;
@@ -49,15 +48,15 @@ namespace PHK
         public GameObject modernTurretPanel;
         public GameObject futureTurretPanel;
 
-        //시대 발전 버튼 
+        // 시대 발전 버튼 
         [Header("시대 발전 버튼")]
         public Button evolveButton;
-        //마지막 시대일 경우 발전 버튼을 비활성화하고 해당 유닛으로 대체
+        // 마지막 시대일 경우 발전 버튼을 비활성화하고 해당 유닛으로 대체
         public Button lastAgeUnitButton;
 
         void Start()
         {
-            // 1. 이 스크립트가 직접 가진 ageDataArray로 딕셔너리를 만듬
+            // 1. 이 스크립트가 직접 가진 ageDataArray로 딕셔너리를 만듦
             ageDataDict = new Dictionary<AgeType, AgeData>();
             foreach (var data in ageDataArray)
             {
@@ -71,7 +70,7 @@ namespace PHK
             if (ageDataDict.TryGetValue(currentAge, out AgeData initialAgeData))
             {
                 // 3. 찾은 데이터를 가지고 UI 업데이트 및 버튼 설정 함수를 '즉시' 호출
-                //     ScriptableObject -> UnitButton의 가장 직접적인 연결
+                //    ScriptableObject -> UnitButton의 가장 직접적인 연결
                 Debug.Log($"[UnitPanelManager.Start] 시작 시대({currentAge})의 버튼 설정을 시작합니다.");
                 UpdateAge(initialAgeData);
             }
@@ -84,10 +83,12 @@ namespace PHK
             activePanel = ActivePanelType.Selection;
             UpdateUnitPanelVisibility();
         }
+
         void Update()
         {
 
         }
+
         public void UpdateAge(AgeData newAgeData)
         {
             Debug.Log($"[2. UnitPanelManager] UpdateAge 호출됨. 유닛 수: {newAgeData.spawnableUnits.Count}");
@@ -134,7 +135,7 @@ namespace PHK
             }
         }
 
-        //현재 시대에 맞는 패널 함수
+        // 현재 활성화된 패널 타입(activePanel)과 시대(currentAge)에 맞는 패널을 보여주는 함수
         private void UpdateUnitPanelVisibility()
         {
             // 모든 패널 비활성화
@@ -176,24 +177,26 @@ namespace PHK
             }
         }
 
-        //Unit 버튼 누르면 호출
+        // 'Units' 버튼을 누르면 호출
         public void ShowUnitPnale()
         {
-            //유닛 패널 활성화
+            // 유닛 패널 활성화
             activePanel = ActivePanelType.Units;
             UpdateUnitPanelVisibility();
         }
-        //Turret 버튼 누르면 호출
+
+        // 'Turrets' 버튼을 누르면 호출
         public void ShowTurretPanel()
         {
-            //터렛 패널 활성화
+            // 터렛 패널 활성화
             activePanel = ActivePanelType.Turrets;
             UpdateUnitPanelVisibility();
         }
-        //유닛/터렛 패널의 돌아가기 버튼 누르면 selection 패널로 돌아감
+
+        // 유닛/터렛 패널의 '돌아가기' 버튼을 누르면 selection 패널로 돌아감
         public void ShowSelectionPanel()
         {
-            //초기 선택 패널 활성화
+            // 초기 선택 패널 활성화
             activePanel = ActivePanelType.Selection;
             UpdateUnitPanelVisibility();
         }

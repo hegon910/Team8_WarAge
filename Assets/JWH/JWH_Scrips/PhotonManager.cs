@@ -210,7 +210,25 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         // 기존 UI 업데이트 로직은 그대로 호출합니다.
         UIManager.Instance.UpdateRoomList(roomList);
     }
- 
+
+    public void LeaveRoomAndLoadLobby()
+    {
+        // ★★★ 가장 중요한 안전장치 ★★★
+        // 현재 게임 룸 안에 있을 때만 LeaveRoom을 호출합니다.
+        if (PhotonNetwork.InRoom)
+        {
+            Debug.Log("게임 룸을 나갑니다...");
+            PhotonNetwork.LeaveRoom(); // 이 함수는 성공 시 OnLeftRoom 콜백을 자동으로 호출합니다.
+        }
+        else
+        {
+            // 이미 룸에 없거나(마스터 서버 등), 연결이 끊긴 상태입니다.
+            // 이 경우 그냥 로비 씬을 로드합니다.
+            Debug.Log("현재 룸에 접속해있지 않아, 바로 로비 씬을 로드합니다.");
+            SceneManager.LoadScene("LobbyScene");
+        }
+    }
+
 
 
 }

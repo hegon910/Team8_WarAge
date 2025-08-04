@@ -3,32 +3,31 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using KYG;
-// �ΰ����� �������� UI�� �����ϴ� ��ũ��Ʈ.
-// �ٸ� �Ŵ�����κ��� �̺�Ʈ�� �޾� UI�� �����ϰ�, UI ��ư �Է��� �޾� �ٸ� �Ŵ������� ��û.
+
+// 인게임의 전반적인 UI를 관리하는 스크립트.
+// 다른 매니저로부터 이벤트를 받아 UI를 변경하고, UI 버튼 입력을 받아 다른 매니저에 요청.
 public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance { get; private set; }
 
-    [Header("UI ���")]
+    [Header("UI 요소")]
     public TextMeshProUGUI inGameInfoText;
     public TextMeshProUGUI UnitInfoText;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI expText;
     public Slider baseHpSlider;
     public Slider GuestBaseHpSlider;
-    public Button evolveButton; // �ô� ���� ��ư ����
+    public Button evolveButton; // 시대 발전 버튼 참조
     public GameObject winnerPanel;
     public GameObject loserPanel;
     public TurretData turretDataToPlace;
 
-    [Header("���� ���� ť")]
+    [Header("유닛 생산 큐")]
     public Slider productionSlider;
     public Toggle[] queueSlots = new Toggle[5];
-    
-    
 
-    // --- �ͷ� ���� ���� ---
-    // PlayerActionState�� ���� UI�� ��ȣ�ۿ��ϴ� ��带 ��Ÿ���Ƿ� UI �Ŵ����� ����.
+    // --- 터렛 관련 상태 ---
+    // PlayerActionState에 따라 UI와 상호작용하는 상태를 나타내므로 UI 매니저에 위치.
     public enum PlayerActionState
     {
         None,
@@ -36,7 +35,7 @@ public class InGameUIManager : MonoBehaviour
         SellingTurret
     }
     public PlayerActionState currentState { get; private set; } = PlayerActionState.None;
-    public GameObject turretPrefabToPlace { get; private set; } // �б� �������� �ܺ� ����
+    public GameObject turretPrefabToPlace { get; private set; } // 설치할 터렛의 프리팹
 
     private void Awake()
     {
@@ -52,12 +51,12 @@ public class InGameUIManager : MonoBehaviour
 
     void Start()
     {
-        // ���� ���� �� ���� �ؽ�Ʈ �����
+        // 게임 시작 시 정보 텍스트 숨김
         if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
         if (UnitInfoText != null) UnitInfoText.text = "";
 
-        // --- �̺�Ʈ ���� ---
-        // �̱��� �ν��Ͻ��� null�� �� �����Ƿ� �����ϰ� Ȯ��
+        // --- 이벤트 구독 ---
+        // 인게임 인스턴스가 null일 수 있으므로 안전하게 확인
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
@@ -68,7 +67,7 @@ public class InGameUIManager : MonoBehaviour
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
             InGameManager.Instance.OnPlayerBaseHealthChanged += UpdateBaseHpUI;
-            //�Խ�Ʈ ���̽� HP ó��
+            // 게스트 베이스 HP 처리
             InGameManager.Instance.OnOpponentBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
@@ -76,7 +75,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnGameLost += ShowLoserPanel;
         }
 
-        // UI �ʱ�ȭ
+        // UI 초기화
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {
@@ -85,16 +84,16 @@ public class InGameUIManager : MonoBehaviour
                 if (slot != null) slot.SetIsOnWithoutNotify(false);
             }
         }
-        //�����Ҷ� evolve��ư ��Ȱ��ȭ
+        // 시작할때 evolve버튼 비활성화
         if (evolveButton != null)
-            evolveButton.interactable = false; // �ʱ⿡�� ��Ȱ��ȭ
+            evolveButton.interactable = false; // 초기에는 비활성화
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        // ������Ʈ �ı� �� �̺�Ʈ ������ �ݵ�� �����ؾ� �޸� ������ ����
+        // 오브젝트 파괴 시 이벤트 구독을 반드시 해제해야 메모리 누수를 방지
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
@@ -123,10 +122,10 @@ public class InGameUIManager : MonoBehaviour
     }
     private void Update()
     {
-        // �ͷ� �Ǽ� �Ǵ� �Ǹ� ����� ���� �Է��� Ȯ���մϴ�.
+        // 터렛 배치 또는 판매 상태일 때 입력을 확인합니다.
         if (currentState != PlayerActionState.None)
         {
-            // ��Ŭ�� �Ǵ� ESC Ű�� ������ �ൿ�� ����մϴ�.
+            // 우클릭 또는 ESC 키로 행동을 취소합니다.
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 CancelPlayerAction();
@@ -135,18 +134,19 @@ public class InGameUIManager : MonoBehaviour
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
-        // ��: �ô밡 ����Ǿ����� �˸��� �ؽ�Ʈ ������Ʈ
+        // 예: 시대가 발전되었음을 알리는 텍스트 업데이트
         Debug.Log($"UI UPDATE: New Age - {newAgeData.ageType}");
-        // ���⿡ ���ο� �ô� ����(newAgeData)�� �������� UI�� �����ϴ� �ڵ带 �ۼ�
+        // 여기에 새로운 시대 정보(newAgeData)를 바탕으로 UI를 변경하는 코드를 작성
     }
 
     public void RegisterPlayerBase(KYG.BaseController playerBase)
     {
         if (playerBase != null)
         {
-            // �� HP �����̴��� '�� ����'�� ü�� ���� �̺�Ʈ�� ����
-        //    playerBase.OnHpChanged += UpdateBaseHpUI;
-            // UI �ʱ�ȭ�� ���� ���� ü������ �ѹ� ������Ʈ
+            // 내 HP 슬라이더는 '내 베이스'의 체력 변경 이벤트를 구독
+            // playerBase.OnHpChanged += UpdateBaseHpUI;
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
+            playerBase.OnHpChanged += UpdateBaseHpUI;
             UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
         }
     }
@@ -154,14 +154,15 @@ public class InGameUIManager : MonoBehaviour
     {
         if (opponentBase != null)
         {
-            // ���� HP �����̴��� '��� ����'�� ü�� ���� �̺�Ʈ�� ����
-         //   opponentBase.OnHpChanged += UpdateGuestBaseUI;
-            // UI �ʱ�ȭ�� ���� ���� ü������ �ѹ� ������Ʈ
+            // 상대 HP 슬라이더는 '상대 베이스'의 체력 변경 이벤트를 직접 구독 (주석 해제)
+            opponentBase.OnHpChanged += UpdateGuestBaseUI;
+
+            // UI 초기화를 위해 현재 체력으로 한번 업데이트
             UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
         }
     }
 
-    #region UI ������Ʈ �Լ� (�̺�Ʈ ����)
+    #region UI 업데이트 함수 (이벤트 수신)
     public void UpdateResourceUI(int newGold, int newExp)
     {
         if (goldText != null) goldText.text = $"{newGold}";
@@ -170,7 +171,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- PLAYER UI UPDATED --- ü��: {currentHp}/{maxHp}");
+        Debug.Log($"--- PLAYER UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
@@ -179,7 +180,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateGuestBaseUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- OPPONENT UI UPDATED --- ü��: {currentHp}/{maxHp}");
+        Debug.Log($"--- OPPONENT UI UPDATED --- 체력: {currentHp}/{maxHp}");
         if (GuestBaseHpSlider != null && maxHp > 0)
         {
             GuestBaseHpSlider.value = (float)currentHp / maxHp;
@@ -192,7 +193,7 @@ public class InGameUIManager : MonoBehaviour
         {
             inGameInfoText.text = message;
             inGameInfoText.gameObject.SetActive(true);
-            // �ʿ��ϴٸ� �� �� �ڿ� �ڵ����� ������� ���� �߰� ����
+            // 필요하다면 몇 초 뒤에 자동으로 사라지는 기능 추가 가능
         }
     }
 
@@ -213,7 +214,7 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region ���� ���� UI
+    #region 유닛 생산 UI
     private void UpdateQueueUI(int queuedCount)
     {
         for (int i = 0; i < queueSlots.Length; i++)
@@ -242,8 +243,8 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region �ͷ� ���� UI �� ���� ����
-    // �ͷ� �Ǽ� ��ư���� ȣ��
+    #region 터렛 관련 UI 및 상태 관리
+    // 터렛 배치 버튼에서 호출
     public void EnterTurretPlaceMode(TurretData data)
     {
         currentState = PlayerActionState.PlacingTurret;
@@ -251,7 +252,7 @@ public class InGameUIManager : MonoBehaviour
         ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
     }
 
-    // �ͷ� �Ǹ� ��ư���� ȣ��
+    // 터렛 판매 버튼에서 호출
     public void EnterTurretSellMode()
     {
         currentState = PlayerActionState.SellingTurret;
@@ -259,7 +260,7 @@ public class InGameUIManager : MonoBehaviour
         ShowInfoText("Select a turret to sell. (Right-click to cancel)");
     }
 
-    // �ͷ� �Ǽ�/�Ǹ� ���� �Ǵ� ��� �� ȣ��
+    // 터렛 배치/판매 상태 취소 또는 완료 시 호출
     public void CancelPlayerAction()
     {
         currentState = PlayerActionState.None;
@@ -267,15 +268,15 @@ public class InGameUIManager : MonoBehaviour
         HideInfoText();
     }
 
-    // �ͷ� ���� �߰� ��ư���� ȣ��
+    // 터렛 슬롯 추가 버튼에서 호출
     public void OnClick_AddTurretSlotButton()
     {
-        /*int slotCost = 100; // ����� InGameManager�� �ٸ� ������ ��Ʈ���� �����ϴ� ���� �� ����
+        /*int slotCost = 100; // 비용은 InGameManager나 다른 곳에서 컨트롤하는 것이 더 좋음
         if (InGameManager.Instance.SpendGold(slotCost))
         {
             ShowInfoText("Turret Slot Added!");
-            // TODO: BaseController�� ���� �߰��� ��û�ϴ� ����
-            // ��: InGameManager.Instance.GetPlayerBase().AddNewSlot();
+            // TODO: BaseController에 슬롯 추가를 요청하는 기능
+            // 예: InGameManager.Instance.GetPlayerBase().AddNewSlot();
         }
         else
         {
@@ -295,7 +296,7 @@ public class InGameUIManager : MonoBehaviour
         if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
         if (evolveButton != null) evolveButton.gameObject.SetActive(false);
 
-        // ���� ���� ���� UI�� ����ϴ�.
+        // 유닛 생산 관련 UI도 숨깁니다.
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {
@@ -310,7 +311,7 @@ public class InGameUIManager : MonoBehaviour
     {
         if (winnerPanel != null)
         {
-            HideAllInGameUI(); // �ٸ� �ΰ��� UI �����
+            HideAllInGameUI(); // 다른 인게임 UI 숨김
             winnerPanel.SetActive(true);
         }
     }
@@ -318,33 +319,44 @@ public class InGameUIManager : MonoBehaviour
     {
         if (loserPanel != null)
         {
-            HideAllInGameUI(); // �ٸ� �ΰ��� UI �����
+            HideAllInGameUI(); // 다른 인게임 UI 숨김
             loserPanel.SetActive(true);
         }
     }
 
     public void ReturnToLobby()
     {
-        // ������ ���� ������ �� �����Ƿ� �ð��� �ٽ� �帣�� �մϴ�.
+        // 게임오버 상태로 멈췄을 수 있으므로 시간을 다시 흐르게 합니다.
         Time.timeScale = 1f;
 
-        // ���� ���� ��� �гε��� ��Ȱ��ȭ�մϴ�.
+        // 승리/패배 모든 패널을 비활성화합니다.
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
 
-        Debug.Log("�κ�� ���ư��� ���� PhotonManager ȣ��.");
+        // --- 수정된 로직 ---
 
-        // PhotonManager���� ���� ������ �κ� ���� �ε��϶�� ��û�մϴ�.
-        if (PhotonManager.Instance != null)
+        // 1. 디버그 모드인지 먼저 확인
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
         {
-            // �Լ� �̸��� LeaveRoomAndLoadLobby �� �� ��Ȯ�ϰ� �ٲ㵵 �����ϴ�.
-            PhotonManager.Instance.LeaveRoomAndRejoinLobby();
+            Debug.Log("디버그 모드: 로비 씬을 직접 로드합니다.");
+            // "LobbyScene"은 실제 로비 씬 이름으로 맞춰야 합니다.
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
         }
+        // 2. 네트워크 모드일 경우
         else
         {
-            Debug.LogError("PhotonManager�� ã�� �� �����ϴ�! �������� LobbyScene�� �ε��մϴ�.");
-            // PhotonManager�� ���� ��� ��Ȳ�� ����� ���� ���� �ε��մϴ�.
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene"); // "LobbyScene"�� ���� �� �̸����� �����ؾ� �մϴ�.
+            Debug.Log("네트워크 모드: 포톤을 통해 로비로 돌아갑니다.");
+            if (PhotonManager.Instance != null)
+            {
+                // PhotonManager의 함수를 호출 (PhotonManager 내부에서 안전장치를 마련할 것)
+                PhotonManager.Instance.LeaveRoomAndLoadLobby();
+            }
+            else
+            {
+                // PhotonManager가 없는 비상상황에서는 씬을 직접 로드
+                Debug.LogError("PhotonManager를 찾을 수 없습니다! 안전하게 LobbyScene을 직접 로드합니다.");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+            }
         }
     }
 

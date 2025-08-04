@@ -122,7 +122,7 @@ namespace KYG
             {
                 // TestNetworkManager가 보낸 "BaseP1" 또는 "BaseP2"를 TeamTag와 gameObject.tag에 모두 설정
                 TeamTag = team;
-                gameObject.tag = TeamTag;
+              //  gameObject.tag = TeamTag;
 
                 if (TeamTag == "BaseP1")
                     gameObject.layer = LayerMask.NameToLayer("P1Base");
@@ -178,7 +178,7 @@ namespace KYG
             // 실제 데미지 처리는 아래 private TakeDamage 함수의 소유권 체크 로직을 따릅니다.
             TakeDamage(damage, attackerTag);
         }
-        private void TakeDamage(int damage, string attackerTag)
+        public void TakeDamage(int damage, string attackerTag)
         {
             if (attackerTag == TeamTag) return; // 아군이면 무시
 
