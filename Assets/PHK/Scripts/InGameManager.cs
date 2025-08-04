@@ -371,4 +371,5 @@ public class InGameManager : MonoBehaviourPunCallbacks
         Debug.Log($"[게임 결과] 플레이어: {user.DisplayName}, 결과: {resultLog}");
     }
     #endregion
+
 }
