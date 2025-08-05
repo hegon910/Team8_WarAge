@@ -26,6 +26,10 @@ public class InGameUIManager : MonoBehaviour
     public Slider productionSlider;
     public Toggle[] queueSlots = new Toggle[5];
 
+    [Header("터렛 정보 UI")]
+    public GameObject turretInfoPanel; // 판매 버튼이 있는 UI 패널
+    private TurretSlot selectedSlot;   // 현재 선택한 슬롯
+
     // --- 터렛 관련 상태 ---
     // PlayerActionState에 따라 UI와 상호작용하는 상태를 나타내므로 UI 매니저에 위치.
     public enum PlayerActionState

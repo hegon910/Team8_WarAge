@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 543449296151265624}
   - component: {fileID: 4165666218261391551}
   - component: {fileID: 777516641681426884}
+  - component: {fileID: 156333845560696180}
+  - component: {fileID: 2385109012912799709}
   m_Layer: 0
   m_Name: StoneAge_person_Spear
   m_TagString: Untagged
@@ -96,6 +98,41 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.3}
   m_Size: {x: 0.8, y: 1.8}
   m_Direction: 0
+--- !u!114 &156333845560696180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066726361041046118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitdata: {fileID: 11400000, guid: b34f081eb733ea84f879701ace973b28, type: 2}
+  rb: {fileID: 4165666218261391551}
+  animator: {fileID: 107341536490249838}
+  currentHealth: 0
+  meleeSwitchRange: 1.5
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopDistance: 1
+  moveDirection: {x: 1, y: 0, z: 0}
+--- !u!114 &2385109012912799709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066726361041046118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0
 --- !u!1 &6969148252041980560
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,7 +207,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300176, guid: 5675db4a4d8e12347911934eb7b196fd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -275,7 +312,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 253c0669cf2436a438e52624b727a664, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
