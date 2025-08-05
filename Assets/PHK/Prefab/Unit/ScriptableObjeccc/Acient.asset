@@ -18,8 +18,11 @@ MonoBehaviour:
   baseSprite: {fileID: 21300000, guid: 05388a2726dd652458622321d256851d, type: 3}
   baseModelPrefab: {fileID: 1669524953809846975, guid: ca304959f6f018f40ac798ec916296f6, type: 3}
   spawnableUnits:
-  - {fileID: 7729183574821180569, guid: 59b35643b2486c84a80427a71eecd65b, type: 3}
-  - {fileID: 4894062003126303280, guid: 8d86a68cff383fc44b06dec9b1091608, type: 3}
-  - {fileID: 7880611672624073045, guid: a18afd32c39e9a44ea5a1165ae533fd4, type: 3}
-
-  availableTurrets: []
+  - {fileID: 3472674702577018649, guid: 8cafc630a39b7894792e6ab7264510c7, type: 3}
+  - {fileID: 245780566914753968, guid: ae3aaa0b99e3e8742be993c646b7f36d, type: 3}
+  - {fileID: 3066726361041046118, guid: 3f162153c9713964aad903aca55c6bb6, type: 3}
+  availableTurrets:
+  - {fileID: 11400000, guid: f0e99727892fb204d98e29561f8bdd4b, type: 2}
+  - {fileID: 11400000, guid: 0f80c734bc54e3641b26f0c6c1b34983, type: 2}
+  - {fileID: 11400000, guid: 5547225d80d1c664a809313cb5413c59, type: 2}
+  ultimateSkill: {fileID: 0}
