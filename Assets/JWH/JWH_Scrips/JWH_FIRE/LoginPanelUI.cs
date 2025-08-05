@@ -21,7 +21,7 @@ public class LoginPanel : MonoBehaviour
     {
         signUpButton.onClick.AddListener(SignUp);
         loginButton.onClick.AddListener(Login);
-        resetPassButton.onClick.AddListener(ResetPass);
+        //resetPassButton.onClick.AddListener(ResetPass);
     }
 
     private void SignUp()
@@ -59,12 +59,12 @@ public class LoginPanel : MonoBehaviour
         });
     }
 
-    private void ResetPass()
-    {
-        UserAuthService.Instance.ResetPassword(idInput.text, success =>
-        {
-            if (success)
-                Debug.Log("비밀번호 재설정 성공");
-        });
-    }
+   //private void ResetPass()
+   //{
+   //    UserAuthService.Instance.ResetPassword(idInput.text, success =>
+   //    {
+   //        if (success)
+   //            Debug.Log("비밀번호 재설정 성공");
+   //    });
+   //}
 }

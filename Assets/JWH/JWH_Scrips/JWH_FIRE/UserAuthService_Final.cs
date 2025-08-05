@@ -155,23 +155,23 @@ public class UserAuthService : MonoBehaviour
     }
 
 
-    public void ResetPassword(string email, Action<bool> callback = null)
-    {
-        Auth.SendPasswordResetEmailAsync(email)
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("패스워드 재설정 실패: " + task.Exception);
-                    callback?.Invoke(false);
-                }
-                else
-                {
-                    Debug.Log("패스워드 재설정 메일 전송 성공");
-                    callback?.Invoke(true);
-                }
-            });
-    }
+   //public void ResetPassword(string email, Action<bool> callback = null)
+   //{
+   //    Auth.SendPasswordResetEmailAsync(email)
+   //        .ContinueWithOnMainThread(task =>
+   //        {
+   //            if (task.IsCanceled || task.IsFaulted)
+   //            {
+   //                Debug.LogError("패스워드 재설정 실패: " + task.Exception);
+   //                callback?.Invoke(false);
+   //            }
+   //            else
+   //            {
+   //                Debug.Log("패스워드 재설정 메일 전송 성공");
+   //                callback?.Invoke(true);
+   //            }
+   //        });
+   //}
 
     public void DeleteAccount(Action<bool> callback = null)
     {
