@@ -1700,12 +1700,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388574051456222283, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388574051456222283, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3388574051456222283, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_MatchWidthOrHeight
+<<<<<<< Updated upstream
       value: 1
+=======
+      value: 0.5
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 3388574051456222283, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_ReferenceResolution.x
@@ -1715,6 +1723,7 @@ PrefabInstance:
       propertyPath: m_ReferenceResolution.y
       value: 1440
       objectReference: {fileID: 0}
+<<<<<<< Updated upstream
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.5
@@ -1771,6 +1780,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -108
       objectReference: {fileID: 0}
+=======
+>>>>>>> Stashed changes
     - target: {fileID: 3829815830551802263, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_text
       value: Create Room
@@ -4319,6 +4330,13 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5362086599810313188, guid: ba3a4bb1a1d7aaf4daae918e738a95d6, type: 3}
+<<<<<<< Updated upstream
+=======
+      propertyPath: m_MatchWidthOrHeight
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5362086599810313188, guid: ba3a4bb1a1d7aaf4daae918e738a95d6, type: 3}
+>>>>>>> Stashed changes
       propertyPath: m_ReferenceResolution.x
       value: 2560
       objectReference: {fileID: 0}
