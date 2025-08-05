@@ -90,8 +90,30 @@ public class InGameManager : MonoBehaviourPunCallbacks
             teamTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
         }
 
-        if (p1_Base != null) p1_Base.InitializeTeam("P1");
-        if (p2_Base != null) p2_Base.InitializeTeam("P2");
+        if (p1_Base != null)
+        {
+            p1_Base.InitializeTeam("P1");
+            if (p1_Base.turretSlots != null)
+            {
+                foreach (var slot in p1_Base.turretSlots)
+                {
+                    slot.Init("BaseP1");
+                }
+            }
+        }
+
+        if (p2_Base != null)
+        {
+            p2_Base.InitializeTeam("P2");
+
+            if (p2_Base.turretSlots != null)
+            {
+                foreach (var slot in p2_Base.turretSlots)
+                {
+                    slot.Init("BaseP2");
+                }
+            }
+        }
 
         OnResourceChanged?.Invoke(currentGold, GetLocalPlayerExp());
         OnInfoMessage?.Invoke("게임 시작!");
@@ -357,6 +379,22 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             OnGameWon?.Invoke();
             SendMatchResult(true);
+        }
+    }
+    public string GetLocalPlayerBaseTag()
+    {
+        if (isDebugMode)
+        {
+            return isDebugHost ? "BaseP1" : "BaseP2";
+        }
+        else
+        {
+            // PhotonNetwork.IsConnected가 false일 경우를 대비한 안전장치 추가
+            if (!PhotonNetwork.IsConnected || PhotonNetwork.LocalPlayer == null)
+            {
+                return null; // 또는 기본값 "BaseP1"
+            }
+            return PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "BaseP1" : "BaseP2";
         }
     }
     #region 게임오버 시퀀스

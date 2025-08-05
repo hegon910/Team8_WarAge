@@ -114,7 +114,24 @@ namespace PHK
                 ConfigureUnitPanel(currentUnitPanel, newAgeData.spawnableUnits);
             }
 
-            Debug.Log($"시대가 {newAgeData.ageType}(으)로 변경되고 유닛 버튼이 재설정되었습니다.");
+            GameObject currentTurretPanel = null;
+            switch (this.currentAge)
+            {
+                case AgeType.Ancient: currentTurretPanel = ancientTurretPanel; break;
+                case AgeType.Medieval: currentTurretPanel = middleAgeTurretPanel; break;
+                case AgeType.Modern: currentTurretPanel = modernTurretPanel; break;
+            }
+
+            if (currentTurretPanel != null)
+            {
+                // 새로 추가한 터렛 설정 함수를 호출합니다.
+                ConfigureTurretPanel(currentTurretPanel, newAgeData.availableTurrets);
+            }
+            // --- 여기까지 추가 ---
+
+            Debug.Log($"시대가 {newAgeData.ageType}(으)로 변경되고 유닛/터렛 버튼이 재설정되었습니다.");
+
+
         }
 
         private void ConfigureUnitPanel(GameObject panel, List<GameObject> units)
@@ -134,7 +151,25 @@ namespace PHK
                 }
             }
         }
+        private void ConfigureTurretPanel(GameObject panel, List<TurretData> turrets)
+        {
+            // `TurretButton`을 찾도록 변경
+            TurretButton[] buttons = panel.GetComponentsInChildren<TurretButton>(true);
+            Debug.Log($"[3. ConfigureTurretPanel] 패널({panel.name}) 설정 시작. 전달된 터렛 수: {turrets.Count}, 찾은 버튼 수: {buttons.Length}");
 
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (i < turrets.Count)
+                {
+                    // TurretData를 넘겨주도록 변경
+                    buttons[i].Init(turrets[i]);
+                }
+                else
+                {
+                    buttons[i].Init(null);
+                }
+            }
+        }
         // 현재 활성화된 패널 타입(activePanel)과 시대(currentAge)에 맞는 패널을 보여주는 함수
         private void UpdateUnitPanelVisibility()
         {

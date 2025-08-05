@@ -77,7 +77,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: d81e7ceac4075ea4a8a558482839ffe9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -175,7 +175,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitdata: {fileID: 11400000, guid: 7b2b6a3169e340249b839d8a16ee7f3e, type: 2}
   rb: {fileID: 935143871363646320}
-  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
     serializedVersion: 2

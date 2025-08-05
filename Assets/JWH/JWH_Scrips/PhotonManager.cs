@@ -1,10 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using ExitGames.Client.Photon;
+using Firebase.Auth;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ExitGames.Client.Photon;
-using System;
-using System.Collections.Generic;
 
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
@@ -79,6 +81,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
+
+        //uid 커스텀프로퍼티로 저장해서 전적을 보여줄거임
+        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+        { "uid", firebaseUid }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
     }
     //추가    PHG : 방에 참가했을 때 호출되는 콜백
     public override void OnJoinedRoom()

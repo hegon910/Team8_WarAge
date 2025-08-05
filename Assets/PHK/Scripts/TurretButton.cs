@@ -1,64 +1,84 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using KYG;
-// ���ӽ����̽��� PHK�� �����Ͽ� �ٸ� ��ũ��Ʈ�� �����մϴ�.
+
 namespace PHK
 {
     /// <summary>
-    /// �ͷ� ���� ��ư�� �����Ǿ� ���콺 ȣ�� �� Ŭ�� �̺�Ʈ�� ó���մϴ�.
-    /// UnitButton.cs�� ���� ������ �����Դϴ�.
+    /// 터렛 생성 버튼. AgeData에 포함된 TurretData를 받아 자신을 초기화합니다.
+    /// 클릭 시 해당 터렛의 설치 모드로 진입을 요청합니다.
     /// </summary>
+    [RequireComponent(typeof(Button))]
     public class TurretButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        [Header("�ͷ� ������")]
-        [Tooltip("�� ��ư�� Ŭ������ �� ������ �ͷ��� �������Դϴ�.")]
-        public GameObject turretPrefab;
-        public TurretData turretData;
-        // private TurretData turretData; // ���߿� �ͷ� ����(�̸�, ��� ��)�� ���� ������ Ŭ����
+        private TurretData turretData;
+
+        private Button button;
+        private Image iconImage;
 
         private void Awake()
         {
-            // ���߿� �ͷ� �����տ� TurretController ���� ��ũ��Ʈ�� �����
-            // �װ����� �̸��̳� ��� ���� �����͸� ������ �� �ֽ��ϴ�.
-            // if (turretPrefab != null)
-            // {
-            //     turretData = turretPrefab.GetComponent<TurretController>().turretData;
-            // }
+            button = GetComponent<Button>();
+            iconImage = GetComponent<Image>();
+
+            button.onClick.AddListener(OnClick_RequestTurret);
         }
 
-        // ���콺�� ��ư ���� �ö���� ��
-        public void OnPointerEnter(PointerEventData eventData)
+        /// <summary>
+        /// 외부(UI 관리 스크립트)에서 TurretData를 받아 버튼을 초기화하는 핵심 함수입니다.
+        /// </summary>
+        public void Init(TurretData data)
         {
-            // �ͷ� ������ UI�� ǥ���մϴ�. (��� ��)
-            // if (turretData != null)
-            // {
-            //     InGameUIManager.Instance.ShowInfoText($"{turretData.name} (Cost: {turretData.cost})");
-            // }
-            // �ӽ÷� ������ �̸��� ǥ��
-            if (turretPrefab != null)
+            this.turretData = data;
+
+            if (this.turretData != null)
             {
-                InGameUIManager.Instance.inGameInfoText.text=$"{turretPrefab.name}";
+                if (iconImage != null && this.turretData.icon != null)
+                {
+                    iconImage.sprite = this.turretData.icon;
+                }
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                gameObject.SetActive(false);
             }
         }
 
-        // ���콺�� ��ư���� ����� ��
+        // 마우스가 버튼 위에 올라갔을 때 호출
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (turretData != null)
+            {
+                string info = $"{turretData.turretName}\nCost: {turretData.cost}";
+                InGameUIManager.Instance.ShowInfoText(info);
+            }
+        }
+
+        // 마우스가 버튼에서 벗어났을 때 호출
         public void OnPointerExit(PointerEventData eventData)
         {
             InGameUIManager.Instance.HideInfoText();
         }
 
         /// <summary>
-        /// [OnClick �̺�Ʈ��] �ͷ� ������ InGameManager�� ��û�մϴ�.
+        /// [OnClick 이벤트] 터렛 설치 모드로 진입하도록 InGameUIManager에 요청합니다.
         /// </summary>
-        public void OnClick_RequestTurret()
+        private void OnClick_RequestTurret()
         {
-            if (turretPrefab == null)
+            if (turretData == null)
             {
-                Debug.LogError("TurretButton�� �ͷ� �������� �Ҵ���� �ʾҽ��ϴ�!");
+                Debug.LogError("TurretButton에 TurretData가 할당되지 않았습니다!");
                 return;
             }
-            // 설치 모드로 진입
+
+            // [수정] 임의로 추가했던 골드 체크 로직을 제거했습니다.
+            // 이제 버튼은 원래 로직대로 설치 모드 진입만 요청합니다.
             InGameUIManager.Instance.EnterTurretPlaceMode(turretData);
+
+            // 버튼 중복 클릭 방지
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 }
