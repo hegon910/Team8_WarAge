@@ -1111,7 +1111,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1120,6 +1123,9 @@ PrefabInstance:
     - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -1133,11 +1139,19 @@ PrefabInstance:
     - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: 671.4004
       objectReference: {fileID: 0}
     - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 795.00024
+=======
+      value: 430
+      objectReference: {fileID: 0}
+    - target: {fileID: 170524060340234981, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 670
+>>>>>>> Stashed changes
 =======
       value: 430
       objectReference: {fileID: 0}
@@ -1360,6 +1374,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 808872414325609496, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 980
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 87
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1005081651749087317, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -1689,6 +1735,7 @@ PrefabInstance:
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.y
       value: 0
+<<<<<<< Updated upstream
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
@@ -1697,6 +1744,8 @@ PrefabInstance:
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.y
       value: 0
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1706,7 +1755,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1715,6 +1767,9 @@ PrefabInstance:
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -1728,6 +1783,7 @@ PrefabInstance:
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: 930
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -1738,6 +1794,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
+=======
+      value: 900
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256218791850447900, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+>>>>>>> Stashed changes
       value: 870
       objectReference: {fileID: 0}
     - target: {fileID: 2328245797858875364, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -1815,6 +1877,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 6
       objectReference: {fileID: 0}
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     - target: {fileID: 2593289032945922948, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Type
@@ -2141,7 +2206,10 @@ PrefabInstance:
       value: 130
       objectReference: {fileID: 0}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     - target: {fileID: 3489946512484513371, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2202,6 +2270,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
@@ -2219,7 +2290,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -2228,6 +2302,9 @@ PrefabInstance:
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -2241,11 +2318,19 @@ PrefabInstance:
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: 1550
       objectReference: {fileID: 0}
     - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 450
+=======
+      value: 1700
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622418857102112241, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 300
+>>>>>>> Stashed changes
 =======
       value: 1700
       objectReference: {fileID: 0}
@@ -2389,6 +2474,8 @@ PrefabInstance:
     - target: {fileID: 3829815830551802263, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_fontSizeBase
       value: 50
+<<<<<<< Updated upstream
+=======
       objectReference: {fileID: 0}
     - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
@@ -2407,6 +2494,55 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+>>>>>>> Stashed changes
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+<<<<<<< Updated upstream
+    - target: {fileID: 3854041846327383230, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+=======
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+>>>>>>> Stashed changes
       propertyPath: m_SizeDelta.x
       value: 500
       objectReference: {fileID: 0}
@@ -2464,11 +2600,19 @@ PrefabInstance:
     - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: 671.4004
       objectReference: {fileID: 0}
     - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 913.60034
+=======
+      value: 430
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916191722883729530, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 870
+>>>>>>> Stashed changes
 =======
       value: 430
       objectReference: {fileID: 0}
@@ -2508,7 +2652,11 @@ PrefabInstance:
     - target: {fileID: 3972516629801382839, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: -0.0020751953
+=======
+      value: -0.0020141602
+>>>>>>> Stashed changes
 =======
       value: -0.0020141602
 >>>>>>> Stashed changes
@@ -2641,7 +2789,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -2650,6 +2801,9 @@ PrefabInstance:
     - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -2662,6 +2816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
       value: 930
       objectReference: {fileID: 0}
@@ -2676,6 +2831,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
+=======
+      value: 900
+      objectReference: {fileID: 0}
+    - target: {fileID: 4628486969874148936, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+>>>>>>> Stashed changes
       value: 670
       objectReference: {fileID: 0}
     - target: {fileID: 4706077242992702286, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -2728,6 +2889,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4731035610596581020, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.y
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
       value: 0
       objectReference: {fileID: 0}
@@ -2764,6 +2926,15 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4731035610596581020, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+=======
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731035610596581020, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4731035610596581020, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+>>>>>>> Stashed changes
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
@@ -2778,8 +2949,11 @@ PrefabInstance:
     - target: {fileID: 4731035610596581020, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: -0.000030517578
 =======
+=======
+>>>>>>> Stashed changes
       value: 0.000017828519
       objectReference: {fileID: 0}
     - target: {fileID: 4929235943236873391, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -3277,6 +3451,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6316724458264230402, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_SizeDelta.y
+<<<<<<< Updated upstream
+=======
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 6316724458264230402, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6316724458264230402, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6379831727555954001, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_fontSize
+>>>>>>> Stashed changes
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6316724458264230402, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -3707,6 +3896,7 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+<<<<<<< Updated upstream
     - target: {fileID: 7365112521844269504, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3731,6 +3921,8 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+=======
+>>>>>>> Stashed changes
     - target: {fileID: 7365112521844269504, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_SizeDelta.x
       value: 300
@@ -3765,6 +3957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7420330192058473574, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       propertyPath: m_SizeDelta.x
       value: 300
       objectReference: {fileID: 0}
@@ -3780,6 +3973,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 450
 =======
+=======
+>>>>>>> Stashed changes
       propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
@@ -3802,6 +3997,9 @@ PrefabInstance:
     - target: {fileID: 7420330192058473574, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 300
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 7430800331171065465, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -3873,6 +4071,7 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3883,6 +4082,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
 =======
+=======
+>>>>>>> Stashed changes
     - target: {fileID: 7805441848441391493, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3892,6 +4093,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7805441848441391493, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+<<<<<<< Updated upstream
       propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
@@ -3909,6 +4111,37 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_Pivot.x
+=======
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7805441848441391493, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7805441848441391493, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 480
+      objectReference: {fileID: 0}
+    - target: {fileID: 7805441848441391493, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 87
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.y
+>>>>>>> Stashed changes
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -3937,6 +4170,46 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
 >>>>>>> Stashed changes
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 2230
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 130
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7936982889710655269, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960769912887037457, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_SizeDelta.x
       value: 300
       objectReference: {fileID: 0}
@@ -4424,7 +4697,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.x
@@ -4433,6 +4709,9 @@ PrefabInstance:
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       objectReference: {fileID: 0}
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -4446,6 +4725,7 @@ PrefabInstance:
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.x
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value: 1130
       objectReference: {fileID: 0}
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -4456,6 +4736,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       propertyPath: m_AnchoredPosition.y
+=======
+      value: 1100
+      objectReference: {fileID: 0}
+    - target: {fileID: 9059640733614849105, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+>>>>>>> Stashed changes
       value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 9065009704858466656, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
@@ -4914,7 +5200,11 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 930, y: 489}
+=======
+  m_AnchoredPosition: {x: 926, y: 350}
+>>>>>>> Stashed changes
 =======
   m_AnchoredPosition: {x: 926, y: 350}
 >>>>>>> Stashed changes
@@ -6663,8 +6953,13 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 930, y: 668}
   m_SizeDelta: {x: 700, y: 70}
+=======
+  m_AnchoredPosition: {x: 930, y: 590}
+  m_SizeDelta: {x: 700, y: 100}
+>>>>>>> Stashed changes
 =======
   m_AnchoredPosition: {x: 930, y: 590}
   m_SizeDelta: {x: 700, y: 100}
@@ -6948,7 +7243,11 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   m_AnchoredPosition: {x: 1330, y: 489}
+=======
+  m_AnchoredPosition: {x: 1326, y: 350}
+>>>>>>> Stashed changes
 =======
   m_AnchoredPosition: {x: 1326, y: 350}
 >>>>>>> Stashed changes
