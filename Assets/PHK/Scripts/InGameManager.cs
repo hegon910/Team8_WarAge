@@ -360,6 +360,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
             photonView.RPC("RPC_ShowResultPanels", RpcTarget.All, losingTeamTag);
         }
     }
+    
 
     [PunRPC]
     private void RPC_ShowResultPanels(string losingTeamTag)

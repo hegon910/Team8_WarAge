@@ -21,8 +21,6 @@ MonoBehaviour:
   - {fileID: 6466190524220667472, guid: 3c1ed2ab56e8ad341b9866c45e3b9315, type: 3}
   - {fileID: 3770082047026634689, guid: ae982c86fecec6e40b2326fef4d1f292, type: 3}
   - {fileID: 7268807772074908459, guid: a7da4e872661ce241b6ce2fcfc6bb639, type: 3}
-  availableTurrets:
-  - {fileID: 11400000, guid: 0ab073f077b3e1e46a5b79b33a1defbb, type: 2}
-  - {fileID: 11400000, guid: 24eb84f36e63e3e4bbde80e287c8509c, type: 2}
-  - {fileID: 11400000, guid: 440667916c1b9e940961c39d6f4d772c, type: 2}
-  ultimateSkill: {fileID: 0}
+  availableTurrets: []
+  ultimateSkill: {fileID: 11400000, guid: 4aa45e55242aaaf499365956460de756, type: 2}
+
