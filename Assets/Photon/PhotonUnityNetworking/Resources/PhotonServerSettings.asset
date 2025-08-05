@@ -54,6 +54,10 @@ MonoBehaviour:
   - RPC_ShowResultPanels
   - RpcPlayAttackAnimation
   - RPC_Chat
+  - FlipObjectX
+  - Initialize
+  - RPC_EvolveTeam
+  - RPC_ExecuteSkill
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
