@@ -1847,6 +1847,60 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1435201891}
   m_SourcePrefab: {fileID: 100100000, guid: 0dae468b24ff67943b5578a20903d52f, type: 3}
+--- !u!1 &1305934961
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1305934963}
+  - component: {fileID: 1305934962}
+  m_Layer: 0
+  m_Name: PhotonObjectPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1305934962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305934961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61834906f805de94c99aab2bdc8d127d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolPrefabs:
+  - key: MeteorProjectile
+    prefab: {fileID: 5595433089640799108, guid: 694525ce194434d4cb4faf4ea3ba86c5, type: 3}
+    initialSize: 10
+  - key: CatapultProjectile
+    prefab: {fileID: 8374780226716921439, guid: 694e629067eb7e746a5446688e008aa5, type: 3}
+    initialSize: 10
+  - key: MissileProjectile
+    prefab: {fileID: 6124938604311219811, guid: 983bd1b70cbd1c84c9df2430de81ac35, type: 3}
+    initialSize: 10
+--- !u!4 &1305934963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305934961}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 989.9687, y: 697.08966, z: -7.7982516}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1349323260 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 89647346517817328, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
@@ -3791,3 +3845,4 @@ SceneRoots:
   - {fileID: 3757905835179977855}
   - {fileID: 5366120425423248999}
   - {fileID: 189912355}
+  - {fileID: 1305934963}

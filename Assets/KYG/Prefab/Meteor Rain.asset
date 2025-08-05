@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033f1194aef66ea4e95a5add8d35ba2e, type: 3}
+  m_Name: Meteor Rain
+  m_EditorClassIdentifier: 
+  skillName: Meteor Rain
+  cooldownTime: 30
+  projectilePrefab: {fileID: 5595433089640799108, guid: 694525ce194434d4cb4faf4ea3ba86c5, type: 3}
+  projectileCount: 6
+  damage: 100
+  areaRadius: 3
+  effectPrefab: {fileID: 0}
+  skillSound: {fileID: 0}
+  skillType: 0
