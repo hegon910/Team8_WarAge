@@ -63,6 +63,7 @@ public class UserAuthService : MonoBehaviour
 
     public void Login(string email, string password, Action<bool, FirebaseUser> callback = null)
     {
+        FirebaseUser user = Auth.CurrentUser;
         Auth.SignInWithEmailAndPasswordAsync(email, password)
             .ContinueWithOnMainThread(task =>
             {
@@ -74,9 +75,11 @@ public class UserAuthService : MonoBehaviour
                 else
                 {
                     Debug.Log("로그인 성공");
-                    UIManager.Instance.OnClickedLogin();
 
-                    UIManager.Instance.OnClickedLoginFirst();
+                    if (user.IsEmailVerified)
+                        UIManager.Instance.OnClickedLogin();
+                    else
+                        UIManager.Instance.OnClickedLoginFirst();
 
                     callback?.Invoke(true, task.Result.User);
                 }

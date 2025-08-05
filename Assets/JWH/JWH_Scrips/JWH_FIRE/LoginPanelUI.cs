@@ -43,9 +43,13 @@ public class LoginPanel : MonoBehaviour
             if (user.IsEmailVerified)
             {
                 if (string.IsNullOrEmpty(user.DisplayName))
+                {
                     nicknamePanel.SetActive(true);
+                }
                 else
-                    UIManager.Instance.OnClickedNicknameConfirm(nickname);
+                {
+                   UIManager.Instance.OnClickedNicknameConfirm(nickname);
+                }
             }
             else
             {
