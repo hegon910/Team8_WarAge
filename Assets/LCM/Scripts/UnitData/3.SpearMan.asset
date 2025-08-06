@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: clubman
+  m_Name: 3.SpearMan
   m_EditorClassIdentifier: 
-  unitName: ClubMan
-  unitExp: 30
-  health: 55
-  attackDamage: 16
+  unitName: SpearMan
+  unitExp: 70
+  health: 160
+  attackDamage: 40
   rangedDamage: 0
-  MeleeRange: 1
+  MeleeRange: 2
   rangedrange: 0
   attackSpeed: 1
   SpawnTime: 3
   moveSpeed: 3
-  goldCost: 15
-  unitSprite: {fileID: 21300000, guid: dbbe7a2fd2aa3484f90ca0413883357c, type: 3}
-  description: StoneAgeDefaultUnit
+  goldCost: 50
+  unitSprite: {fileID: 0}
+  description: StoneAgeDino
   ArrowPrefab: {fileID: 0}
   unitType: 0
   eraType: 0
