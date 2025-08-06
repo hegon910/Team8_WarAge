@@ -550,5 +550,4 @@ public class InGameManager : MonoBehaviourPunCallbacks
         // ���� ������ ������Ʈ�ϴ� ������ ����
 
     }
-    #endregion
 }
