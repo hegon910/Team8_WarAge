@@ -79,8 +79,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
+        PhotonNetwork.JoinLobby();
 
         //uid 커스텀프로퍼티로 저장해서 전적을 보여줄거임
         string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
@@ -126,19 +126,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void CreateOrJoinLobby()// �� ���� ����� ������
     {
-        Debug.Log("CreateOrJoinLobby ȣ��");
-
-        if (!PhotonNetwork.InLobby)
-        {
-            Debug.LogWarning("�κ�������");
-            return;
-        }
-
-        UIManager.Instance.CreateRoom();
+    
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        UIManager.Instance.CreateRoom();
         Debug.Log("JoinOrCreateRoom ȣ��");
-
+    
     }
 
 

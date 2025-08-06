@@ -29,7 +29,7 @@ public class OptionManager : MonoBehaviour
     }
 
     ///<summary>
-    ///옵션 설정창 관련 함수
+    ///메인 화면 옵션 설정창 관련 함수
     ///<summary>
 
     #region 함수
@@ -69,5 +69,7 @@ public class OptionManager : MonoBehaviour
         soundPanel.SetActive(true);
     }
     #endregion
+
+
 
 }
