@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: Meteor Rain
   cooldownTime: 30
-  projectilePrefab: {fileID: 5595433089640799108, guid: 694525ce194434d4cb4faf4ea3ba86c5, type: 3}
+  skillIcon: {fileID: 21300000, guid: 30c65149fb05fff43973ae8e11f964ce, type: 3}
+  projectilePrefab: {fileID: 6124938604311219811, guid: 24cd46d8dbf657a4c83fc3276211283d, type: 3}
   projectileCount: 6
   damage: 100
-  areaRadius: 3
+  areaRadius: 10
   effectPrefab: {fileID: 0}
   skillSound: {fileID: 0}
   skillType: 0

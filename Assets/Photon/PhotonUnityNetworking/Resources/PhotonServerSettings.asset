@@ -59,6 +59,9 @@ MonoBehaviour:
   - RPC_EvolveTeam
   - RPC_ExecuteSkill
   - RPC_ActivateSlotAtIndex
+  - RPC_ExecuteUltimateSkill
+  - RPC_ImpactEffect
+  - RPC_Initialize
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

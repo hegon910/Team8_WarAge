@@ -81,29 +81,27 @@ public class TurretSlot : MonoBehaviourPun //  터렛 설치 장소 및 판매,�
                 return;
             }
 
-            // ======================================================================
-            // ★★★★★ 사용자 요청: "강제로 P1/P2 태그 받는 로직" 시작 ★★★★★
-            // ======================================================================
-
-            // 1. 게임의 유일한 정보 소스인 InGameManager에서 로컬 플레이어의 팀 정보를 직접 가져옵니다.
-            //    이것이 가장 확실하고 다른 코드의 영향을 받지 않는 방법입니다.
+            // 로컬 플레이어의 팀 정보를 가져옴
             string localPlayerTeamTag = InGameManager.Instance.GetLocalPlayerBaseTag();
-
-            // 2. 만약의 경우에 대비해, 팀 정보를 가져오지 못했다면 오류를 출력하고 중단합니다.
             if (string.IsNullOrEmpty(localPlayerTeamTag))
             {
-                Debug.LogError("InGameManager에서 플레이어의 팀 정보를 가져오지 못했습니다! InGameManager의 GetLocalPlayerBaseTag() 함수를 확인하세요.");
+                Debug.LogError("InGameManager에서 플레이어의 팀 정보를 가져오지 못했습니다!");
                 return;
             }
 
-            // 3. 이제 'localPlayerTeamTag' ("BaseP1" 또는 "BaseP2")를 기준으로 모든 작업을 수행합니다.
+            // [핵심 추가] 이 슬롯의 팀(this.TeamTag)과 클릭한 플레이어의 팀(localPlayerTeamTag)이 다른 경우, 설치를 막습니다.
+            if (this.TeamTag != localPlayerTeamTag)
+            {
+                InGameUIManager.Instance.ShowInfoText("다른 플레이어의 슬롯에는 건설할 수 없습니다.");
+                return;
+            }
+
+            // 내 슬롯이 맞을 경우에만 아래의 설치 로직을 진행
             TurretData dataToPlace = InGameUIManager.Instance.turretDataToPlace;
             if (dataToPlace != null && IsEmpty && InGameManager.Instance.SpendGold(dataToPlace.cost))
             {
-                // 4. 터렛 설치 함수에 '강제로 알아낸' 플레이어의 팀 태그를 전달합니다.
+                // 터렛 설치 함수에 '내 팀 태그'를 전달
                 InstallTurret(dataToPlace, localPlayerTeamTag);
-
-                // 5. 작업 완료 후 설치 모드를 해제합니다.
                 InGameUIManager.Instance.CancelPlayerAction();
             }
         }

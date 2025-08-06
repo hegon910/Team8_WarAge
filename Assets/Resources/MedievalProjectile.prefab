@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 160203948341005147}
   - component: {fileID: 3750161152824577611}
   - component: {fileID: 5738564997411406089}
+  - component: {fileID: 5512785119918995142}
   m_Layer: 0
   m_Name: MedievalProjectile
   m_TagString: Untagged
@@ -130,7 +131,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2603175800963303953}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -161,3 +162,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71a9fa6d7327224479c21d25f001fe7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5512785119918995142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2603175800963303953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

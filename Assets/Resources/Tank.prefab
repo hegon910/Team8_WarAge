@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1561008231416571509}
   - component: {fileID: 2381647018410404393}
   - component: {fileID: 2003863107078656995}
+
   - component: {fileID: -8648976633300797354}
   - component: {fileID: 97210486006326587}
   - component: {fileID: 2105019323390384621}
@@ -63,7 +64,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2003863107078656995
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -109,6 +110,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.886716, y: 3.042004}
   m_EdgeRadius: 0
+
 --- !u!114 &-8648976633300797354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
   unitdata: {fileID: 11400000, guid: 53e47e8a78b834841a66e156661fb300, type: 2}
   rb: {fileID: 2381647018410404393}
   animator: {fileID: 3541325098862167946}
@@ -131,6 +134,7 @@ MonoBehaviour:
     m_Bits: 0
   stopDistance: 1
   moveDirection: {x: 1, y: 0, z: 0}
+
 --- !u!114 &97210486006326587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,6 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3727567686385393061}
   m_Enabled: 1
   m_EditorHideFlags: 0
+
   m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -246,7 +251,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 00fba67cbb80f8441a6cfaf354228753, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

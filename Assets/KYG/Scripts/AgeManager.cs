@@ -46,5 +46,17 @@ namespace KYG
         {
             return ageDataDict.ContainsKey(ageType) ? ageDataDict[ageType] : null;
         }
+
+        public UltimateSkillData FindUltimateSkillByName(string name)
+        {
+            foreach (AgeData ageData in ageDataArray)
+            {
+                if (ageData.ultimateSkill != null && ageData.ultimateSkill.skillName == name)
+                {
+                    return ageData.ultimateSkill;
+                }
+            }
+            return null;
+        }
     }
 }
