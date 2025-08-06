@@ -98,8 +98,10 @@ public class UnitSpawnManager : MonoBehaviour
 
         Vector3 initialMoveDirection = (ownerTag == "P1") ? Vector3.right : Vector3.left;
         isProducing = true;
+        string myOwnerTag = InGameManager.isDebugMode ? "P1" : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        bool isMyRequest = (ownerTag == myOwnerTag);
 
-        if (isPlayerRequest)
+        if (isMyRequest) 
         {
             OnProductionStatusChanged?.Invoke(true);
             OnProductionProgress?.Invoke(0f);
@@ -113,7 +115,7 @@ public class UnitSpawnManager : MonoBehaviour
             while (timer < unitData.SpawnTime)
             {
                 timer += Time.deltaTime;
-                if (isPlayerRequest)
+                if (isMyRequest) 
                 {
                     OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
                     int percent = (int)((timer / unitData.SpawnTime) * 100f);
@@ -122,7 +124,7 @@ public class UnitSpawnManager : MonoBehaviour
                 yield return null;
             }
         }
-        if (isPlayerRequest) OnProductionProgress?.Invoke(1f);
+        if (isMyRequest) OnProductionProgress?.Invoke(1f);
 
         Transform spawnPoint = (ownerTag == "P1") ? p1_spawnPoint : p2_spawnPoint;
         if (spawnPoint != null)
@@ -169,7 +171,7 @@ public class UnitSpawnManager : MonoBehaviour
         else
         {
             isProducing = false;
-            if (isPlayerRequest)
+            if (isMyRequest) 
             {
                 OnProductionStatusChanged?.Invoke(false);
                 OnProductionProgress?.Invoke(0f);

@@ -183,8 +183,12 @@ namespace KYG
             TurretSlot slotToActivate = turretSlots[slotIndex];
             if (slotToActivate != null)
             {
+                // 슬롯을 활성화하기 전에, 이 슬롯의 주인이 누구인지 알려줍니다.
+                // BaseController가 가진 자신의 팀 태그(TeamTag)를 전달합니다.
+                slotToActivate.Init(this.TeamTag);
+
                 slotToActivate.gameObject.SetActive(true);
-                Debug.Log($"슬롯 {slotToActivate.name} (인덱스: {slotIndex}) 활성화.");
+                Debug.Log($"슬롯 {slotToActivate.name} (인덱스: {slotIndex}) 활성화 및 초기화 완료. 팀: {this.TeamTag}");
             }
 
             // 활성화된 슬롯 개수를 업데이트 (로컬/모든 클라이언트 공통)
@@ -291,7 +295,7 @@ namespace KYG
         /// </summary>
         public void UpgradeBaseByAge(AgeData nextAgeData)
         {
-            Debug.LogError($"--- UpgradeBaseByAge CALLED for {gameObject.name} ---");
+            Debug.Log($"--- UpgradeBaseByAge CALLED for {gameObject.name} ---");
             // TODO 업그래이드 기능 구현
             this.maxHP = nextAgeData.maxHP; // 최대 체력 업그레이드
             this.currentHP = maxHP; // 현재 체력 업그레이드 및 회복

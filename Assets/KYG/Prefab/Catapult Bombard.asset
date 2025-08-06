@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: Catapult Bombard
   cooldownTime: 50
-  projectilePrefab: {fileID: 8374780226716921439, guid: 694e629067eb7e746a5446688e008aa5, type: 3}
+  skillIcon: {fileID: 21300000, guid: 5305f900936fc0d4f927476f797c7801, type: 3}
+  projectilePrefab: {fileID: 8374780226716921439, guid: e6131c51728002844bd284a5558288ee, type: 3}
   projectileCount: 10
   damage: 500
   areaRadius: 10

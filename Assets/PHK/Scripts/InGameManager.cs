@@ -45,6 +45,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     public event Action<bool> OnEvolveStatusChanged;
     public event Action OnGameWon;
     public event Action OnGameLost;
+    public event Action<float> OnUltimateSkillUsed;
     #endregion
 
     #region 초기화 및 Update()
@@ -59,6 +60,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
         {
             Destroy(gameObject);
         }
+
     }
     public void RegisterBase(BaseController baseController, string team)
     {
@@ -77,7 +79,6 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         currentGold = startingGold;
-
         if (isDebugMode)
         {
             p1_exp_debug = 0; // 디버그 모드에서는 로컬 변수로 경험치 관리
@@ -323,6 +324,19 @@ public class InGameManager : MonoBehaviourPunCallbacks
         }
     }
     #endregion
+
+    public void NotifyUltimateSkillUsed(float cooldownTime)
+    {
+        // 구독된 모든 함수(InGameUIManager의 StartUltimateCooldownVisual)를 호출
+        OnUltimateSkillUsed?.Invoke(cooldownTime);
+    }
+
+    public AgeType GetLocalPlayerCurrentAge()
+    {
+        string localTeamTag = isDebugMode ? "P1" : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
+        return (localTeamTag == "P1") ? p1_currentAge : p2_currentAge;
+    }
+
     private IEnumerator PassiveGoldGeneration()
     {
         var fiveSecondWait = new WaitForSeconds(5f);

@@ -20,6 +20,8 @@ namespace KYG
         /// </summary>
         /// <param name="data"></param>
         /// <param name="slot"></param>
+        /// 
+
         public void Init(TurretData data, TurretSlot slot, string teamTag)
         {
             Debug.Log($"TurretController.Init 호출됨. 전달받은 teamTag 값: '{teamTag}'"); // <-- 이 로그를 추가
@@ -43,6 +45,16 @@ namespace KYG
 
         private void Update()
         {
+            bool isTargetInvalid = false;
+            if (target != null)
+            {
+                Collider2D targetCollider = target.GetComponent<Collider2D>();
+                // 타겟의 콜라이더가 없거나 비활성화 상태이면 무효한 타겟으로 간주
+                if (targetCollider == null || !targetCollider.enabled)
+                {
+                    isTargetInvalid = true;
+                }
+            }
             if (data == null)
             {
                 Debug.LogWarning($"{gameObject.name}: TurretData가 초기화되지 않았습니다!");
@@ -50,11 +62,12 @@ namespace KYG
             }
 
             // 타겟이 없거나 사거리 밖이면 다시 찾기
-            if (target == null || Vector3.Distance(transform.position, target.position) > data.attackRange)
+            if (target == null || isTargetInvalid || Vector3.Distance(transform.position, target.position) > data.attackRange)
             {
                 target = FindNearestEnemy();
             }
 
+            // 유효한 타겟이 있을 때만 공격
             if (target != null)
             {
                 attackTimer += Time.deltaTime;
@@ -81,8 +94,15 @@ namespace KYG
             foreach (var enemy in enemies)
             {
                 if (enemy == null) continue;
-                float dist = Vector3.Distance(transform.position, enemy.transform.position);
 
+                // [수정] 적의 콜라이더가 활성화 상태인지 확인하는 조건 추가
+                Collider2D enemyCollider = enemy.GetComponent<Collider2D>();
+                if (enemyCollider == null || !enemyCollider.enabled)
+                {
+                    continue; // 콜라이더가 없거나 꺼져있으면 이 적은 건너뜀
+                }
+
+                float dist = Vector3.Distance(transform.position, enemy.transform.position);
                 if (dist < minDist && dist <= data.attackRange)
                 {
                     minDist = dist;
@@ -108,33 +128,38 @@ namespace KYG
         {
             if (target == null || data.projectilePrefab == null) return;
 
-            Vector3 spawnPosition = transform.position;
-            if (muzzlePoint != null)
-            {
-                spawnPosition = muzzlePoint.position; // MuzzlePoint가 있으면 그 위치를 사용
-            }
-            else
-            {
-                Debug.LogWarning($"{gameObject.name}: MuzzlePoint가 설정되지 않아 터렛 위치에서 발사합니다.");
-            }
+            Vector3 spawnPosition = (muzzlePoint != null) ? muzzlePoint.position : transform.position;
 
-            GameObject projectile;
-
+            // [수정] 발사체 생성 및 초기화 로직 분기 처리
             if (InGameManager.Instance.isDebugMode && !PhotonNetwork.IsConnected)
             {
-                // 오프라인 & 디버그 모드
-                projectile = Instantiate(data.projectilePrefab, spawnPosition, Quaternion.identity);
+                // --- 오프라인 & 디버그 모드 ---
+                GameObject projectile = Instantiate(data.projectilePrefab, spawnPosition, Quaternion.identity);
+                var controller = projectile.GetComponent<ProjectileController>();
+                if (controller != null)
+                {
+                    // [기존 로직 유지] 로컬 객체이므로 Init()을 직접 호출합니다.
+                    controller.Init(target, data.attackDamage, data.projectileSpeed, TeamTag);
+                }
             }
             else
             {
-                // 그 외 모든 경우 (포톤에 연결된 모든 경우)
-                projectile = PhotonNetwork.Instantiate(data.projectilePrefab.name, spawnPosition, Quaternion.identity);
-            }
+                // --- 온라인 네트워크 모드 ---
+                PhotonView targetPV = target.GetComponent<PhotonView>();
+                if (targetPV == null)
+                {
+                    Debug.LogError("네트워크 타겟이 PhotonView를 가지고 있지 않아 공격할 수 없습니다.");
+                    return;
+                }
 
-            var controller = projectile.GetComponent<ProjectileController>();
-            if (controller != null)
-            {
-                controller.Init(target, data.attackDamage, data.projectileSpeed, TeamTag);
+                GameObject projectile = PhotonNetwork.Instantiate(data.projectilePrefab.name, spawnPosition, Quaternion.identity);
+
+                // [수정] Init() 대신, RPC를 통해 모든 클라이언트에게 초기화 명령을 내립니다.
+                projectile.GetComponent<PhotonView>().RPC("RPC_Initialize", RpcTarget.All,
+                                                           targetPV.ViewID,
+                                                           data.attackDamage,
+                                                           data.projectileSpeed,
+                                                           TeamTag);
             }
         }
 

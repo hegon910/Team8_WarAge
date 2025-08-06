@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1561008231416571509}
   - component: {fileID: 2381647018410404393}
   - component: {fileID: 2003863107078656995}
+  - component: {fileID: -3907301868354869160}
+  - component: {fileID: -6397779003207451797}
   m_Layer: 0
   m_Name: Tank
   m_TagString: Untagged
@@ -60,7 +62,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2003863107078656995
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -106,6 +108,41 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 6.886716, y: 3.042004}
   m_EdgeRadius: 0
+--- !u!114 &-3907301868354869160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3727567686385393061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitdata: {fileID: 0}
+  rb: {fileID: 0}
+  animator: {fileID: 0}
+  currentHealth: 0
+  meleeSwitchRange: 1.5
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopDistance: 1
+  moveDirection: {x: 1, y: 0, z: 0}
+--- !u!114 &-6397779003207451797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3727567686385393061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0
 --- !u!1 &5247796692999809368
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,7 +216,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 00fba67cbb80f8441a6cfaf354228753, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4601441455624764942}
   - component: {fileID: 6831223856595281753}
   - component: {fileID: -6355295524718767707}
+  - component: {fileID: 5162674459241381466}
   m_Layer: 0
   m_Name: SpearMan
   m_TagString: Untagged
@@ -162,6 +163,19 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &5162674459241381466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066726361041046118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0
 --- !u!1 &6969148252041980560
 GameObject:
   m_ObjectHideFlags: 0

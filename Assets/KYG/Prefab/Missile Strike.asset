@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: Missile Strike
   cooldownTime: 60
-  projectilePrefab: {fileID: 6124938604311219811, guid: 983bd1b70cbd1c84c9df2430de81ac35, type: 3}
+  skillIcon: {fileID: 21300000, guid: defb8347e6a713745b8e10d474672176, type: 3}
+  projectilePrefab: {fileID: 5595433089640799108, guid: 265051be7655cca4cbabc2577626b4b9, type: 3}
   projectileCount: 15
   damage: 500
   areaRadius: 15

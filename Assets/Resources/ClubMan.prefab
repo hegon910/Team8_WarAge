@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 1130964890787538895}
   - component: {fileID: 5404793409948385571}
   - component: {fileID: 6517137997414606962}
+  - component: {fileID: -7950193646565140025}
   m_Layer: 0
   m_Name: ClubMan
   m_TagString: Untagged
@@ -246,6 +247,19 @@ MonoBehaviour:
     m_Bits: 0
   stopDistance: 1
   moveDirection: {x: 1, y: 0, z: 0}
+--- !u!114 &-7950193646565140025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3472674702577018649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0
 --- !u!1 &5543026220087004097
 GameObject:
   m_ObjectHideFlags: 0

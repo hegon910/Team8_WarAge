@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using KYG;
+using System.Collections;
 
 // 인게임의 전반적인 UI를 관리하는 스크립트.
 // 다른 매니저로부터 이벤트를 받아 UI를 변경하고, UI 버튼 입력을 받아 다른 매니저에 요청.
@@ -21,6 +22,10 @@ public class InGameUIManager : MonoBehaviour
     public GameObject winnerPanel;
     public GameObject loserPanel;
     public TurretData turretDataToPlace;
+
+    [Header("궁극기 버튼 UI")] // 추가된 부분
+    public Button ultimateSkillButton;
+    public Image ultimateSkillCooldownImage;
 
     [Header("유닛 생산 큐")]
     public Slider productionSlider;
@@ -77,6 +82,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
             InGameManager.Instance.OnGameWon += ShowWinnerPanel;
             InGameManager.Instance.OnGameLost += ShowLoserPanel;
+            InGameManager.Instance.OnUltimateSkillUsed += StartUltimateCooldownVisual;
         }
 
         // UI 초기화
@@ -93,6 +99,17 @@ public class InGameUIManager : MonoBehaviour
             evolveButton.interactable = false; // 초기에는 비활성화
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
+        if (ultimateSkillButton != null)
+        {
+            ultimateSkillButton.onClick.AddListener(OnUltimateSkillButtonClicked);
+            // 초기 시대(고대)의 궁극기 정보로 UI 업데이트
+            AgeData initialAgeData = AgeManager.Instance.GetAgeData(AgeType.Ancient);
+            if (initialAgeData != null) HandleAgeEvolvedUI(initialAgeData);
+        }
+        if (ultimateSkillCooldownImage != null)
+        {
+            ultimateSkillCooldownImage.fillAmount = 0; // 쿨타임 UI 초기화
+        }
     }
 
     private void OnDestroy()
@@ -122,6 +139,7 @@ public class InGameUIManager : MonoBehaviour
             }
             InGameManager.Instance.OnGameWon -= ShowWinnerPanel;
             InGameManager.Instance.OnGameLost -= ShowLoserPanel;
+            InGameManager.Instance.OnUltimateSkillUsed -= StartUltimateCooldownVisual;
         }
     }
     private void Update()
@@ -138,9 +156,38 @@ public class InGameUIManager : MonoBehaviour
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
-        // 예: 시대가 발전되었음을 알리는 텍스트 업데이트
-        Debug.Log($"UI UPDATE: New Age - {newAgeData.ageType}");
-        // 여기에 새로운 시대 정보(newAgeData)를 바탕으로 UI를 변경하는 코드를 작성
+        Debug.Log($"UI UPDATE: 시대 발전에 따른 UI 업데이트 시도. 새로운 시대: {newAgeData.ageType}");
+
+        // 궁극기 버튼 UI 업데이트
+        if (ultimateSkillButton == null)
+        {
+            Debug.LogError("궁극기 버튼(ultimateSkillButton)이 InGameUIManager에 할당되지 않았습니다!");
+            return;
+        }
+
+        // 버튼의 Image 컴포넌트를 직접 참조하는 것이 더 안전합니다.
+        Image buttonImage = ultimateSkillButton.image;
+        if (buttonImage == null)
+        {
+            Debug.LogError("궁극기 버튼(ultimateSkillButton)에 Image 컴포넌트가 없습니다!");
+            return;
+        }
+
+        if (newAgeData.ultimateSkill == null)
+        {
+            Debug.LogError($"{newAgeData.ageType}의 AgeData 에셋에 UltimateSkillData가 할당되지 않았습니다!");
+            return;
+        }
+
+        if (newAgeData.ultimateSkill.skillIcon == null)
+        {
+            Debug.LogError($"{newAgeData.ultimateSkill.name} 에셋에 스킬 아이콘(skillIcon) 스프라이트가 할당되지 않았습니다!");
+            return;
+        }
+
+        // 모든 데이터가 정상일 때만 스프라이트 변경
+        Debug.Log($"성공: {newAgeData.ultimateSkill.skillIcon.name} 스프라이트를 버튼에 적용합니다.");
+        buttonImage.sprite = newAgeData.ultimateSkill.skillIcon;
     }
 
     public void RegisterPlayerBase(KYG.BaseController playerBase)
@@ -217,6 +264,58 @@ public class InGameUIManager : MonoBehaviour
         }
     }
     #endregion
+
+    #region 궁극기 UI (추가된 부분)
+    public void OnUltimateSkillButtonClicked()
+    {
+        // 1. "InGameManager야, 지금 내 시대가 뭐야?" 라고 물어봅니다.
+        AgeType currentAge = InGameManager.Instance.GetLocalPlayerCurrentAge();
+
+        // 2. "AgeManager야, 방금 알아낸 시대의 데이터를 줘" 라고 요청합니다.
+        AgeData currentAgeData = AgeManager.Instance.GetAgeData(currentAge);
+
+        // 에러 방지용 확인 코드
+        if (currentAgeData == null || currentAgeData.ultimateSkill == null)
+        {
+            Debug.LogError("현재 시대의 UltimateSkillData를 찾을 수 없습니다. AgeData 에셋에 궁극기 데이터가 할당되었는지 확인해주세요.");
+            return;
+        }
+
+        // 3. "UltimateSkillManager야, 이 스킬 데이터 가지고 스킬 사용해줘!" 라고 최종 요청합니다.
+        UltimateSkillManager.Instance.TryCastUltimate(currentAgeData.ultimateSkill);
+    }
+
+
+
+    private void StartUltimateCooldownVisual(float cooldownTime)
+    {
+        if (ultimateSkillCooldownImage != null)
+        {
+            StartCoroutine(UltimateCooldownCoroutine(cooldownTime));
+        }
+    }
+
+    private IEnumerator UltimateCooldownCoroutine(float cooldownTime)
+    {
+        ultimateSkillButton.interactable = false; // 버튼 비활성화
+
+        float timer = 0f;
+        ultimateSkillCooldownImage.fillAmount = 1;
+
+        while (timer < cooldownTime)
+        {
+            timer += Time.deltaTime;
+            // 이미지가 서서히 투명해지는 것이 아니라, 채워진 부분이 줄어드는 방식입니다.
+            ultimateSkillCooldownImage.fillAmount = 1 - (timer / cooldownTime);
+            yield return null;
+        }
+
+        ultimateSkillCooldownImage.fillAmount = 0; // 쿨타임 UI 초기화
+        ultimateSkillButton.interactable = true; // 버튼 활성화
+    }
+    #endregion
+
+
 
     #region 유닛 생산 UI
     private void UpdateQueueUI(int queuedCount)
@@ -299,8 +398,8 @@ public class InGameUIManager : MonoBehaviour
         if (baseHpSlider != null) baseHpSlider.gameObject.SetActive(false);
         if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
         if (evolveButton != null) evolveButton.gameObject.SetActive(false);
-
-        // 유닛 생산 관련 UI도 숨깁니다.
+        if (ultimateSkillButton != null) ultimateSkillButton.gameObject.SetActive(false);
+        // 유닛 생산 관련 UI
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {

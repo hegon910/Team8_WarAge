@@ -14,6 +14,7 @@ namespace KYG
         [Header("공통 정보")]
         public string skillName;                  // 스킬 이름
         public float cooldownTime = 30f;          // 쿨타임 (초)
+        public Sprite skillIcon;              // 스킬 아이콘 (UI 표시용)
 
         [Header("투사체 정보")]
         public GameObject projectilePrefab;       // 투사체 프리팹

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4654eaa013151341b07c526f82f2f96, type: 3}
-  m_Name: BoiledOil
+  m_Name: Balista
   m_EditorClassIdentifier: 
-  turretName: BoiledOil
+  turretName: Balista
   turretPrefab: {fileID: 8115034038526851965, guid: 41c15f3bec8abf0409a11386707b6c38, type: 3}
   cost: 200
   sellPrice: 100
-  attackRange: 1.5
-  attackDelay: 1
-  attackDamage: 4
+  attackRange: 20
+  attackDelay: 5
+  attackDamage: 80
   icon: {fileID: 0}
-  projectilePrefab: {fileID: 2603175800963303953, guid: d3d1cd3fe5ef6b045932179fe74f9978, type: 3}
-  projectileSpeed: 2
+  projectilePrefab: {fileID: 718458916219908554, guid: 62944ea725fd82e44905c75414ac5fde, type: 3}
+  projectileSpeed: 20
