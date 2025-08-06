@@ -15,10 +15,10 @@ MonoBehaviour:
   unitName: Archer
   unitExp: 70
   health: 80
-  attackDamage: 14
+  attackDamage: 25
   rangedDamage: 14
   MeleeRange: 1
-  rangedrange: 15
+  rangedrange: 7
   attackSpeed: 1
   SpawnTime: 3
   moveSpeed: 1

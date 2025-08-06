@@ -18,7 +18,7 @@ MonoBehaviour:
   attackDamage: 150
   rangedDamage: 150
   MeleeRange: 10
-  rangedrange: 30
+  rangedrange: 15
   attackSpeed: 0.5
   SpawnTime: 10
   moveSpeed: 2

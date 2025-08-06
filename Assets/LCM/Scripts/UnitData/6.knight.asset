@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: Knight
   unitExp: 100
   health: 300
-  attackDamage: 60
+  attackDamage: 30
   rangedDamage: 0
   MeleeRange: 2
   rangedrange: 0
