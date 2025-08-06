@@ -48,7 +48,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
 
-    public void ConnectToServer(string fallbackNickname)
+    public void ConnectToServer(string fallbackNickname)//로그인에서 로비로?
     {
         string nicknameToUse = fallbackNickname;
         if (Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser != null)
@@ -79,16 +79,15 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
 
         //uid 커스텀프로퍼티로 저장해서 전적을 보여줄거임
-        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
-        {
-        { "uid", firebaseUid }
-        };
-        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        //string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        //ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        //{
+        //{ "uid", firebaseUid }
+        //};
+        //PhotonNetwork.LocalPlayer.SetCustomProperties(props);
     }
     //추가    PHG : 방에 참가했을 때 호출되는 콜백
     public override void OnJoinedRoom()
@@ -97,6 +96,12 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         // 방에 성공적으로 참가했으므로, UIManager를 통해 방 패널을 활성화합니다.
         UIManager.Instance.ShowRoomPanel(); // UIManager에 이 메서드를 추가해야 합니다.
         // 필요하다면 여기서 게임 시작 전 준비 상태 UI 등을 업데이트할 수 있습니다.
+        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+        { "uid", firebaseUid }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
     }
     //추가 PHG : 주석처리
     //public override void OnJoinedLobby()
@@ -124,20 +129,25 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     }
 
 
-    public void CreateOrJoinLobby()// �� ���� ����� ������
+    public void CreateOrJoinLobby()
     {
-        Debug.Log("CreateOrJoinLobby ȣ��");
 
-        if (!PhotonNetwork.InLobby)
+        Debug.Log("CreateOrJoinLobby");
+
+        if (!PhotonNetwork.InLobby)//동작안함?
         {
-            Debug.LogWarning("�κ�������");
+            Debug.LogWarning("로비진입");
             return;
         }
 
-        UIManager.Instance.CreateRoom();
+      
+
+    
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
+        UIManager.Instance.CreateRoom();
         Debug.Log("JoinOrCreateRoom ȣ��");
+    
 
     }
 
