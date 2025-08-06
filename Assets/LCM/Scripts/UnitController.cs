@@ -24,8 +24,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     private InGameManager gm;
 
     private static readonly int IsMoving = Animator.StringToHash("isMoving");
-    private static readonly int IsDead = Animator.StringToHash("isDead"); 
-    private static readonly int IsAttack = Animator.StringToHash("isAttack"); 
+    private static readonly int IsDead = Animator.StringToHash("isDead");
+    private static readonly int IsAttack = Animator.StringToHash("isAttack");
 
     private void Awake()
     {
@@ -263,7 +263,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
                 if (arrow != null)
                 {
-                    arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.attackDamage, unitdata.rangedrange);
+                    arrow.photonView.RPC("InitializeArrow", RpcTarget.All, spawnerTag, moveDirection, unitdata.rangedDamage, unitdata.rangedrange);
                 }
             }
             attackCooldownTimer = 1f / unitdata.attackSpeed;

@@ -10,21 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: TANK
+  m_Name: 9.airplane
   m_EditorClassIdentifier: 
-  unitName: Tank
-  unitExp: 300
-  health: 800
-  attackDamage: 150
-  rangedDamage: 150
-  MeleeRange: 10
-  rangedrange: 30
-  attackSpeed: 0.5
-  SpawnTime: 10
-  moveSpeed: 2
+  unitName: Canoneer
+  health: 600
+  attackDamage: 120
+  rangedDamage: 0
+  MeleeRange: 25
+  rangedrange: 0
+  attackSpeed: 1
+  SpawnTime: 3
+  moveSpeed: 1
   goldCost: 1000
   unitSprite: {fileID: 0}
-  description: 
-  ArrowPrefab: {fileID: 8650717888753219707, guid: ece0d93b644297d48990794eafa60776, type: 3}
-  unitType: 1
+  description: IndustrialCaoneer
+  unitType: 0
   eraType: 2

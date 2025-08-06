@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: sword
+  m_Name: 1.clubman
   m_EditorClassIdentifier: 
-  unitName: Sword
-  unitExp: 50
-  health: 100
-  attackDamage: 35
+  unitName: ClubMan
+  unitExp: 30
+  health: 55
+  attackDamage: 16
   rangedDamage: 0
-  MeleeRange: 6
+  MeleeRange: 1
   rangedrange: 0
   attackSpeed: 1
   SpawnTime: 3
-  moveSpeed: 1
-  goldCost: 50
-  unitSprite: {fileID: 0}
-  description: MedievalSword
+  moveSpeed: 3
+  goldCost: 15
+  unitSprite: {fileID: 21300000, guid: dbbe7a2fd2aa3484f90ca0413883357c, type: 3}
+  description: StoneAgeDefaultUnit
   ArrowPrefab: {fileID: 0}
   unitType: 0
-  eraType: 1
+  eraType: 0
