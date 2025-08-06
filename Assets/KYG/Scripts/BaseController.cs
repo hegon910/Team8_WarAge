@@ -1,6 +1,7 @@
 using Photon.Pun; // 네트워크 연동을 위한 using
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace KYG
@@ -41,12 +42,14 @@ namespace KYG
         [SerializeField] private GameObject defaultUnitPrefab; // 생성할 유닛 프리팹
 
         [Header("Turret Slot")]
-        [SerializeField] private GameObject turretSlotPrefab;
+        [SerializeField] public TurretSlot[] turretSlots; // 미리 BasePrefab에 붙여놓을 슬롯 배열
+        private int unlockedSlotCount = 0; // 현재 열려 있는 슬롯 개수
+        //[SerializeField] private GameObject turretSlotPrefab;
 
-        [SerializeField] private Transform turretSlotParent;
+        //[SerializeField] private Transform turretSlotParent;
 
-        [SerializeField] private int maxTurretSlots = 4;
-        private readonly List<TurretSlot> turretSlots = new();
+        //[SerializeField] private int maxTurretSlots = 4;
+        //private readonly List<TurretSlot> turretSlots = new();
 
         private PhotonView pv; // 네트워크 식별용 포톤 뷰
         public event Action<int, int> OnHpChanged; //HP 변동시 이벤트 발생 (최대 체력, 현재 체력) 
@@ -55,6 +58,10 @@ namespace KYG
         private void Awake()
         {
             pv = GetComponent<PhotonView>();
+            
+            // 시작할 때 모든 슬롯을 비활성화
+            foreach (var slot in turretSlots)
+                slot.gameObject.SetActive(false);
 
         }
 
@@ -116,7 +123,7 @@ namespace KYG
             {
                 // TestNetworkManager가 보낸 "BaseP1" 또는 "BaseP2"를 TeamTag와 gameObject.tag에 모두 설정
                 TeamTag = team;
-                gameObject.tag = TeamTag;
+              //  gameObject.tag = TeamTag;
 
                 if (TeamTag == "BaseP1")
                     gameObject.layer = LayerMask.NameToLayer("P1Base");
@@ -124,6 +131,7 @@ namespace KYG
                     gameObject.layer = LayerMask.NameToLayer("P2Base");
 
                 Debug.Log($"{gameObject.name}의 TeamTag와 GameObject.tag가 '{TeamTag}'로 설정되었습니다.");
+             
 
                 if (InGameManager.Instance != null)
                 {
@@ -141,6 +149,47 @@ namespace KYG
         private void UpdateHpUI() => OnHpChanged?.Invoke(currentHP, maxHP); // UI로 HP 갱신 이벤트
 
 
+        // 슬롯 해금
+        public void UnlockNextTurretSlot(int cost)
+        {
+            // 슬롯 해금은 내 베이스에서만 가능
+            // 디버그 모드에서는 isMine이 false일 수 있으므로 PhotonNetwork.IsConnected 조건을 추가
+            if (PhotonNetwork.IsConnected && !pv.IsMine) return;
+
+            if (unlockedSlotCount >= turretSlots.Length)
+            {
+                Debug.Log("더 이상 활성화할 터렛 슬롯이 없습니다.");
+                return;
+            }
+
+            if (PhotonNetwork.IsConnected)
+            {
+                // 1. 네트워크 모드일 경우: RPC를 통해 모든 클라이언트에 활성화를 요청
+                pv.RPC(nameof(RPC_ActivateSlotAtIndex), RpcTarget.All, unlockedSlotCount);
+            }
+            else
+            {
+                // 2. 디버그 모드일 경우: 로컬에서 직접 활성화 함수를 호출
+                ActivateSlot(unlockedSlotCount);
+            }
+        }
+
+        private void ActivateSlot(int slotIndex)
+        {
+            // 유효한 인덱스인지 확인
+            if (slotIndex < 0 || slotIndex >= turretSlots.Length) return;
+
+            // 해당 인덱스의 슬롯을 가져와 활성화
+            TurretSlot slotToActivate = turretSlots[slotIndex];
+            if (slotToActivate != null)
+            {
+                slotToActivate.gameObject.SetActive(true);
+                Debug.Log($"슬롯 {slotToActivate.name} (인덱스: {slotIndex}) 활성화.");
+            }
+
+            // 활성화된 슬롯 개수를 업데이트 (로컬/모든 클라이언트 공통)
+            this.unlockedSlotCount = slotIndex + 1;
+        }
         /// <summary>
         /// 데미지를 받으면 해당 공력력 만큼 현재체력 감소
         /// 체력 UI에 기지 체력 연동 필요
@@ -155,7 +204,7 @@ namespace KYG
             // 실제 데미지 처리는 아래 private TakeDamage 함수의 소유권 체크 로직을 따릅니다.
             TakeDamage(damage, attackerTag);
         }
-        private void TakeDamage(int damage, string attackerTag)
+        public void TakeDamage(int damage, string attackerTag)
         {
             if (attackerTag == TeamTag) return; // 아군이면 무시
 
@@ -167,6 +216,14 @@ namespace KYG
             // RPC로 다른 클라이언트(P2)에게 변경된 HP 상태를 동기화합니다.
             if (PhotonNetwork.IsConnected)
                 pv.RPC(nameof(RPC_UpdateHP), RpcTarget.Others, currentHP);
+        }
+
+        [PunRPC]
+        public void RPC_ActivateSlotAtIndex(int slotIndex)
+        {
+            // 실제 로직은 ActivateSlot 함수에 위임
+            ActivateSlot(slotIndex);
+            Debug.Log($"RPC 수신: 슬롯 인덱스 {slotIndex} 활성화 로직 실행.");
         }
 
         /// <summary>
@@ -271,7 +328,7 @@ namespace KYG
         /// <summary>
         /// 슬롯 추가: Base 위에 새로운 터렛 설치 공간 생성
         /// </summary>
-        public void CreateTurretSlot()
+        /*public void CreateTurretSlot()
         {
             if (turretSlots.Count >= maxTurretSlots || turretSlotPrefab == null) return;
 
@@ -308,7 +365,7 @@ namespace KYG
                 turretSlots[i].transform.SetParent(turretSlotParent, false);
                 turretSlots[i].transform.localPosition = new Vector3(i * spacing, 0, 0);
             }
-        }
+        }*/
 
 
     }

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033f1194aef66ea4e95a5add8d35ba2e, type: 3}
+  m_Name: Catapult Bombard
+  m_EditorClassIdentifier: 
+  skillName: Catapult Bombard
+  cooldownTime: 50
+  projectilePrefab: {fileID: 8374780226716921439, guid: 694e629067eb7e746a5446688e008aa5, type: 3}
+  projectileCount: 10
+  damage: 500
+  areaRadius: 10
+  effectPrefab: {fileID: 0}
+  skillSound: {fileID: 0}
+  skillType: 1

@@ -2,30 +2,36 @@ using PHK;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using KYG;
 
-// ÀÎ°ÔÀÓÀÇ Àü¹İÀûÀÎ UI¸¦ °ü¸®ÇÏ´Â ½ºÅ©¸³Æ®.
-// ´Ù¸¥ ¸Å´ÏÀúµé·ÎºÎÅÍ ÀÌº¥Æ®¸¦ ¹Ş¾Æ UI¸¦ °»½ÅÇÏ°í, UI ¹öÆ° ÀÔ·ÂÀ» ¹Ş¾Æ ´Ù¸¥ ¸Å´ÏÀú¿¡°Ô ¿äÃ».
+// ì¸ê²Œì„ì˜ ì „ë°˜ì ì¸ UIë¥¼ ê´€ë¦¬í•˜ëŠ” ìŠ¤í¬ë¦½íŠ¸.
+// ë‹¤ë¥¸ ë§¤ë‹ˆì €ë¡œë¶€í„° ì´ë²¤íŠ¸ë¥¼ ë°›ì•„ UIë¥¼ ë³€ê²½í•˜ê³ , UI ë²„íŠ¼ ì…ë ¥ì„ ë°›ì•„ ë‹¤ë¥¸ ë§¤ë‹ˆì €ì— ìš”ì²­.
 public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance { get; private set; }
 
-    [Header("UI ¿ä¼Ò")]
+    [Header("UI ìš”ì†Œ")]
     public TextMeshProUGUI inGameInfoText;
     public TextMeshProUGUI UnitInfoText;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI expText;
     public Slider baseHpSlider;
     public Slider GuestBaseHpSlider;
-    public Button evolveButton; // ½Ã´ë ¹ßÀü ¹öÆ° ÂüÁ¶
+    public Button evolveButton; // ì‹œëŒ€ ë°œì „ ë²„íŠ¼ ì°¸ì¡°
     public GameObject winnerPanel;
     public GameObject loserPanel;
+    public TurretData turretDataToPlace;
 
-    [Header("À¯´Ö »ı»ê Å¥")]
+    [Header("ìœ ë‹› ìƒì‚° í")]
     public Slider productionSlider;
     public Toggle[] queueSlots = new Toggle[5];
 
-    // --- ÅÍ·¿ °ü·Ã »óÅÂ ---
-    // PlayerActionState´Â ÀÌÁ¦ UI¿Í »óÈ£ÀÛ¿ëÇÏ´Â ¸ğµå¸¦ ³ªÅ¸³»¹Ç·Î UI ¸Å´ÏÀú°¡ °ü¸®.
+    [Header("í„°ë › ì •ë³´ UI")]
+    public GameObject turretInfoPanel; // íŒë§¤ ë²„íŠ¼ì´ ìˆëŠ” UI íŒ¨ë„
+    private TurretSlot selectedSlot;   // í˜„ì¬ ì„ íƒí•œ ìŠ¬ë¡¯
+
+    // --- í„°ë › ê´€ë ¨ ìƒíƒœ ---
+    // PlayerActionStateì— ë”°ë¼ UIì™€ ìƒí˜¸ì‘ìš©í•˜ëŠ” ìƒíƒœë¥¼ ë‚˜íƒ€ë‚´ë¯€ë¡œ UI ë§¤ë‹ˆì €ì— ìœ„ì¹˜.
     public enum PlayerActionState
     {
         None,
@@ -33,7 +39,7 @@ public class InGameUIManager : MonoBehaviour
         SellingTurret
     }
     public PlayerActionState currentState { get; private set; } = PlayerActionState.None;
-    public GameObject turretPrefabToPlace { get; private set; } // ÀĞ±â Àü¿ëÀ¸·Î ¿ÜºÎ ³ëÃâ
+    public GameObject turretPrefabToPlace { get; private set; } // ì„¤ì¹˜í•  í„°ë ›ì˜ í”„ë¦¬íŒ¹
 
     private void Awake()
     {
@@ -49,12 +55,12 @@ public class InGameUIManager : MonoBehaviour
 
     void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã Á¤º¸ ÅØ½ºÆ® ¼û±â±â
+        // ê²Œì„ ì‹œì‘ ì‹œ ì •ë³´ í…ìŠ¤íŠ¸ ìˆ¨ê¹€
         if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
         if (UnitInfoText != null) UnitInfoText.text = "";
 
-        // --- ÀÌº¥Æ® ±¸µ¶ ---
-        // ½Ì±ÛÅÏ ÀÎ½ºÅÏ½º°¡ nullÀÏ ¼ö ÀÖÀ¸¹Ç·Î ¾ÈÀüÇÏ°Ô È®ÀÎ
+        // --- ì´ë²¤íŠ¸ êµ¬ë… ---
+        // ì¸ê²Œì„ ì¸ìŠ¤í„´ìŠ¤ê°€ nullì¼ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì•ˆì „í•˜ê²Œ í™•ì¸
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged += UpdateQueueUI;
@@ -65,7 +71,7 @@ public class InGameUIManager : MonoBehaviour
         {
             InGameManager.Instance.OnResourceChanged += UpdateResourceUI;
             InGameManager.Instance.OnPlayerBaseHealthChanged += UpdateBaseHpUI;
-            //°Ô½ºÆ® º£ÀÌ½º HP Ã³¸®
+            // ê²ŒìŠ¤íŠ¸ ë² ì´ìŠ¤ HP ì²˜ë¦¬
             InGameManager.Instance.OnOpponentBaseHealthChanged += UpdateGuestBaseUI;
             InGameManager.Instance.OnEvolveStatusChanged += UpdateEvolveButton;
             InGameManager.Instance.OnAgeEvolved += HandleAgeEvolvedUI;
@@ -73,7 +79,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnGameLost += ShowLoserPanel;
         }
 
-        // UI ÃÊ±âÈ­
+        // UI ì´ˆê¸°í™”
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {
@@ -82,16 +88,16 @@ public class InGameUIManager : MonoBehaviour
                 if (slot != null) slot.SetIsOnWithoutNotify(false);
             }
         }
-        //½ÃÀÛÇÒ¶§ evolve¹öÆ° ºñÈ°¼ºÈ­
+        // ì‹œì‘í• ë•Œ evolveë²„íŠ¼ ë¹„í™œì„±í™”
         if (evolveButton != null)
-            evolveButton.interactable = false; // ÃÊ±â¿¡´Â ºñÈ°¼ºÈ­
+            evolveButton.interactable = false; // ì´ˆê¸°ì—ëŠ” ë¹„í™œì„±í™”
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        // ¿ÀºêÁ§Æ® ÆÄ±« ½Ã ÀÌº¥Æ® ±¸µ¶À» ¹İµå½Ã ÇØÁ¦ÇØ¾ß ¸Ş¸ğ¸® ´©¼ö¸¦ ¹æÁö
+        // ì˜¤ë¸Œì íŠ¸ íŒŒê´´ ì‹œ ì´ë²¤íŠ¸ êµ¬ë…ì„ ë°˜ë“œì‹œ í•´ì œí•´ì•¼ ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ë¥¼ ë°©ì§€
         if (UnitSpawnManager.Instance != null)
         {
             UnitSpawnManager.Instance.OnQueueChanged -= UpdateQueueUI;
@@ -120,10 +126,10 @@ public class InGameUIManager : MonoBehaviour
     }
     private void Update()
     {
-        // ÅÍ·¿ °Ç¼³ ¶Ç´Â ÆÇ¸Å ¸ğµåÀÏ ¶§¸¸ ÀÔ·ÂÀ» È®ÀÎÇÕ´Ï´Ù.
+        // í„°ë › ë°°ì¹˜ ë˜ëŠ” íŒë§¤ ìƒíƒœì¼ ë•Œ ì…ë ¥ì„ í™•ì¸í•©ë‹ˆë‹¤.
         if (currentState != PlayerActionState.None)
         {
-            // ¿ìÅ¬¸¯ ¶Ç´Â ESC Å°¸¦ ´©¸£¸é Çàµ¿À» Ãë¼ÒÇÕ´Ï´Ù.
+            // ìš°í´ë¦­ ë˜ëŠ” ESC í‚¤ë¡œ í–‰ë™ì„ ì·¨ì†Œí•©ë‹ˆë‹¤.
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 CancelPlayerAction();
@@ -132,18 +138,19 @@ public class InGameUIManager : MonoBehaviour
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
-        // ¿¹: ½Ã´ë°¡ º¯°æµÇ¾úÀ½À» ¾Ë¸®´Â ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+        // ì˜ˆ: ì‹œëŒ€ê°€ ë°œì „ë˜ì—ˆìŒì„ ì•Œë¦¬ëŠ” í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
         Debug.Log($"UI UPDATE: New Age - {newAgeData.ageType}");
-        // ¿©±â¿¡ »õ·Î¿î ½Ã´ë Á¤º¸(newAgeData)¸¦ ¹ÙÅÁÀ¸·Î UI¸¦ °»½ÅÇÏ´Â ÄÚµå¸¦ ÀÛ¼º
+        // ì—¬ê¸°ì— ìƒˆë¡œìš´ ì‹œëŒ€ ì •ë³´(newAgeData)ë¥¼ ë°”íƒ•ìœ¼ë¡œ UIë¥¼ ë³€ê²½í•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±
     }
 
     public void RegisterPlayerBase(KYG.BaseController playerBase)
     {
         if (playerBase != null)
         {
-            // ³» HP ½½¶óÀÌ´õ¸¦ '³» ±âÁö'ÀÇ Ã¼·Â º¯°æ ÀÌº¥Æ®¿¡ ¿¬°á
-        //    playerBase.OnHpChanged += UpdateBaseHpUI;
-            // UI ÃÊ±âÈ­¸¦ À§ÇØ ÇöÀç Ã¼·ÂÀ¸·Î ÇÑ¹ø ¾÷µ¥ÀÌÆ®
+            // ë‚´ HP ìŠ¬ë¼ì´ë”ëŠ” 'ë‚´ ë² ì´ìŠ¤'ì˜ ì²´ë ¥ ë³€ê²½ ì´ë²¤íŠ¸ë¥¼ êµ¬ë…
+            // playerBase.OnHpChanged += UpdateBaseHpUI;
+            // UI ì´ˆê¸°í™”ë¥¼ ìœ„í•´ í˜„ì¬ ì²´ë ¥ìœ¼ë¡œ í•œë²ˆ ì—…ë°ì´íŠ¸
+            playerBase.OnHpChanged += UpdateBaseHpUI;
             UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
         }
     }
@@ -151,14 +158,15 @@ public class InGameUIManager : MonoBehaviour
     {
         if (opponentBase != null)
         {
-            // »ó´ë¹æ HP ½½¶óÀÌ´õ¸¦ '»ó´ë ±âÁö'ÀÇ Ã¼·Â º¯°æ ÀÌº¥Æ®¿¡ ¿¬°á
-         //   opponentBase.OnHpChanged += UpdateGuestBaseUI;
-            // UI ÃÊ±âÈ­¸¦ À§ÇØ ÇöÀç Ã¼·ÂÀ¸·Î ÇÑ¹ø ¾÷µ¥ÀÌÆ®
+            // ìƒëŒ€ HP ìŠ¬ë¼ì´ë”ëŠ” 'ìƒëŒ€ ë² ì´ìŠ¤'ì˜ ì²´ë ¥ ë³€ê²½ ì´ë²¤íŠ¸ë¥¼ ì§ì ‘ êµ¬ë… (ì£¼ì„ í•´ì œ)
+            opponentBase.OnHpChanged += UpdateGuestBaseUI;
+
+            // UI ì´ˆê¸°í™”ë¥¼ ìœ„í•´ í˜„ì¬ ì²´ë ¥ìœ¼ë¡œ í•œë²ˆ ì—…ë°ì´íŠ¸
             UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
         }
     }
 
-    #region UI ¾÷µ¥ÀÌÆ® ÇÔ¼ö (ÀÌº¥Æ® ¼ö½Å)
+    #region UI ì—…ë°ì´íŠ¸ í•¨ìˆ˜ (ì´ë²¤íŠ¸ ìˆ˜ì‹ )
     public void UpdateResourceUI(int newGold, int newExp)
     {
         if (goldText != null) goldText.text = $"{newGold}";
@@ -167,7 +175,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateBaseHpUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- PLAYER UI UPDATED --- Ã¼·Â: {currentHp}/{maxHp}");
+        Debug.Log($"--- PLAYER UI UPDATED --- ì²´ë ¥: {currentHp}/{maxHp}");
         if (baseHpSlider != null && maxHp > 0)
         {
             baseHpSlider.value = (float)currentHp / maxHp;
@@ -176,7 +184,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void UpdateGuestBaseUI(int currentHp, int maxHp)
     {
-        Debug.Log($"--- OPPONENT UI UPDATED --- Ã¼·Â: {currentHp}/{maxHp}");
+        Debug.Log($"--- OPPONENT UI UPDATED --- ì²´ë ¥: {currentHp}/{maxHp}");
         if (GuestBaseHpSlider != null && maxHp > 0)
         {
             GuestBaseHpSlider.value = (float)currentHp / maxHp;
@@ -189,7 +197,7 @@ public class InGameUIManager : MonoBehaviour
         {
             inGameInfoText.text = message;
             inGameInfoText.gameObject.SetActive(true);
-            // ÇÊ¿äÇÏ´Ù¸é ¸î ÃÊ µÚ¿¡ ÀÚµ¿À¸·Î »ç¶óÁö´Â ·ÎÁ÷ Ãß°¡ °¡´É
+            // í•„ìš”í•˜ë‹¤ë©´ ëª‡ ì´ˆ ë’¤ì— ìë™ìœ¼ë¡œ ì‚¬ë¼ì§€ëŠ” ê¸°ëŠ¥ ì¶”ê°€ ê°€ëŠ¥
         }
     }
 
@@ -210,7 +218,7 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region À¯´Ö »ı»ê UI
+    #region ìœ ë‹› ìƒì‚° UI
     private void UpdateQueueUI(int queuedCount)
     {
         for (int i = 0; i < queueSlots.Length; i++)
@@ -239,16 +247,16 @@ public class InGameUIManager : MonoBehaviour
     }
     #endregion
 
-    #region ÅÍ·¿ °ü·Ã UI ¹× »óÅÂ °ü¸®
-    // ÅÍ·¿ °Ç¼³ ¹öÆ°¿¡¼­ È£Ãâ
-    public void EnterTurretPlaceMode(GameObject turretPrefab)
+    #region í„°ë › ê´€ë ¨ UI ë° ìƒíƒœ ê´€ë¦¬
+    // í„°ë › ë°°ì¹˜ ë²„íŠ¼ì—ì„œ í˜¸ì¶œ
+    public void EnterTurretPlaceMode(TurretData data)
     {
         currentState = PlayerActionState.PlacingTurret;
-        turretPrefabToPlace = turretPrefab;
+        turretDataToPlace = data;
         ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
     }
 
-    // ÅÍ·¿ ÆÇ¸Å ¹öÆ°¿¡¼­ È£Ãâ
+    // í„°ë › íŒë§¤ ë²„íŠ¼ì—ì„œ í˜¸ì¶œ
     public void EnterTurretSellMode()
     {
         currentState = PlayerActionState.SellingTurret;
@@ -256,7 +264,7 @@ public class InGameUIManager : MonoBehaviour
         ShowInfoText("Select a turret to sell. (Right-click to cancel)");
     }
 
-    // ÅÍ·¿ °Ç¼³/ÆÇ¸Å ¼º°ø ¶Ç´Â Ãë¼Ò ½Ã È£Ãâ
+    // í„°ë › ë°°ì¹˜/íŒë§¤ ìƒíƒœ ì·¨ì†Œ ë˜ëŠ” ì™„ë£Œ ì‹œ í˜¸ì¶œ
     public void CancelPlayerAction()
     {
         currentState = PlayerActionState.None;
@@ -264,25 +272,50 @@ public class InGameUIManager : MonoBehaviour
         HideInfoText();
     }
 
-    // ÅÍ·¿ ½½·Ô Ãß°¡ ¹öÆ°¿¡¼­ È£Ãâ
+    // í„°ë › ìŠ¬ë¡¯ ì¶”ê°€ ë²„íŠ¼ì—ì„œ í˜¸ì¶œ
     public void OnClick_AddTurretSlotButton()
     {
-        int slotCost = 100; // ºñ¿ëÀº InGameManager³ª ´Ù¸¥ µ¥ÀÌÅÍ ½ÃÆ®¿¡¼­ °ü¸®ÇÏ´Â °ÍÀÌ ´õ ÁÁÀ½
+        /*int slotCost = 100; // ë¹„ìš©ì€ InGameManagerë‚˜ ë‹¤ë¥¸ ê³³ì—ì„œ ì»¨íŠ¸ë¡¤í•˜ëŠ” ê²ƒì´ ë” ì¢‹ìŒ
         if (InGameManager.Instance.SpendGold(slotCost))
         {
             ShowInfoText("Turret Slot Added!");
-            // TODO: BaseController¿¡ ½½·Ô Ãß°¡¸¦ ¿äÃ»ÇÏ´Â ·ÎÁ÷
-            // ¿¹: InGameManager.Instance.GetPlayerBase().AddNewSlot();
+            // TODO: BaseControllerì— ìŠ¬ë¡¯ ì¶”ê°€ë¥¼ ìš”ì²­í•˜ëŠ” ê¸°ëŠ¥
+            // ì˜ˆ: InGameManager.Instance.GetPlayerBase().AddNewSlot();
         }
         else
         {
             ShowInfoText("Not Enough Gold to Add Turret Slot!");
+        }*/
+        var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
+        if (baseCtrl != null)
+            baseCtrl.UnlockNextTurretSlot(100); // ìŠ¬ë¡¯ í•´ê¸ˆ ë¹„ìš© 100
+    }
+    private void HideAllInGameUI()
+    {
+        if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
+        if (UnitInfoText != null) UnitInfoText.gameObject.SetActive(false);
+        if (goldText != null) goldText.gameObject.SetActive(false);
+        if (expText != null) expText.gameObject.SetActive(false);
+        if (baseHpSlider != null) baseHpSlider.gameObject.SetActive(false);
+        if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
+        if (evolveButton != null) evolveButton.gameObject.SetActive(false);
+
+        // ìœ ë‹› ìƒì‚° ê´€ë ¨ UIë„ ìˆ¨ê¹ë‹ˆë‹¤.
+        if (productionSlider != null) productionSlider.gameObject.SetActive(false);
+        if (queueSlots != null)
+        {
+            foreach (var slot in queueSlots)
+            {
+                if (slot != null) slot.gameObject.SetActive(false);
+            }
         }
     }
+
     private void ShowWinnerPanel()
     {
         if (winnerPanel != null)
         {
+            HideAllInGameUI(); // ë‹¤ë¥¸ ì¸ê²Œì„ UI ìˆ¨ê¹€
             winnerPanel.SetActive(true);
         }
     }
@@ -290,32 +323,44 @@ public class InGameUIManager : MonoBehaviour
     {
         if (loserPanel != null)
         {
+            HideAllInGameUI(); // ë‹¤ë¥¸ ì¸ê²Œì„ UI ìˆ¨ê¹€
             loserPanel.SetActive(true);
         }
     }
 
     public void ReturnToLobby()
     {
-        // °ÔÀÓÀÌ ¸ØÃá »óÅÂÀÏ ¼ö ÀÖÀ¸¹Ç·Î ½Ã°£À» ´Ù½Ã Èå¸£°Ô ÇÕ´Ï´Ù.
+        // ê²Œì„ì˜¤ë²„ ìƒíƒœë¡œ ë©ˆì·„ì„ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì‹œê°„ì„ ë‹¤ì‹œ íë¥´ê²Œ í•©ë‹ˆë‹¤.
         Time.timeScale = 1f;
 
-        // ÇöÀç ¾ÀÀÇ °á°ú ÆĞ³ÎµéÀ» ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
+        // ìŠ¹ë¦¬/íŒ¨ë°° ëª¨ë“  íŒ¨ë„ì„ ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
 
-        Debug.Log("·Îºñ·Î µ¹¾Æ°¡±â À§ÇØ PhotonManager È£Ãâ.");
+        // --- ìˆ˜ì •ëœ ë¡œì§ ---
 
-        // PhotonManager¿¡°Ô ¹æÀ» ³ª°¡°í ·Îºñ ¾ÀÀ» ·ÎµåÇÏ¶ó°í ¿äÃ»ÇÕ´Ï´Ù.
-        if (PhotonManager.Instance != null)
+        // 1. ë””ë²„ê·¸ ëª¨ë“œì¸ì§€ ë¨¼ì € í™•ì¸
+        if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
         {
-            // ÇÔ¼ö ÀÌ¸§À» LeaveRoomAndLoadLobby µî ´õ ¸íÈ®ÇÏ°Ô ¹Ù²ãµµ ÁÁ½À´Ï´Ù.
-            PhotonManager.Instance.LeaveRoomAndRejoinLobby();
+            Debug.Log("ë””ë²„ê·¸ ëª¨ë“œ: ë¡œë¹„ ì”¬ì„ ì§ì ‘ ë¡œë“œí•©ë‹ˆë‹¤.");
+            // "LobbyScene"ì€ ì‹¤ì œ ë¡œë¹„ ì”¬ ì´ë¦„ìœ¼ë¡œ ë§ì¶°ì•¼ í•©ë‹ˆë‹¤.
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
         }
+        // 2. ë„¤íŠ¸ì›Œí¬ ëª¨ë“œì¼ ê²½ìš°
         else
         {
-            Debug.LogError("PhotonManager¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù! ¼öµ¿À¸·Î LobbySceneÀ» ·ÎµåÇÕ´Ï´Ù.");
-            // PhotonManager°¡ ¾ø´Â ºñ»ó »óÈ²À» ´ëºñÇØ Á÷Á¢ ¾ÀÀ» ·ÎµåÇÕ´Ï´Ù.
-            UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene"); // "LobbyScene"Àº ½ÇÁ¦ ¾À ÀÌ¸§À¸·Î º¯°æÇØ¾ß ÇÕ´Ï´Ù.
+            Debug.Log("ë„¤íŠ¸ì›Œí¬ ëª¨ë“œ: í¬í†¤ì„ í†µí•´ ë¡œë¹„ë¡œ ëŒì•„ê°‘ë‹ˆë‹¤.");
+            if (PhotonManager.Instance != null)
+            {
+                // PhotonManagerì˜ í•¨ìˆ˜ë¥¼ í˜¸ì¶œ (PhotonManager ë‚´ë¶€ì—ì„œ ì•ˆì „ì¥ì¹˜ë¥¼ ë§ˆë ¨í•  ê²ƒ)
+                PhotonManager.Instance.LeaveRoomAndLoadLobby();
+            }
+            else
+            {
+                // PhotonManagerê°€ ì—†ëŠ” ë¹„ìƒìƒí™©ì—ì„œëŠ” ì”¬ì„ ì§ì ‘ ë¡œë“œ
+                Debug.LogError("PhotonManagerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤! ì•ˆì „í•˜ê²Œ LobbySceneì„ ì§ì ‘ ë¡œë“œí•©ë‹ˆë‹¤.");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+            }
         }
     }
 

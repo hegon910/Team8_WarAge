@@ -1,63 +1,84 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using KYG;
 
-// ³×ÀÓ½ºÆäÀÌ½º¸¦ PHK·Î ÁöÁ¤ÇÏ¿© ´Ù¸¥ ½ºÅ©¸³Æ®¿Í ÅëÀÏÇÕ´Ï´Ù.
 namespace PHK
 {
     /// <summary>
-    /// ÅÍ·¿ ±¸¸Å ¹öÆ°¿¡ ºÎÂøµÇ¾î ¸¶¿ì½º È£¹ö ¹× Å¬¸¯ ÀÌº¥Æ®¸¦ Ã³¸®ÇÕ´Ï´Ù.
-    /// UnitButton.cs¿Í °ÅÀÇ µ¿ÀÏÇÑ ±¸Á¶ÀÔ´Ï´Ù.
+    /// í„°ë › ìƒì„± ë²„íŠ¼. AgeDataì— í¬í•¨ëœ TurretDataë¥¼ ë°›ì•„ ìì‹ ì„ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
+    /// í´ë¦­ ì‹œ í•´ë‹¹ í„°ë ›ì˜ ì„¤ì¹˜ ëª¨ë“œë¡œ ì§„ì…ì„ ìš”ì²­í•©ë‹ˆë‹¤.
     /// </summary>
+    [RequireComponent(typeof(Button))]
     public class TurretButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        [Header("ÅÍ·¿ ÇÁ¸®ÆÕ")]
-        [Tooltip("ÀÌ ¹öÆ°À» Å¬¸¯ÇßÀ» ¶§ »ı¼ºµÉ ÅÍ·¿ÀÇ ÇÁ¸®ÆÕÀÔ´Ï´Ù.")]
-        public GameObject turretPrefab;
+        private TurretData turretData;
 
-        // private TurretData turretData; // ³ªÁß¿¡ ÅÍ·¿ Á¤º¸(ÀÌ¸§, ºñ¿ë µî)¸¦ ´ãÀ» µ¥ÀÌÅÍ Å¬·¡½º
+        private Button button;
+        private Image iconImage;
 
         private void Awake()
         {
-            // ³ªÁß¿¡ ÅÍ·¿ ÇÁ¸®ÆÕ¿¡ TurretController °°Àº ½ºÅ©¸³Æ®°¡ »ı±â¸é
-            // ±×°÷¿¡¼­ ÀÌ¸§ÀÌ³ª ºñ¿ë °°Àº µ¥ÀÌÅÍ¸¦ °¡Á®¿Ã ¼ö ÀÖ½À´Ï´Ù.
-            // if (turretPrefab != null)
-            // {
-            //     turretData = turretPrefab.GetComponent<TurretController>().turretData;
-            // }
+            button = GetComponent<Button>();
+            iconImage = GetComponent<Image>();
+
+            button.onClick.AddListener(OnClick_RequestTurret);
         }
 
-        // ¸¶¿ì½º°¡ ¹öÆ° À§¿¡ ¿Ã¶ó¿ÔÀ» ¶§
-        public void OnPointerEnter(PointerEventData eventData)
+        /// <summary>
+        /// ì™¸ë¶€(UI ê´€ë¦¬ ìŠ¤í¬ë¦½íŠ¸)ì—ì„œ TurretDataë¥¼ ë°›ì•„ ë²„íŠ¼ì„ ì´ˆê¸°í™”í•˜ëŠ” í•µì‹¬ í•¨ìˆ˜ì…ë‹ˆë‹¤.
+        /// </summary>
+        public void Init(TurretData data)
         {
-            // ÅÍ·¿ Á¤º¸¸¦ UI¿¡ Ç¥½ÃÇÕ´Ï´Ù. (ºñ¿ë µî)
-            // if (turretData != null)
-            // {
-            //     InGameUIManager.Instance.ShowInfoText($"{turretData.name} (Cost: {turretData.cost})");
-            // }
-            // ÀÓ½Ã·Î ÇÁ¸®ÆÕ ÀÌ¸§¸¸ Ç¥½Ã
-            if (turretPrefab != null)
+            this.turretData = data;
+
+            if (this.turretData != null)
             {
-                InGameUIManager.Instance.inGameInfoText.text=$"{turretPrefab.name}";
+                if (iconImage != null && this.turretData.icon != null)
+                {
+                    iconImage.sprite = this.turretData.icon;
+                }
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                gameObject.SetActive(false);
             }
         }
 
-        // ¸¶¿ì½º°¡ ¹öÆ°¿¡¼­ ¹ş¾î³µÀ» ¶§
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ ìœ„ì— ì˜¬ë¼ê°”ì„ ë•Œ í˜¸ì¶œ
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (turretData != null)
+            {
+                string info = $"{turretData.turretName}\nCost: {turretData.cost}";
+                InGameUIManager.Instance.ShowInfoText(info);
+            }
+        }
+
+        // ë§ˆìš°ìŠ¤ê°€ ë²„íŠ¼ì—ì„œ ë²—ì–´ë‚¬ì„ ë•Œ í˜¸ì¶œ
         public void OnPointerExit(PointerEventData eventData)
         {
             InGameUIManager.Instance.HideInfoText();
         }
 
         /// <summary>
-        /// [OnClick ÀÌº¥Æ®¿ë] ÅÍ·¿ »ı¼ºÀ» InGameManager¿¡ ¿äÃ»ÇÕ´Ï´Ù.
+        /// [OnClick ì´ë²¤íŠ¸] í„°ë › ì„¤ì¹˜ ëª¨ë“œë¡œ ì§„ì…í•˜ë„ë¡ InGameUIManagerì— ìš”ì²­í•©ë‹ˆë‹¤.
         /// </summary>
-        public void OnClick_RequestTurret()
+        private void OnClick_RequestTurret()
         {
-            if (turretPrefab == null)
+            if (turretData == null)
             {
-                Debug.LogError("TurretButton¿¡ ÅÍ·¿ ÇÁ¸®ÆÕÀÌ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+                Debug.LogError("TurretButtonì— TurretDataê°€ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
                 return;
             }
-            //InGameManager.Instance.RequestTurretPlacement(turretPrefab);
+
+            // [ìˆ˜ì •] ì„ì˜ë¡œ ì¶”ê°€í–ˆë˜ ê³¨ë“œ ì²´í¬ ë¡œì§ì„ ì œê±°í–ˆìŠµë‹ˆë‹¤.
+            // ì´ì œ ë²„íŠ¼ì€ ì›ë˜ ë¡œì§ëŒ€ë¡œ ì„¤ì¹˜ ëª¨ë“œ ì§„ì…ë§Œ ìš”ì²­í•©ë‹ˆë‹¤.
+            InGameUIManager.Instance.EnterTurretPlaceMode(turretData);
+
+            // ë²„íŠ¼ ì¤‘ë³µ í´ë¦­ ë°©ì§€
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 }

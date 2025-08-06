@@ -63,6 +63,7 @@ public class UserAuthService : MonoBehaviour
 
     public void Login(string email, string password, Action<bool, FirebaseUser> callback = null)
     {
+        FirebaseUser user = Auth.CurrentUser;
         Auth.SignInWithEmailAndPasswordAsync(email, password)
             .ContinueWithOnMainThread(task =>
             {
@@ -74,6 +75,12 @@ public class UserAuthService : MonoBehaviour
                 else
                 {
                     Debug.Log("로그인 성공");
+
+                    if (user.IsEmailVerified)
+                        UIManager.Instance.OnClickedLogin();
+                    else
+                        UIManager.Instance.OnClickedLoginFirst();
+
                     callback?.Invoke(true, task.Result.User);
                 }
             });
@@ -147,59 +154,42 @@ public class UserAuthService : MonoBehaviour
             });
     }
 
-    public void ChangePassword(string newPassword, Action<bool> callback = null)
-    {
-        Auth.CurrentUser.UpdatePasswordAsync(newPassword)
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("비밀번호 변경 실패: " + task.Exception);
-                    callback?.Invoke(false);
-                }
-                else
-                {
-                    Debug.Log("비밀번호 변경 성공");
-                    callback?.Invoke(true);
-                }
-            });
-    }
 
-    public void ResetPassword(string email, Action<bool> callback = null)
-    {
-        Auth.SendPasswordResetEmailAsync(email)
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("패스워드 재설정 실패: " + task.Exception);
-                    callback?.Invoke(false);
-                }
-                else
-                {
-                    Debug.Log("패스워드 재설정 메일 전송 성공");
-                    callback?.Invoke(true);
-                }
-            });
-    }
+    //public void ResetPassword(string email, Action<bool> callback = null)
+    //{
+    //    Auth.SendPasswordResetEmailAsync(email)
+    //        .ContinueWithOnMainThread(task =>
+    //        {
+    //            if (task.IsCanceled || task.IsFaulted)
+    //            {
+    //                Debug.LogError("패스워드 재설정 실패: " + task.Exception);
+    //                callback?.Invoke(false);
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("패스워드 재설정 메일 전송 성공");
+    //                callback?.Invoke(true);
+    //            }
+    //        });
+    //}
 
-    public void DeleteAccount(Action<bool> callback = null)
-    {
-        Auth.CurrentUser.DeleteAsync()
-            .ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCanceled || task.IsFaulted)
-                {
-                    Debug.LogError("계정 삭제 실패: " + task.Exception);
-                    callback?.Invoke(false);
-                }
-                else
-                {
-                    Debug.Log("계정 삭제 성공");
-                    callback?.Invoke(true);
-                }
-            });
-    }
+    //public void DeleteAccount(Action<bool> callback = null)
+    //{
+    //    Auth.CurrentUser.DeleteAsync()
+    //        .ContinueWithOnMainThread(task =>
+    //        {
+    //            if (task.IsCanceled || task.IsFaulted)
+    //            {
+    //                Debug.LogError("계정 삭제 실패: " + task.Exception);
+    //                callback?.Invoke(false);
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("계정 삭제 성공");
+    //                callback?.Invoke(true);
+    //            }
+    //        });
+    //}
 
     public void SignOut()
     {
