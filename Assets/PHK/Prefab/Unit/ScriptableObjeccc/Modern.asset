@@ -25,4 +25,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0ab073f077b3e1e46a5b79b33a1defbb, type: 2}
   - {fileID: 11400000, guid: 24eb84f36e63e3e4bbde80e287c8509c, type: 2}
   - {fileID: 11400000, guid: 440667916c1b9e940961c39d6f4d772c, type: 2}
+
   ultimateSkill: {fileID: 11400000, guid: 4aa45e55242aaaf499365956460de756, type: 2}

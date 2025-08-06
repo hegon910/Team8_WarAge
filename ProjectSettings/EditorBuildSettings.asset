@@ -4,5 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+
+
+  m_Scenes:
+  - enabled: 1
+    path: Assets/CJH/CJH_Scene/LobbyScene.unity
+    guid: 8076dd5d8d792d24dac5db45446c411e
   m_configObjects: {}

@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: Sword
   unitExp: 50
   health: 100
-  attackDamage: 35
+  attackDamage: 20
   rangedDamage: 0
   MeleeRange: 1
   rangedrange: 0

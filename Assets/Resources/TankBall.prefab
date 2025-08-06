@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 746600409017060036}
   - component: {fileID: 8641566182942445840}
   - component: {fileID: 7263577475340310221}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TankBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7ba930d86e4e4f44ac0ef2e9cb37a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  speed: 50
   damage: 70
   ownerTag: 
 --- !u!58 &6767859258342482463
