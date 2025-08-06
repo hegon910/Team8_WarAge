@@ -131,7 +131,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void CreateOrJoinLobby()
     {
-<<<<<<< HEAD:Assets/JWH/JWH_Scrips/JWH_Photon/PhotonManager.cs
+
         Debug.Log("CreateOrJoinLobby");
 
         if (!PhotonNetwork.InLobby)//동작안함?
@@ -140,19 +140,15 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        UIManager.Instance.CreateRoom();
-        RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
-        Debug.Log("JoinOrCreateRoom");
+      
 
-=======
     
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
         UIManager.Instance.CreateRoom();
         Debug.Log("JoinOrCreateRoom ȣ��");
     
->>>>>>> Develop:Assets/JWH/JWH_Scrips/PhotonManager.cs
+
     }
 
 
