@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: SpearMan
   unitExp: 70
   health: 160
-  attackDamage: 40
+  attackDamage: 20
   rangedDamage: 0
   MeleeRange: 2
   rangedrange: 0

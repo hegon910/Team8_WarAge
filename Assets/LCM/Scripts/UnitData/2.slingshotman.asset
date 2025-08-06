@@ -17,8 +17,8 @@ MonoBehaviour:
   health: 42
   attackDamage: 8
   rangedDamage: 8
-  MeleeRange: 20
-  rangedrange: 10
+  MeleeRange: 1
+  rangedrange: 5
   attackSpeed: 1
   SpawnTime: 3
   moveSpeed: 3

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: 7.Soilder
   m_EditorClassIdentifier: 
   unitName: Solider
-  unitExp: 70
+  unitExp: 150
   health: 160
   attackDamage: 20
-  rangedDamage: 100
+  rangedDamage: 50
   MeleeRange: 1
-  rangedrange: 25
+  rangedrange: 10
   attackSpeed: 1
   SpawnTime: 3
   moveSpeed: 1
