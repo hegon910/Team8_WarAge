@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
-  m_Name: slingshotman
+  m_Name: 8.TANK
   m_EditorClassIdentifier: 
-  unitName: slingshotman
-  unitExp: 50
-  health: 42
-  attackDamage: 10
-  rangedDamage: 8
-  MeleeRange: 20
-  rangedrange: 10
-  attackSpeed: 1
-  SpawnTime: 3
-  moveSpeed: 3
-  goldCost: 25
+  unitName: Tank
+  unitExp: 300
+  health: 800
+  attackDamage: 150
+  rangedDamage: 150
+  MeleeRange: 10
+  rangedrange: 30
+  attackSpeed: 0.5
+  SpawnTime: 10
+  moveSpeed: 2
+  goldCost: 1000
   unitSprite: {fileID: 0}
-  description: StoneAgeSlingshotMan
-  ArrowPrefab: {fileID: 2715820060423574543, guid: ad378be1ac5dda14caa9a1529e82eb4c, type: 3}
+  description: 
+  ArrowPrefab: {fileID: 8650717888753219707, guid: ece0d93b644297d48990794eafa60776, type: 3}
   unitType: 1
-  eraType: 0
+  eraType: 2

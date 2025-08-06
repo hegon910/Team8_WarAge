@@ -1449,6 +1449,10 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 212997711224579068, guid: 28ea3e902e0bb9f4aaadcd074429e5d1, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1504,6 +1508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b25ae633c3eead94abbd60d34443736a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  basePrefab: {fileID: 0}
   p1_spawnPoint: {fileID: 1608749305}
   p2_spawnPoint: {fileID: 649957994}
 --- !u!4 &1432687696
