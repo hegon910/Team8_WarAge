@@ -22,7 +22,6 @@ public class EditPanel : MonoBehaviour
     private void Awake()
     {
         nicknameConfirmButton.onClick.AddListener(ChangeNickname);
-        passConfirmButton.onClick.AddListener(ChangePassword);
         backButton.onClick.AddListener(Back);
     }
 
@@ -45,21 +44,6 @@ public class EditPanel : MonoBehaviour
         {
             if (success)
                 Debug.Log("닉네임 변경 성공");
-        });
-    }
-
-    private void ChangePassword()
-    {
-        if (passInput.text != passConfirmInput.text)
-        {
-            Debug.LogError("비밀번호가 일치하지 않음");
-            return;
-        }
-
-        UserAuthService.Instance.ChangePassword(passInput.text, success =>
-        {
-            if (success)
-                Debug.Log("비밀번호 변경 성공");
         });
     }
 

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7832314037079516267}
   - component: {fileID: 7429702643693339149}
   - component: {fileID: 6020517860906636926}
+  - component: {fileID: -5460033766509328755}
   m_Layer: 0
   m_Name: RifleModern
   m_TagString: Untagged
@@ -77,7 +78,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 1b54f806d59a99f41b7581b1b421498d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -175,7 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitdata: {fileID: 11400000, guid: 13824e732138cb74487775d91e0c7fd3, type: 2}
   rb: {fileID: 7120483240345192152}
-  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
@@ -223,3 +224,16 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &-5460033766509328755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770082047026634689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 512002489f8c95240b0bf49447cd45c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentHealth: 0

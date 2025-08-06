@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22f9ad54888b9aa47aef61131245a000, type: 3}
+  m_Name: 7.Soilder
+  m_EditorClassIdentifier: 
+  unitName: Solider
+  unitExp: 150
+  health: 160
+  attackDamage: 20
+  rangedDamage: 50
+  MeleeRange: 1
+  rangedrange: 10
+  attackSpeed: 1
+  SpawnTime: 3
+  moveSpeed: 1
+  goldCost: 400
+  unitSprite: {fileID: 0}
+  description: IndustrialMouschete
+  ArrowPrefab: {fileID: 2518859896990933696, guid: cf6e68ea3bb7dc840aa010e513f31197, type: 3}
+  unitType: 1
+  eraType: 2

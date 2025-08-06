@@ -50,20 +50,39 @@ namespace PHK
         //SpawnManager.cs 스크립트 받았을 때 클릭 시 유닛 생성요청을 SpawnManager로 보내는 onclick 이벤트 함수
         public void SpawnUnit()
         {
-            if (unitPrefab == null) return;
+            if (unitPrefab == null)
+            {
+                Debug.LogError("Unit Prefab이 Inspector에 할당되지 않았습니다!");
+                return;
+            }
 
-            //현재 클라이언트가 마스터 클라이언트인지 확인
-            string ownerTag = PhotonNetwork.IsMasterClient ? "P1" : "P2";
+            string ownerTag;
+
             if (InGameManager.Instance.isDebugMode)
             {
-                // isDebugHost 값에 따라 P1 또는 P2로 태그를 설정
-                ownerTag = InGameManager.Instance.isDebugHost ? "P1" : "P2";
+                ownerTag = "P1";
             }
-            else // 실제 네트워크 환경일 경우
+            else
             {
-                ownerTag = PhotonNetwork.IsMasterClient ? "P1" : "P2";
+                ownerTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
             }
-            UnitSpawnManager.Instance.RequestUnitProduction(unitPrefab, ownerTag);
+
+            Unit unitData = unitPrefab.GetComponent<UnitController>().unitdata;
+            if (InGameManager.Instance.SpendGold(unitData.goldCost))
+            {
+                UnitSpawnManager.Instance.RequestUnitProduction(unitPrefab, ownerTag);
+            }
+            else
+            {
+                if (InGameUIManager.Instance != null)
+                {
+                    // [수정] InGameUIManager의 표준 함수를 사용하는 것이 더 일관적
+                    InGameUIManager.Instance.ShowInfoText("Not enough gold!");
+                }
+            }
+
+            // 스페이스, 엔터로 인한 중복입력 방지
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
         }
     }
 }

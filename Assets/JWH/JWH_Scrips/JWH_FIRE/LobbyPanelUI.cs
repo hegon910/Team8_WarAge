@@ -19,8 +19,8 @@ public class LobbyPanel : MonoBehaviour
     private void Awake()
     {
         logoutButton.onClick.AddListener(Logout);
-        editProfileButton.onClick.AddListener(EditProfile);
-        deleteUserButton.onClick.AddListener(DeleteUser);
+        //editProfileButton.onClick.AddListener(EditProfile);
+        //deleteUserButton.onClick.AddListener(DeleteUser);
     }
 
     private void OnEnable()
@@ -43,21 +43,21 @@ public class LobbyPanel : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void EditProfile()
-    {
-        editPanel.SetActive(true);
-        gameObject.SetActive(false);
-    }
+    //private void EditProfile()
+    //{
+    //    editPanel.SetActive(true);
+    //    gameObject.SetActive(false);
+    //}
 
-    private void DeleteUser()
-    {
-        UserAuthService.Instance.DeleteAccount(success =>
-        {
-            if (success)
-            {
-                loginPannel.SetActive(true);
-                gameObject.SetActive(false);
-            }
-        });
-    }
+    //private void DeleteUser()
+    //{
+    //    UserAuthService.Instance.DeleteAccount(success =>
+    //    {
+    //        if (success)
+    //        {
+    //            loginPannel.SetActive(true);
+    //            gameObject.SetActive(false);
+    //        }
+    //    });
+    //}
 }
