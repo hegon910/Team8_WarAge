@@ -409,6 +409,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
         string resultLog = isWinner ? "승리" : "패배";
         Debug.Log($"[게임 결과] 플레이어: {user.DisplayName}, 결과: {resultLog}");
     }
+
     #endregion
 
 }
