@@ -46,11 +46,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         Debug.Log($"{nicknameToUse}");
         PhotonNetwork.NickName = nicknameToUse;
         PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.JoinLobby();
     }
 
 
     public override void OnConnectedToMaster()
     {
+        Debug.Log("마스터 연결");
         PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
     }
@@ -64,7 +66,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
         // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
-        UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
+        PhotonNetwork.JoinLobby();
+        UIManager.Instance.ShowLobbyPanel();
 
         Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
@@ -91,12 +94,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     //}
     //추가 PHG
 
-    public void LeaveRoomAndRejoinLobby()
-    {
-        // 방을 나가는 요청만 합니다.
-        // 실제 씬 로드는 OnLeftRoom 콜백에서 처리됩니다.
-        PhotonNetwork.LeaveRoom();
-    }
+
     public void CreateOrJoinLobby()
     {
 
@@ -115,7 +113,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("방 이름이 비어 있습니다");
             return;
         }
-
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         Debug.Log($"CreateRoom 호출됨: {roomName}");
