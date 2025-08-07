@@ -28,7 +28,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     private const string PLAYER_EXP_KEY = "PlayerExp";
 
     // 게임 상태 관련 변수
-    private int currentGold;
+    public int currentGold { get; private set; }
     private int p1_exp_debug; // 디버그 모드에서 사용할 플레이어(P1)의 경험치
     private PhotonView photonView;
     private string teamTag;
@@ -397,19 +397,22 @@ public class InGameManager : MonoBehaviourPunCallbacks
     }
     public string GetLocalPlayerBaseTag()
     {
+        // 디버그 모드일 경우, 항상 P1을 기준으로 테스트합니다.
         if (isDebugMode)
         {
-            return isDebugHost ? "BaseP1" : "BaseP2";
+            return "BaseP1";
         }
-        else
+
+        // 포톤 네트워크에 연결된 온라인 모드일 경우
+        if (PhotonNetwork.IsConnected)
         {
-            // PhotonNetwork.IsConnected가 false일 경우를 대비한 안전장치 추가
-            if (!PhotonNetwork.IsConnected || PhotonNetwork.LocalPlayer == null)
-            {
-                return null; // 또는 기본값 "BaseP1"
-            }
-            return PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "BaseP1" : "BaseP2";
+            // 내가 마스터 클라이언트(방장)이면 "BaseP1", 아니면(게스트) "BaseP2"를 반환합니다.
+            return PhotonNetwork.IsMasterClient ? "BaseP1" : "BaseP2";
         }
+
+        // 예외적인 상황 (네트워크 연결도, 디버그 모드도 아닌 경우)
+        Debug.LogWarning("GetLocalPlayerBaseTag: 네트워크 상태를 알 수 없습니다. 기본값 'BaseP1'을 반환합니다.");
+        return "BaseP1";
     }
     #region 게임오버 시퀀스
 

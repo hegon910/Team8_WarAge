@@ -18,7 +18,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     public float meleeSwitchRange = 1.5f;
     public LayerMask unitLayer;
     public float stopDistance = 1f;
-
+    public string TeamTag { get; private set; }
     public Vector3 moveDirection = Vector3.right;
     public bool IsMine => photonView.IsMine;
     private InGameManager gm;
@@ -37,6 +37,9 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
             this.gameObject.tag = (string)photonView.InstantiationData[0];
+            this.moveDirection = (Vector3)photonView.InstantiationData[1];
+            this.TeamTag = (string)photonView.InstantiationData[0];
+            this.gameObject.tag = this.TeamTag;
             this.moveDirection = (Vector3)photonView.InstantiationData[1];
         }
     }
@@ -127,7 +130,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            currentHealth = (int)stream.ReceiveNext();
+            int receivedHealth = (int)stream.ReceiveNext();
             int targetViewID = (int)stream.ReceiveNext();
             if (targetViewID != -1)
             {
@@ -141,7 +144,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (animator != null)
             {
-                if (stream.Count >= 3) 
+                // 스트림에 데이터가 충분한지 확인하는 방어 코드 추가
+                if (stream.Count >= 3)
                 {
                     animator.SetBool(IsMoving, (bool)stream.ReceiveNext());
                     animator.SetBool(IsAttack, (bool)stream.ReceiveNext());
