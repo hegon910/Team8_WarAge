@@ -14,7 +14,7 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public static PhotonManager Instance;
 
     [Header("Input")]
-    [SerializeField] private string gameSceneName = "JWH_GameScene";
+    [SerializeField] private string gameSceneName = "PHG_NetWorkInGameTest";
     [SerializeField] private TMP_InputField roomNameInputField; // 로비패널에 있는 인풋 방이름
 
     void Awake()
