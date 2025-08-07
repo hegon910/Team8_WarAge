@@ -129,25 +129,21 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     }
 
 
-    public void CreateOrJoinLobby()
+    public void CreateOrJoinLobby()// �� ���� ����� ������
     {
+        Debug.Log("CreateOrJoinLobby ȣ��");
 
-        Debug.Log("CreateOrJoinLobby");
 
-        if (!PhotonNetwork.InLobby)//동작안함?
+        if (!PhotonNetwork.InLobby)
         {
-            Debug.LogWarning("로비진입");
+            Debug.LogWarning("�κ�������");
+            UIManager.Instance.CreateRoom();
             return;
         }
 
-      
-
-    
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
-        UIManager.Instance.CreateRoom();
         Debug.Log("JoinOrCreateRoom ȣ��");
-    
 
     }
 
