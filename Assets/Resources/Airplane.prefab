@@ -240,7 +240,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 5.865713, y: 3.1855826}
   m_EdgeRadius: 0
-
 --- !u!114 &4603073028796539886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,7 +252,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-
   unitdata: {fileID: 11400000, guid: 37c23673d250a014fbc948b6806cee8e, type: 2}
   rb: {fileID: 6591797136301302588}
   animator: {fileID: 1384186024968749444}
@@ -264,7 +262,6 @@ MonoBehaviour:
     m_Bits: 0
   stopDistance: 1
   moveDirection: {x: 1, y: 0, z: 0}
-
 --- !u!114 &7689215525347844113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +271,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7143470042879478821}
   m_Enabled: 1
   m_EditorHideFlags: 0
-
   m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
