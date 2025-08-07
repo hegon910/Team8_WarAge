@@ -196,6 +196,7 @@ public class UIManager : MonoBehaviour
         lobbyPanel.SetActive(true);
         roomPanel.SetActive(false);
         PhotonManager.Instance.OnLeftRoom();
+        PhotonNetwork.LeaveRoom();
     }
 
 
