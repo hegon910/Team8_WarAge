@@ -56,6 +56,11 @@ namespace LHE
                     listener.enabled = false;
                 }
             }
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayBGM();
+            }
+
         }
 
         private void Update()

@@ -1,0 +1,489 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7359350485840395175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 6551863438955205808, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+  m_PrefabInstance: {fileID: 514947060511653767}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2128729912372770306}
+  - component: {fileID: 4765594461402513737}
+  - component: {fileID: 2058894247643354846}
+  - component: {fileID: 4769293324735817888}
+  m_Layer: 0
+  m_Name: anim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2128729912372770306
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+  m_PrefabInstance: {fileID: 514947060511653767}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7359350485840395175}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 7859305489357528405}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &4765594461402513737
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 927938137333369129, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+  m_PrefabInstance: {fileID: 514947060511653767}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7359350485840395175}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 4
+  m_Sprite: {fileID: -725895843, guid: 299c2c290baab7f46ba4333e7075233b, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1.44, y: 1.44}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!95 &2058894247643354846
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2705223116170620769, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+  m_PrefabInstance: {fileID: 514947060511653767}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7359350485840395175}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3702d3d85179767478de34e18d00b55d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &7694914925259262284
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7859305489357528405}
+  - component: {fileID: 534310651467232894}
+  - component: {fileID: 6781838634317443994}
+  - component: {fileID: 7334572981660863679}
+  - component: {fileID: 6167186851536219470}
+  - component: {fileID: 617394934881799011}
+  m_Layer: 0
+  m_Name: Boxgelion
+  m_TagString: "using System.Collections;\r\nusing System.Collections.Generic;\r\nusing
+    UnityEngine;\r\nusing UnityEngine.UI;\r\nusing KYG;\r\n\r\nnamespace PHK\r\n{\r\n   
+    public class UnitPanelManager : MonoBehaviour\r\n    {\r\n        public AgeType
+    age;\r\n\r\n        [Header(\"\uC2DC\uB300 \uB370\uC774\uD130 (\uC9C1\uC811 \uC5F0\uACB0)\")]\r\n       
+    [SerializeField] private AgeData[] ageDataArray;\r\n        private Dictionary<AgeType,
+    AgeData> ageDataDict;\r\n\r\n        private enum ActivePanelType { Selection,
+    Units, Turrets }\r\n        [Header(\"\uD604\uC7AC \uC0C1\uD0DC\")]\r\n       
+    public AgeType currentAge = AgeType.Ancient;\r\n        private ActivePanelType
+    activePanel = ActivePanelType.Selection;\r\n\r\n        [Header(\"\uACF5\uC6A9
+    \uD328\uB110\")]\r\n        public GameObject selectPanel;\r\n\r\n        [Header(\"\uC720\uB2DB
+    \uD328\uB110\")]\r\n        public GameObject ancientUnitPanel;\r\n        public
+    GameObject middleUnitPanel;\r\n        public GameObject modernUnitPanel;\r\n       
+    public GameObject futureUnitPanel;\r\n\r\n        [Header(\"\uC2DC\uB300\uBCC4
+    \uD130\uB81B \uD328\uB110\")]\r\n        public GameObject ancientTurretPanel;\r\n       
+    public GameObject middleAgeTurretPanel;\r\n        public GameObject modernTurretPanel;\r\n       
+    public GameObject futureTurretPanel;\r\n\r\n        [Header(\"\uC2DC\uB300 \uBC1C\uC804
+    \uBC84\uD2BC\")]\r\n        public Button evolveButton;\r\n        public Button
+    lastAgeUnitButton;\r\n\r\n        void Start()\r\n        {\r\n            ageDataDict
+    = new Dictionary<AgeType, AgeData>();\r\n            foreach (var data in ageDataArray)\r\n           
+    {\r\n                if (data != null) ageDataDict[data.ageType] = data;\r\n           
+    }\r\n\r\n            if (ageDataDict.TryGetValue(currentAge, out AgeData initialAgeData))\r\n           
+    {\r\n                Debug.Log($\"[UnitPanelManager.Start] \uC2DC\uC791 \uC2DC\uB300({currentAge})\uC758
+    \uBC84\uD2BC \uC124\uC815\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4.\");\r\n               
+    UpdateAge(initialAgeData);\r\n            }\r\n            else\r\n           
+    {\r\n                Debug.LogError($\"[UnitPanelManager.Start] \uC2DC\uC791
+    \uC2DC\uB300({currentAge})\uC5D0 \uD574\uB2F9\uD558\uB294 AgeData\uB97C \uCC3E\uC744
+    \uC218 \uC5C6\uC2B5\uB2C8\uB2E4!\");\r\n            }\r\n\r\n            activePanel
+    = ActivePanelType.Selection;\r\n            UpdateUnitPanelVisibility();\r\n\r\n           
+    if (lastAgeUnitButton != null)\r\n            {\r\n                lastAgeUnitButton.gameObject.SetActive(false);\r\n           
+    }\r\n        }\r\n\r\n        public void UpdateAge(AgeData newAgeData)\r\n       
+    {\r\n            Debug.Log($\"[2. UnitPanelManager] UpdateAge \uD638\uCD9C\uB428.
+    \uC720\uB2DB \uC218: {newAgeData.spawnableUnits.Count}\");\r\n            this.currentAge
+    = newAgeData.ageType;\r\n\r\n            UpdateUnitPanelVisibility();\r\n\r\n           
+    if (this.currentAge == AgeType.Modern) \r\n            {\r\n                if
+    (evolveButton != null) evolveButton.gameObject.SetActive(false);\r\n               
+    if (lastAgeUnitButton != null) lastAgeUnitButton.gameObject.SetActive(true);\r\n           
+    }\r\n            else\r\n            {\r\n                if (evolveButton !=
+    null) evolveButton.gameObject.SetActive(true);\r\n                if (lastAgeUnitButton
+    != null) lastAgeUnitButton.gameObject.SetActive(false);\r\n            }\r\n\r\n           
+    GameObject currentUnitPanel = null;\r\n            switch (this.currentAge)\r\n           
+    {\r\n                case AgeType.Ancient: currentUnitPanel = ancientUnitPanel;
+    break;\r\n                case AgeType.Medieval: currentUnitPanel = middleUnitPanel;
+    break;\r\n                case AgeType.Modern: currentUnitPanel = modernUnitPanel;
+    break;\r\n            }\r\n\r\n            if (currentUnitPanel != null)\r\n           
+    {\r\n                ConfigureUnitPanel(currentUnitPanel, newAgeData.spawnableUnits);\r\n           
+    }\r\n\r\n            GameObject currentTurretPanel = null;\r\n            switch
+    (this.currentAge)\r\n            {\r\n                case AgeType.Ancient: currentTurretPanel
+    = ancientTurretPanel; break;\r\n                case AgeType.Medieval: currentTurretPanel
+    = middleAgeTurretPanel; break;\r\n                case AgeType.Modern: currentTurretPanel
+    = modernTurretPanel; break;\r\n            }\r\n\r\n            if (currentTurretPanel
+    != null)\r\n            {\r\n                ConfigureTurretPanel(currentTurretPanel,
+    newAgeData.availableTurrets);\r\n            }\r\n\r\n            Debug.Log($\"\uC2DC\uB300\uAC00
+    {newAgeData.ageType}(\uC73C)\uB85C \uBCC0\uACBD\uB418\uACE0 \uC720\uB2DB/\uD130\uB81B
+    \uBC84\uD2BC\uC774 \uC7AC\uC124\uC815\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\");\r\n       
+    }\r\n\r\n        private void ConfigureUnitPanel(GameObject panel, List<GameObject>
+    units)\r\n        {\r\n            UnitButton[] buttons = panel.GetComponentsInChildren<UnitButton>(true);\r\n           
+    Debug.Log($\"[3. ConfigureUnitPanel] \uD328\uB110({panel.name}) \uC124\uC815
+    \uC2DC\uC791. \uC804\uB2EC\uB41C \uC720\uB2DB \uC218: {units.Count}, \uCC3E\uC740
+    \uBC84\uD2BC \uC218: {buttons.Length}\");\r\n\r\n            for (int i = 0;
+    i < buttons.Length; i++)\r\n            {\r\n                if (i < units.Count)\r\n               
+    {\r\n                    buttons[i].Init(units[i]);\r\n                }\r\n               
+    else\r\n                {\r\n                    buttons[i].Init(null);\r\n               
+    }\r\n            }\r\n        }\r\n\r\n        private void ConfigureTurretPanel(GameObject
+    panel, List<TurretData> turrets)\r\n        {\r\n            TurretButton[] buttons
+    = panel.GetComponentsInChildren<TurretButton>(true);\r\n            Debug.Log($\"[3.
+    ConfigureTurretPanel] \uD328\uB110({panel.name}) \uC124\uC815 \uC2DC\uC791. \uC804\uB2EC\uB41C
+    \uD130\uB81B \uC218: {turrets.Count}, \uCC3E\uC740 \uBC84\uD2BC \uC218: {buttons.Length}\");\r\n\r\n           
+    for (int i = 0; i < buttons.Length; i++)\r\n            {\r\n               
+    if (i < turrets.Count)\r\n                {\r\n                    buttons[i].Init(turrets[i]);\r\n               
+    }\r\n                else\r\n                {\r\n                    buttons[i].Init(null);\r\n               
+    }\r\n            }\r\n        }\r\n\r\n        private void UpdateUnitPanelVisibility()\r\n       
+    {\r\n            selectPanel.SetActive(false);\r\n            ancientUnitPanel.SetActive(false);\r\n           
+    middleUnitPanel.SetActive(false);\r\n            modernUnitPanel.SetActive(false);\r\n           
+    \r\n            if (ancientTurretPanel != null) ancientTurretPanel.SetActive(false);\r\n           
+    if (middleAgeTurretPanel != null) middleAgeTurretPanel.SetActive(false);\r\n           
+    if (modernTurretPanel != null) modernTurretPanel.SetActive(false);\r\n           
+    \r\n            switch (activePanel)\r\n            {\r\n                case
+    ActivePanelType.Selection:\r\n                    selectPanel.SetActive(true);\r\n                   
+    break;\r\n\r\n                case ActivePanelType.Units:\r\n                   
+    switch (currentAge)\r\n                    {\r\n                        case
+    AgeType.Ancient: ancientUnitPanel.SetActive(true); break;\r\n                       
+    case AgeType.Medieval: middleUnitPanel.SetActive(true); break;\r\n                       
+    case AgeType.Modern: modernUnitPanel.SetActive(true); break;\r\n                   
+    }\r\n                    break;\r\n\r\n                case ActivePanelType.Turrets:\r\n                   
+    switch (currentAge)\r\n                    {\r\n                        case
+    AgeType.Ancient: if (ancientTurretPanel != null) ancientTurretPanel.SetActive(true);
+    break;\r\n                        case AgeType.Medieval: if (middleAgeTurretPanel
+    != null) middleAgeTurretPanel.SetActive(true); break;\r\n                       
+    case AgeType.Modern: if (modernTurretPanel != null) modernTurretPanel.SetActive(true);
+    break;\r\n                    }\r\n                    break;\r\n           
+    }\r\n        }\r\n        \r\n        public void ShowUnitPnale()\r\n       
+    {\r\n            activePanel = ActivePanelType.Units;\r\n            UpdateUnitPanelVisibility();\r\n       
+    }\r\n        \r\n        public void ShowTurretPanel()\r\n        {\r\n           
+    activePanel = ActivePanelType.Turrets;\r\n            UpdateUnitPanelVisibility();\r\n       
+    }\r\n\r\n        public void ShowSelectionPanel()\r\n        {\r\n           
+    activePanel = ActivePanelType.Selection;\r\n            UpdateUnitPanelVisibility();\r\n       
+    }\r\n    }\r\n}"
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7859305489357528405
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 2128729912372770306}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &534310651467232894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b032092e745add74798cd56ca0a5521d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unitdata: {fileID: 11400000, guid: 969dba209cc43114d9fdac747f6995d4, type: 2}
+  rb: {fileID: 6167186851536219470}
+  animator: {fileID: 2058894247643354846}
+  arrowSpawnPoint: {fileID: 0}
+  currentHealth: 0
+  meleeSwitchRange: 1.5
+  unitLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopDistance: 1
+  moveDirection: {x: 1, y: 0, z: 0}
+--- !u!114 &6781838634317443994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 534310651467232894}
+  - {fileID: 7334572981660863679}
+  - {fileID: 4769293324735817888}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &7334572981660863679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
+--- !u!50 &6167186851536219470
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!70 &617394934881799011
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7694914925259262284}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.08, y: 0.2}
+  m_Size: {x: 0.6, y: 1}
+  m_Direction: 0
+--- !u!1001 &514947060511653767
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7859305489357528405}
+    m_Modifications:
+    - target: {fileID: 927938137333369129, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_FlipX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 927938137333369129, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_SortingOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3224206831884987569, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: sceneViewId
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6077360617081617834, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6551863438955205808, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      propertyPath: m_Name
+      value: anim
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 0}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6551863438955205808, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4769293324735817888}
+  m_SourcePrefab: {fileID: 100100000, guid: 882fcb19c6ed1a646bd3c94b94bb5754, type: 3}
+--- !u!114 &4769293324735817888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7359350485840395175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 9
+    SynchronizeType: 0
+    Name: Attack
+  - Type: 9
+    SynchronizeType: 0
+    Name: Dead
+  - Type: 1
+    SynchronizeType: 0
+    Name: Speed
+  - Type: 4
+    SynchronizeType: 0
+    Name: isAttack
+  - Type: 4
+    SynchronizeType: 0
+    Name: isDead
+  - Type: 4
+    SynchronizeType: 0
+    Name: isMoving
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0

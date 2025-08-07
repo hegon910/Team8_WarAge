@@ -1,8 +1,7 @@
-using System.Collections;
+using KYG;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using KYG;
 
 namespace PHK
 {
@@ -27,6 +26,9 @@ namespace PHK
         public GameObject middleUnitPanel;
         public GameObject modernUnitPanel;
         public GameObject futureUnitPanel;
+
+        [Header("최종 시대 전용")]
+        public GameObject finalUnitPrefab;
 
         [Header("시대별 터렛 패널")]
         public GameObject ancientTurretPanel;
@@ -71,6 +73,7 @@ namespace PHK
 
         public void UpdateAge(AgeData newAgeData)
         {
+            SoundManager.Instance.PlayEvolveSound();
             Debug.Log($"[2. UnitPanelManager] UpdateAge 호출됨. 유닛 수: {newAgeData.spawnableUnits.Count}");
             this.currentAge = newAgeData.ageType;
 
@@ -81,7 +84,22 @@ namespace PHK
             if (this.currentAge == AgeType.Modern) // Modern이 마지막 시대라고 가정
             {
                 if (evolveButton != null) evolveButton.gameObject.SetActive(false);
-                if (lastAgeUnitButton != null) lastAgeUnitButton.gameObject.SetActive(true);
+                if (lastAgeUnitButton != null)
+                {
+                    lastAgeUnitButton.gameObject.SetActive(true);
+
+                    // --- 추가된 부분 ---
+                    // 최종 유닛 버튼에 있는 UnitButton 컴포넌트를 찾아 초기화
+                    UnitButton finalUnitBtnScript = lastAgeUnitButton.GetComponent<UnitButton>();
+                    if (finalUnitBtnScript != null && finalUnitPrefab != null)
+                    {
+                        finalUnitBtnScript.Init(finalUnitPrefab);
+                    }
+                    else
+                    {
+                        Debug.LogError("lastAgeUnitButton에 UnitButton 스크립트가 없거나 finalUnitPrefab이 연결되지 않았습니다!");
+                    }
+                }
             }
             else
             {
@@ -172,24 +190,37 @@ namespace PHK
             switch (activePanel)
             {
                 case ActivePanelType.Selection:
+                    SoundManager.Instance.PlayUIClick();
                     selectPanel.SetActive(true);
                     break;
 
                 case ActivePanelType.Units:
                     switch (currentAge)
                     {
-                        case AgeType.Ancient: ancientUnitPanel.SetActive(true); break;
-                        case AgeType.Medieval: middleUnitPanel.SetActive(true); break;
-                        case AgeType.Modern: modernUnitPanel.SetActive(true); break;
+                        case AgeType.Ancient:
+                            ancientUnitPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
+                        case AgeType.Medieval:
+                            middleUnitPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
+                        case AgeType.Modern:
+                            modernUnitPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
                     }
                     break;
 
                 case ActivePanelType.Turrets:
                     switch (currentAge)
                     {
-                        case AgeType.Ancient: if (ancientTurretPanel != null) ancientTurretPanel.SetActive(true); break;
-                        case AgeType.Medieval: if (middleAgeTurretPanel != null) middleAgeTurretPanel.SetActive(true); break;
-                        case AgeType.Modern: if (modernTurretPanel != null) modernTurretPanel.SetActive(true); break;
+                        case AgeType.Ancient:
+                            if (ancientTurretPanel != null) ancientTurretPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
+                        case AgeType.Medieval:
+                            if (middleAgeTurretPanel != null) middleAgeTurretPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
+                        case AgeType.Modern:
+                            if (modernTurretPanel != null) modernTurretPanel.SetActive(true);
+                            SoundManager.Instance.PlayUIClick(); break;
                     }
                     break;
             }
@@ -198,6 +229,7 @@ namespace PHK
         // 'Units' 버튼을 누르면 호출
         public void ShowUnitPnale()
         {
+            SoundManager.Instance.PlayUIClick();
             activePanel = ActivePanelType.Units;
             UpdateUnitPanelVisibility();
         }
@@ -205,6 +237,7 @@ namespace PHK
         // 'Turrets' 버튼을 누르면 호출
         public void ShowTurretPanel()
         {
+            SoundManager.Instance.PlayUIClick();
             activePanel = ActivePanelType.Turrets;
             UpdateUnitPanelVisibility();
         }
@@ -212,6 +245,7 @@ namespace PHK
         // 유닛/터렛 패널의 '돌아가기' 버튼을 누르면 selection 패널로 돌아감
         public void ShowSelectionPanel()
         {
+            SoundManager.Instance.PlayUIClick();
             activePanel = ActivePanelType.Selection;
             UpdateUnitPanelVisibility();
         }

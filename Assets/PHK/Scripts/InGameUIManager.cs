@@ -1,9 +1,8 @@
-using PHK;
+using KYG;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using KYG;
-using System.Collections;
 
 // 인게임의 전반적인 UI를 관리하는 스크립트.
 // 다른 매니저로부터 이벤트를 받아 UI를 변경하고, UI 버튼 입력을 받아 다른 매니저에 요청.
@@ -149,11 +148,33 @@ public class InGameUIManager : MonoBehaviour
         if (currentState != PlayerActionState.None)
         {
             // 우클릭 또는 ESC 키로 행동을 취소합니다.
-            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetMouseButtonDown(1))
             {
                 CancelPlayerAction();
             }
+        
         }
+        //esc 누를 때 옵션 패널 열기
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("ESC 키 입력 감지! OptionManager.Instance는? " + (OptionManager.Instance != null));
+            // [조건 1] 옵션 패널이 이미 화면에 나와있다면?
+            if (OptionManager.Instance != null && OptionManager.Instance.optionPanel.activeInHierarchy)
+            {
+                //
+                OptionManager.Instance.OnClickedOptionCancel();
+            }
+            else
+            {
+                CancelPlayerAction();
+
+                if (OptionManager.Instance != null)
+                {
+                    OptionManager.Instance.ShowOptionPanel();
+                }
+            }
+        }
+
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
@@ -270,6 +291,7 @@ public class InGameUIManager : MonoBehaviour
     #region 궁극기 UI (추가된 부분)
     public void OnUltimateSkillButtonClicked()
     {
+        SoundManager.Instance.PlayUltimateSkillSound();
         AgeType currentAge = InGameManager.Instance.GetLocalPlayerCurrentAge();
         AgeData currentAgeData = AgeManager.Instance.GetAgeData(currentAge);
 
@@ -345,6 +367,7 @@ public class InGameUIManager : MonoBehaviour
     #region 터렛 관련 UI 및 상태 관리
     public void EnterTurretPlaceMode(TurretData data)
     {
+        SoundManager.Instance.PlayUIClick();
         currentState = PlayerActionState.PlacingTurret;
         turretDataToPlace = data;
         // --- 영문으로 변경 ---
@@ -353,6 +376,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void EnterTurretSellMode()
     {
+        SoundManager.Instance.PlayUIClick();
         currentState = PlayerActionState.SellingTurret;
         turretPrefabToPlace = null;
         // --- 영문으로 변경 ---
@@ -368,6 +392,8 @@ public class InGameUIManager : MonoBehaviour
 
     public void OnClick_AddTurretSlotButton()
     {
+        SoundManager.Instance.PlayEvolveSound();
+        SoundManager.Instance.PlayUIClick();
         int slotCost = 100;
         var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
 
@@ -430,6 +456,11 @@ public class InGameUIManager : MonoBehaviour
 
     public void ReturnToLobby()
     {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopBGM();
+        }
+
         Time.timeScale = 1f;
 
         if (winnerPanel != null) winnerPanel.SetActive(false);

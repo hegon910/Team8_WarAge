@@ -86,6 +86,8 @@ public class UnitSpawnManager : MonoBehaviour
         Quaternion initialRotation = Quaternion.Euler(0, 180, 0); // P2 유닛은 항상 뒤집어서 생성
         GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, initialRotation);
 
+
+
         newUnit.tag = "P2";
         newUnit.layer = LayerMask.NameToLayer("P2Unit");
 
@@ -157,6 +159,7 @@ public class UnitSpawnManager : MonoBehaviour
                 object[] data = new object[] { ownerTag, initialMoveDirection };
                 // PhotonNetwork.Instantiate는 마스터 클라이언트에서만 호출하는 것이 안정적이지만, 기존 로직을 유지합니다.
                 GameObject newUnit = PhotonNetwork.Instantiate(prefabToProduce.name, spawnPoint.position, spawnPoint.rotation, 0, data);
+
 
                 PhotonView newUnitPV = newUnit.GetComponent<PhotonView>();
                 if (newUnitPV != null && GetComponent<PhotonView>() != null)

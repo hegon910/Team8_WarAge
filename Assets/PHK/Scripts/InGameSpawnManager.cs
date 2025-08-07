@@ -68,6 +68,7 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
         }
         Debug.Log("디버그 모드: P1 기지 생성 완료 (Tag: BaseP1, Layer: P1Base)");
 
+
         // P2 기지 생성 및 등록
         Vector3 p2SpawnPosition = p2_spawnPoint.position - (p2_spawnPoint.right * offsetDistance);
         GameObject p2BaseObject = Instantiate(basePrefab, p2SpawnPosition, Quaternion.identity);

@@ -78,6 +78,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+       
         currentGold = startingGold;
         if (isDebugMode)
         {
@@ -121,6 +122,8 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
         OnEvolveStatusChanged?.Invoke(false);
         StartCoroutine(PassiveGoldGeneration());
+
+
     }
 
     private void OnDestroy()
@@ -144,8 +147,9 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) AddGold(50);
-        if (Input.GetKeyDown(KeyCode.G)) AddExp("P1", 500); // 디버그 시 P1에게 경험치
+        if (Input.GetKeyDown(KeyCode.Space)) AddGold(50000);
+        if (Input.GetKeyDown(KeyCode.G)) AddExp("P1", 5000); // 디버그 시 P1에게 경험치
+        if (Input.GetKeyDown(KeyCode.H)) AddExp("P2", 5000); // 디버그 시 P1에게 경험치
     }
     #endregion
 

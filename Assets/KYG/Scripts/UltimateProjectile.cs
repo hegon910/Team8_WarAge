@@ -8,7 +8,6 @@ namespace KYG
     
 public class UltimateProjectile : MonoBehaviourPun
 {
-    private Vector3 targetPosition;
         private float damage;
         private float radius;
         private float speed = 15f;
@@ -24,9 +23,9 @@ public class UltimateProjectile : MonoBehaviourPun
         /// 투사체 초기화: 목표 위치, 데미지, 범위, 팀 태그
         /// </summary>
         [PunRPC]
-        public void Initialize(Vector3 target, float dmg, float area, string tag)
+        public void Initialize(float dmg, float area, string tag)
         {
-            targetPosition = target;
+           
             damage = dmg;
             radius = area;
             ownerTag = tag;
@@ -57,7 +56,7 @@ public class UltimateProjectile : MonoBehaviourPun
         private void OnTriggerEnter2D(Collider2D other)
         {
             // 이미 충돌했거나, 내 유닛과 부딪혔거나, 상대 유닛이 아니면 무시
-            if (hasImpacted || !other.CompareTag(opponentUnitTag))
+            if (hasImpacted || string.IsNullOrEmpty(opponentUnitTag) || !other.CompareTag(opponentUnitTag))
             {
                 return;
             }
