@@ -5,6 +5,7 @@ using ExitGames.Client.Photon;
 using Firebase.Auth;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,8 +13,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance;
 
-    [SerializeField] private string loginSceneName = "JWH_LoginScene";
+    [Header("Input")]
     [SerializeField] private string gameSceneName = "JWH_GameScene";
+    [SerializeField] private TMP_InputField roomNameInputField; // 로비패널에 있는 인풋 방이름
 
     void Awake()
     {
@@ -53,6 +55,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         UIManager.Instance.Connect();
     }
     //추가    PHG : 방에 참가했을 때 호출되는 콜백
+
+
     // [수정] 방을 나간 후 자동으로 호출되는 콜백 함수
     public override void OnLeftRoom()
     {
@@ -98,15 +102,23 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         Debug.Log("CreateOrJoinLobby");
 
-        if (!PhotonNetwork.InLobby)//동작안함?
+        if (!PhotonNetwork.InLobby)
         {
-            Debug.LogWarning("로비진입");
+            Debug.LogWarning("로비에 입장하지 않았습니다");
             return;
         }
+
+        string roomName = roomNameInputField.text;
+
+        if (string.IsNullOrWhiteSpace(roomName))
+        {
+            Debug.LogWarning("방 이름이 비어 있습니다");
+            return;
+        }
+
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
-        Debug.Log("JoinOrCreateRoomg 호출");
-        //UIManager.Instance.CreateRoom();
+        PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+        Debug.Log($"CreateRoom 호출됨: {roomName}");
     }
     public override void OnJoinedLobby()
     {
