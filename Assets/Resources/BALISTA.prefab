@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: -5628826957882167131}
   - component: {fileID: 1296887425722362794}
   m_Layer: 0
-  m_Name: BoiledOil
+  m_Name: BALISTA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
