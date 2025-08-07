@@ -4,10 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-
-
   m_Scenes:
   - enabled: 1
     path: Assets/CJH/CJH_Scene/LobbyScene.unity
     guid: 8076dd5d8d792d24dac5db45446c411e
+  - enabled: 1
+    path: Assets/PHK/Scene/PHG_NetWorkInGameTest.unity
+    guid: a651914c4c06bb44e9d9d62204d26344
   m_configObjects: {}

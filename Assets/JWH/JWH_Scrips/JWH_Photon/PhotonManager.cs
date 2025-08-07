@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using ExitGames.Client.Photon;
 using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Extensions;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
@@ -74,15 +76,29 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log($"방에 참가했습니다: {PhotonNetwork.CurrentRoom.Name}");
-        // 방에 성공적으로 참가했으므로, UIManager를 통해 방 패널을 활성화합니다.
-        UIManager.Instance.ShowRoomPanel(); // UIManager에 이 메서드를 추가해야 합니다.
-        // 필요하다면 여기서 게임 시작 전 준비 상태 UI 등을 업데이트할 수 있습니다.
+
+        UIManager.Instance.ShowRoomPanel();
+
         string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
         {
         { "uid", firebaseUid }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        // 유저가 처음일 경우 초기화
+        FirebaseDatabase.DefaultInstance.GetReference("users").Child(firebaseUid)
+            .GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (!task.Result.Exists)
+                {
+                    Debug.Log("[전적 없음] 방 입장 시 전적 초기화");
+                    UserRank.Instance?.InitializeNewUser();
+                }
+
+                // uid 설정 후 강제 전적 UI 갱신 호출
+                FindObjectOfType<TestStateUI>()?.UpdateMyStateUI();
+            });
     }
     //추가 PHG : 주석처리
     //public override void OnJoinedLobby()
