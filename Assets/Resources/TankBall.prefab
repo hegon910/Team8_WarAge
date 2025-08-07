@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7ba930d86e4e4f44ac0ef2e9cb37a46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 50
+  speed: 30
   damage: 70
   ownerTag: 
 --- !u!58 &6767859258342482463

@@ -26,5 +26,5 @@ MonoBehaviour:
   unitSprite: {fileID: 0}
   description: IndustrialCaoneer
   ArrowPrefab: {fileID: 3912679969794020967, guid: 978cc6146b60b64408b6436688287868, type: 3}
-  unitType: 0
+  unitType: 1
   eraType: 2
