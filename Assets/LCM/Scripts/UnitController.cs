@@ -212,7 +212,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         currentTarget = target;
     }
 
-    private void Attack(Transform target)
+    public void Attack(Transform target)
     {
         if (attackCooldownTimer > 0) return;
         rb.velocity = Vector2.zero;
