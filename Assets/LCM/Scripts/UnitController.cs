@@ -10,6 +10,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] public Unit unitdata;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
+    [SerializeField] private Transform arrowSpawnPoint;
 
     public int currentHealth;
     private Transform currentTarget;
@@ -222,7 +223,6 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         rb.velocity = Vector2.zero;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
 
-
         if (unitdata.unitType == UnitType.Melee && distanceToTarget <= unitdata.MeleeRange)
         {
             var targetUnit = target.GetComponent<UnitController>();
@@ -261,7 +261,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
             else
             {
                 string spawnerTag = gameObject.tag;
-                Vector3 ArrowSpawnPos = transform.position + (moveDirection.normalized * 0.5f);
+                Vector3 ArrowSpawnPos = (arrowSpawnPoint != null) ? arrowSpawnPoint.position : transform.position + (moveDirection.normalized * 0.5f);
                 GameObject ArrowGo = PhotonNetwork.Instantiate(unitdata.ArrowPrefab.name, ArrowSpawnPos, Quaternion.identity);
                 Arrow arrow = ArrowGo.GetComponent<Arrow>();
 
@@ -324,14 +324,17 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         animator.SetBool(IsDead, isDead);
     }
 
+
     // 공격 애니메이션이 끝난 후 IsAttacking 불린을 false로 되돌리는 코루틴
     private IEnumerator ResetAttackStateAfterAnimation()
     {
-        yield return new WaitForSeconds(0.5f); 
+        yield return new WaitForSeconds(1f);
 
         if (currentHealth > 0)
         {
             SetAnimationState(false, false, false);
         }
+
+        
     }
 }

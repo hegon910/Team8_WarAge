@@ -59,12 +59,37 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
+        Debug.Log("2p 들어옴");
+        GameObject obj = GameObject.Find("P2PlayerInfo");
+        if (obj != null)
+        {
+            obj.SetActive(true);
+            Debug.Log("P2PlayerInfo 오브젝트를 활성화");
+        }
+        else
+        {
+            Debug.LogWarning("P2PlayerInfo 오브젝트 null");
+        }
         UpdateAllLobbyUI(); // 플레이어 입장
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        UpdateAllLobbyUI(); // 플레이어 퇴장
+        Debug.Log($"플레이어 {otherPlayer.NickName} 나감");
+
+        // 상대가 나가면 준비 상태 초기화
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 방에 남은 모든 플레이어의 Ready 상태를 false로 초기화
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                ExitGames.Client.Photon.Hashtable resetProps = new ExitGames.Client.Photon.Hashtable { { "Ready", false } };
+                player.SetCustomProperties(resetProps);
+            }
+        }
+
+        // UI 전체 갱신
+        UpdateAllLobbyUI();
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
