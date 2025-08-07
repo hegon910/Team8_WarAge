@@ -40,6 +40,7 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("방 입장 완료");
+        PhotonManager.Instance.SetUID();
         UIManager.Instance.ShowRoomPanel();
         UpdateAllLobbyUI();
     }

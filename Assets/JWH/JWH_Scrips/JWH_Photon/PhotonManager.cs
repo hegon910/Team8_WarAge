@@ -224,6 +224,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void SetUID()
+    {
+        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        if (!string.IsNullOrEmpty(firebaseUid))
+        {
+            ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+            { "uid", firebaseUid }
+        };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        }
+    }
+
 
 
 }
