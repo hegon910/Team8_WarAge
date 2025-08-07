@@ -97,8 +97,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.3}
-  m_Size: {x: 0.8, y: 1.8}
+  m_Offset: {x: 0, y: -0.1}
+  m_Size: {x: 0.8, y: 2.24}
   m_Direction: 0
 --- !u!114 &4601441455624764942
 MonoBehaviour:
@@ -115,6 +115,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: b34f081eb733ea84f879701ace973b28, type: 2}
   rb: {fileID: 4165666218261391551}
   animator: {fileID: 107341536490249838}
+  arrowSpawnPoint: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:
