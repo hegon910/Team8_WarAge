@@ -40,6 +40,8 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("방 입장 완료");
+        PhotonManager.Instance.SetUID();
+        UIManager.Instance.ShowRoomPanel();
         UpdateAllLobbyUI();
     }
 
@@ -67,15 +69,18 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        if (changedProps.ContainsKey("Ready"))
+        if (changedProps.ContainsKey("uid") || changedProps.ContainsKey("Ready"))
         {
-         
-            if (targetPlayer == PhotonNetwork.LocalPlayer)
+            // 내 Ready 상태라면 버튼만 업데이트
+            if (changedProps.ContainsKey("Ready") && targetPlayer == PhotonNetwork.LocalPlayer)
             {
                 isLocalPlayerReady = (bool)changedProps["Ready"];
                 UpdateReadyUI(isLocalPlayerReady);
             }
-            
+
+            // 항상 전체 UI 갱신 (uid가 들어왔을 때도 포함됨)
+            UpdateAllLobbyUI();
+
             if (PhotonNetwork.IsMasterClient)
             {
                 startButton.interactable = PhotonManager.Instance.AreAllPlayersReady();
