@@ -154,7 +154,7 @@ namespace KYG
         {
             // 슬롯 해금은 내 베이스에서만 가능
             // 디버그 모드에서는 isMine이 false일 수 있으므로 PhotonNetwork.IsConnected 조건을 추가
-            if (PhotonNetwork.IsConnected && !pv.IsMine) return;
+            //if (PhotonNetwork.IsConnected && !pv.IsMine) return; <-p2에서 슬롯 못여는 버그 발생
 
             if (unlockedSlotCount >= turretSlots.Length)
             {
