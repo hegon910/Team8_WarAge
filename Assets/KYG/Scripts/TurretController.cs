@@ -1,35 +1,28 @@
+// TurretController.cs (UnitController 로직 적용 최종본)
+
 using Photon.Pun;
 using UnityEngine;
 
 namespace KYG
 {
-
     public class TurretController : MonoBehaviourPun
     {
-        public TurretData data; // 터렛 데이터
+        public TurretData data;
         public Transform muzzlePoint;
-        private TurretSlot parentSlot; // 설치된 슬롯 참조
+        // public LayerMask enemyLayerMask; // 더 이상 사용하지 않으므로 삭제
 
-        private Transform target; // 현재 공격 중인 타겟
-        private float attackTimer = 0f; // 공격 딜레이 타이머
+        private TurretSlot parentSlot;
+        private Transform target;
+        private float attackTimer = 0f;
 
-        public string TeamTag { get; private set; }  // 팀 정보 추가
-
-        /// <summary>
-        /// 터렛 초기화
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="slot"></param>
-        /// 
+        public string TeamTag { get; private set; }
 
         public void Init(TurretData data, TurretSlot slot, string teamTag)
         {
-            Debug.Log($"TurretController.Init 호출됨. 전달받은 teamTag 값: '{teamTag}'"); // <-- 이 로그를 추가
             this.data = data;
             this.parentSlot = slot;
             this.TeamTag = teamTag;
 
-            // 태그, 레이어 자동 설정
             if (TeamTag == "BaseP1")
             {
                 gameObject.tag = "P1Turret";
@@ -39,8 +32,16 @@ namespace KYG
             {
                 gameObject.tag = "P2Turret";
                 gameObject.layer = LayerMask.NameToLayer("P2Turret");
-            }
 
+                Vector3 currentScale = transform.localScale;
+                transform.localScale = new Vector3(-currentScale.x, currentScale.y, currentScale.z);
+
+                if (muzzlePoint != null)
+                {
+                    Vector3 muzzleScale = muzzlePoint.localScale;
+                    muzzlePoint.localScale = new Vector3(-muzzleScale.x, muzzleScale.y, muzzleScale.z);
+                }
+            }
         }
 
         private void Update()
@@ -48,26 +49,31 @@ namespace KYG
             bool isTargetInvalid = false;
             if (target != null)
             {
-                Collider2D targetCollider = target.GetComponent<Collider2D>();
-                // 타겟의 콜라이더가 없거나 비활성화 상태이면 무효한 타겟으로 간주
-                if (targetCollider == null || !targetCollider.enabled)
+                // 타겟이 비활성화(사망 등)되었는지 확인
+                if (!target.gameObject.activeInHierarchy)
                 {
                     isTargetInvalid = true;
                 }
+                else
+                {
+                    Collider2D targetCollider = target.GetComponent<Collider2D>();
+                    if (targetCollider == null || !targetCollider.enabled)
+                    {
+                        isTargetInvalid = true;
+                    }
+                }
             }
+
             if (data == null)
             {
-                Debug.LogWarning($"{gameObject.name}: TurretData가 초기화되지 않았습니다!");
                 return;
             }
 
-            // 타겟이 없거나 사거리 밖이면 다시 찾기
             if (target == null || isTargetInvalid || Vector3.Distance(transform.position, target.position) > data.attackRange)
             {
                 target = FindNearestEnemy();
             }
 
-            // 유효한 타겟이 있을 때만 공격
             if (target != null)
             {
                 attackTimer += Time.deltaTime;
@@ -79,82 +85,86 @@ namespace KYG
             }
         }
 
-        /// <summary>
-        /// 사거리 내 가까운 적 탐지
-        /// </summary>
-        /// <returns></returns>
+        // [핵심 수정] UnitController의 FindTarget 로직을 그대로 가져와 적용
         private Transform FindNearestEnemy()
         {
-            string enemyTag = GetEnemyTag();
+            if (data == null || string.IsNullOrEmpty(TeamTag))
+            {
+                return null;
+            }
 
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag(enemyTag);
+            // UnitController와 동일하게, 자신의 태그를 기준으로 적의 태그를 결정합니다.
+            string opponentUnitTag = this.TeamTag.Contains("P1") ? "P2" : "P1";
+            string opponentBaseTag = this.TeamTag.Contains("P1") ? "BaseP2" : "BaseP1";
+
             Transform nearest = null;
             float minDist = float.MaxValue;
 
-            foreach (var enemy in enemies)
+            // UnitController와 동일하게, 태그로 모든 적 유닛을 찾습니다.
+            GameObject[] enemyUnits = GameObject.FindGameObjectsWithTag(opponentUnitTag);
+            foreach (var enemyUnit in enemyUnits)
             {
-                if (enemy == null) continue;
-
-                // [수정] 적의 콜라이더가 활성화 상태인지 확인하는 조건 추가
-                Collider2D enemyCollider = enemy.GetComponent<Collider2D>();
-                if (enemyCollider == null || !enemyCollider.enabled)
+                // 죽은 유닛(콜라이더 비활성화)은 건너뛰는 방어 코드
+                Collider2D col = enemyUnit.GetComponent<Collider2D>();
+                if (col == null || !col.enabled)
                 {
-                    continue; // 콜라이더가 없거나 꺼져있으면 이 적은 건너뜀
+                    continue;
                 }
 
-                float dist = Vector3.Distance(transform.position, enemy.transform.position);
+                float dist = Vector3.Distance(transform.position, enemyUnit.transform.position);
+
+                // 터렛의 공격 범위(attackRange) 안에 있는 가장 가까운 적을 찾습니다.
                 if (dist < minDist && dist <= data.attackRange)
                 {
                     minDist = dist;
-                    nearest = enemy.transform;
+                    nearest = enemyUnit.transform;
+                }
+            }
+
+            // 공격 범위 내에 유닛이 없으면, 베이스를 타겟으로 삼습니다.
+            if (nearest == null)
+            {
+                GameObject enemyBaseGO = GameObject.FindGameObjectWithTag(opponentBaseTag);
+                if (enemyBaseGO != null && Vector3.Distance(transform.position, enemyBaseGO.transform.position) <= data.attackRange)
+                {
+                    nearest = enemyBaseGO.transform;
                 }
             }
 
             return nearest;
         }
 
-        /// <summary>
-        /// 팀 태그에 따라 적 태그 반환
-        /// </summary>
-        private string GetEnemyTag()
+        // IsEnemy 함수는 더 이상 사용되지 않지만, 만약을 위해 그대로 둡니다.
+        private bool IsEnemy(UnitController targetUnit)
         {
-            return TeamTag == "BaseP1" ? "P2" : "P1";
+            bool isMyTeamP1 = this.TeamTag.Contains("P1");
+            bool isTargetTeamP1 = targetUnit.gameObject.CompareTag("P1");
+            return isMyTeamP1 != isTargetTeamP1;
         }
 
-        /// <summary>
-        /// 발사체 발사
-        /// </summary>
         private void FireProjectile()
         {
             if (target == null || data.projectilePrefab == null) return;
-
             Vector3 spawnPosition = (muzzlePoint != null) ? muzzlePoint.position : transform.position;
 
-            // [수정] 발사체 생성 및 초기화 로직 분기 처리
             if (InGameManager.Instance.isDebugMode && !PhotonNetwork.IsConnected)
             {
-                // --- 오프라인 & 디버그 모드 ---
                 GameObject projectile = Instantiate(data.projectilePrefab, spawnPosition, Quaternion.identity);
                 var controller = projectile.GetComponent<ProjectileController>();
                 if (controller != null)
                 {
-                    // [기존 로직 유지] 로컬 객체이므로 Init()을 직접 호출합니다.
                     controller.Init(target, data.attackDamage, data.projectileSpeed, TeamTag);
                 }
             }
             else
             {
-                // --- 온라인 네트워크 모드 ---
                 PhotonView targetPV = target.GetComponent<PhotonView>();
                 if (targetPV == null)
                 {
                     Debug.LogError("네트워크 타겟이 PhotonView를 가지고 있지 않아 공격할 수 없습니다.");
                     return;
                 }
-
                 GameObject projectile = PhotonNetwork.Instantiate(data.projectilePrefab.name, spawnPosition, Quaternion.identity);
-
-                // [수정] Init() 대신, RPC를 통해 모든 클라이언트에게 초기화 명령을 내립니다.
                 projectile.GetComponent<PhotonView>().RPC("RPC_Initialize", RpcTarget.All,
                                                            targetPV.ViewID,
                                                            data.attackDamage,
@@ -162,6 +172,5 @@ namespace KYG
                                                            TeamTag);
             }
         }
-
     }
 }

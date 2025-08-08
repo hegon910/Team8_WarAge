@@ -123,6 +123,7 @@ public class UIManager : MonoBehaviour
     public void OnClickedCreateRoom()
     {
         PhotonManager.Instance.CreateOrJoinLobby();
+        PhotonManager.Instance.OnJoinedRoom();
         Debug.Log("클릭");
         
     }
@@ -169,6 +170,7 @@ public class UIManager : MonoBehaviour
         roomPanel.SetActive(true);
         lobbyPanel.SetActive(false);
         Debug.Log("UI: 방 패널 활성화, 로비 패널 비활성화");
+
     }
     //---------------
     public void OnClickedLobbyCancel()
@@ -190,8 +192,11 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedLeave()
     {
+        Debug.Log("방 떠남");
         lobbyPanel.SetActive(true);
         roomPanel.SetActive(false);
+        PhotonManager.Instance.OnLeftRoom();
+        PhotonNetwork.LeaveRoom();
     }
 
 

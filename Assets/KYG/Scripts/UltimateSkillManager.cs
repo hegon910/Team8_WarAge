@@ -87,20 +87,26 @@ namespace KYG
         /// </summary>
         private IEnumerator SpawnProjectiles(UltimateSkillData data)
         {
-            for (int i = 0; i < data.projectileCount; i++)
+
+            float duration = 5f;
+
+            float spawnInterval = 0.08f;
+
+            float startTime = Time.time;
+            string spawnerTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
+
+            // 설정된 duration(5초)이 지날 때까지 계속 반복합니다.
+            while (Time.time - startTime < duration)
             {
-                // 수정: 목표 지점이 아닌, 생성될 시작 위치만 계산합니다.
-                // Y좌표는 15로 고정하고, X좌표만 무작위로 설정합니다.
+                // Y좌표는 15로 고정, X좌표만 무작위로 설정하여 비처럼 보이게 합니다.
                 Vector3 startPos = new Vector3(Random.Range(-20f, 20f), 15f, 0);
 
-                string spawnerTag = PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2";
-
+                // 투사체 생성 및 초기화
                 GameObject proj = PhotonNetwork.Instantiate(data.projectilePrefab.name, startPos, Quaternion.identity);
-
-                // 수정: Initialize RPC에서 목표 위치(targetPosition) 정보를 전달할 필요가 없어졌습니다.
                 proj.GetComponent<PhotonView>().RPC("Initialize", RpcTarget.All, data.damage, data.areaRadius, spawnerTag);
 
-                yield return new WaitForSeconds(0.3f);
+                // 다음 투사체를 생성하기 전, 설정된 간격만큼 잠시 대기
+                yield return new WaitForSeconds(spawnInterval);
             }
         }
 

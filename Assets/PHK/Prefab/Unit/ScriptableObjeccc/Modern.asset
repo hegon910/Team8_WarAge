@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Modern
   m_EditorClassIdentifier: 
   ageType: 2
-  maxHP: 2000
+  maxHP: 4000
   requiredExp: 2000
   baseSprite: {fileID: 21300000, guid: b8d0b1b3090137949afd460a44503909, type: 3}
   baseModelPrefab: {fileID: 1881372313158580051, guid: d4d0e2e4de1fee5438f923e17639e34d, type: 3}

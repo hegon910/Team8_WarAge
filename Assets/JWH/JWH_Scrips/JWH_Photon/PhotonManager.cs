@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using ExitGames.Client.Photon;
 using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Extensions;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,8 +15,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance;
 
-    [SerializeField] private string loginSceneName = "JWH_LoginScene";
-    [SerializeField] private string gameSceneName = "JWH_GameScene";
+    [Header("Input")]
+    [SerializeField] private string gameSceneName = "PHG_NetWorkInGameTest";
+    [SerializeField] private TMP_InputField roomNameInputField; // 로비패널에 있는 인풋 방이름
 
     void Awake()
     {
@@ -27,25 +31,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         {
             Destroy(gameObject);
         }
-    }
-
-    public void LeaveRoomAndRejoinLobby()
-    {
-        // 방을 나가는 요청만 합니다.
-        // 실제 씬 로드는 OnLeftRoom 콜백에서 처리됩니다.
-        PhotonNetwork.LeaveRoom();
-    }
-
-    // [수정] 방을 나간 후 자동으로 호출되는 콜백 함수
-    public override void OnLeftRoom()
-    {
-        base.OnLeftRoom(); // PUN의 기본 로직을 실행합니다.
-
-        // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
-        // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
-        UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
-
-        Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
 
     public void ConnectToServer(string fallbackNickname)//로그인에서 로비로?
@@ -63,45 +48,57 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         Debug.Log($"{nicknameToUse}");
         PhotonNetwork.NickName = nicknameToUse;
         PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.JoinLobby();
     }
-    //public void ConnectToServer(string nickname)
-    //{
-    //    if (PhotonNetwork.IsConnected)
-    //    {
-    //        OnConnectedToMaster();
-    //        return;
-    //    }
-    //    Debug.Log("��������");
-    //    PhotonNetwork.NickName = nickname;
-    //    PhotonNetwork.ConnectUsingSettings();
-    //}
 
 
     public override void OnConnectedToMaster()
     {
+        Debug.Log("마스터 연결");
+        PhotonNetwork.JoinLobby();
         UIManager.Instance.Connect();
-
-        //uid 커스텀프로퍼티로 저장해서 전적을 보여줄거임
-        //string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-        //ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
-        //{
-        //{ "uid", firebaseUid }
-        //};
-        //PhotonNetwork.LocalPlayer.SetCustomProperties(props);
     }
     //추가    PHG : 방에 참가했을 때 호출되는 콜백
+
+
+    // [수정] 방을 나간 후 자동으로 호출되는 콜백 함수
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom(); // PUN의 기본 로직을 실행합니다.
+
+        // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
+        // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
+        PhotonNetwork.JoinLobby();
+        UIManager.Instance.ShowLobbyPanel();
+
+        Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
+    }
     public override void OnJoinedRoom()
     {
         Debug.Log($"방에 참가했습니다: {PhotonNetwork.CurrentRoom.Name}");
-        // 방에 성공적으로 참가했으므로, UIManager를 통해 방 패널을 활성화합니다.
-        UIManager.Instance.ShowRoomPanel(); // UIManager에 이 메서드를 추가해야 합니다.
-        // 필요하다면 여기서 게임 시작 전 준비 상태 UI 등을 업데이트할 수 있습니다.
+
+        UIManager.Instance.ShowRoomPanel();
+
         string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
         {
         { "uid", firebaseUid }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        // 유저가 처음일 경우 초기화
+        FirebaseDatabase.DefaultInstance.GetReference("users").Child(firebaseUid)
+            .GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (!task.Result.Exists)
+                {
+                    Debug.Log("[전적 없음] 방 입장 시 전적 초기화");
+                    UserRank.Instance?.InitializeNewUser();
+                }
+
+                // uid 설정 후 강제 전적 UI 갱신 호출
+                FindObjectOfType<TestStateUI>()?.UpdateMyStateUI();
+            });
     }
     //추가 PHG : 주석처리
     //public override void OnJoinedLobby()
@@ -112,21 +109,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     //    // 방 목록 활성화
     //}
     //추가 PHG
-    public void CreateOrJoinRoom()
-    {
-        Debug.Log("CreateOrJoinRoom 호출");
-
-        if (!PhotonNetwork.InLobby)
-        {
-            Debug.LogWarning("로비에 접속하지 않아 방을 만들 수 없습니다.");
-            return;
-        }
-
-        UIManager.Instance.CreateRoom();
-        RoomOptions options = new RoomOptions { MaxPlayers = 2, IsVisible = true, IsOpen = true };
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
-        Debug.Log("JoinOrCreateRoom 호출 완료");
-    }
 
 
     public void CreateOrJoinLobby()
@@ -134,21 +116,27 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
         Debug.Log("CreateOrJoinLobby");
 
-        if (!PhotonNetwork.InLobby)//동작안함?
+        if (!PhotonNetwork.InLobby)
         {
-            Debug.LogWarning("로비진입");
+            Debug.LogWarning("로비에 입장하지 않았습니다");
             return;
         }
 
-      
+        string roomName = roomNameInputField.text;
 
-    
+        if (string.IsNullOrWhiteSpace(roomName))
+        {
+            Debug.LogWarning("방 이름이 비어 있습니다");
+            return;
+        }
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", options, TypedLobby.Default);
-        UIManager.Instance.CreateRoom();
-        Debug.Log("JoinOrCreateRoom ȣ��");
-    
-
+        PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
+        Debug.Log($"CreateRoom 호출됨: {roomName}");
+    }
+    public override void OnJoinedLobby()
+    {
+        Debug.Log("로비에 입장했습니다.");
+        //CreateOrJoinLobby(); // 자동으로 로비에서 룸으로 넘어감
     }
 
 
@@ -246,6 +234,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
             // 이 경우 그냥 로비 씬을 로드합니다.
             Debug.Log("현재 룸에 접속해있지 않아, 바로 로비 씬을 로드합니다.");
             SceneManager.LoadScene("LobbyScene");
+        }
+    }
+
+    public void SetUID()
+    {
+        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        if (!string.IsNullOrEmpty(firebaseUid))
+        {
+            ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+            { "uid", firebaseUid }
+        };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
         }
     }
 

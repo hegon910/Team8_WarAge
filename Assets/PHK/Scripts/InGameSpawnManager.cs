@@ -68,6 +68,7 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
         }
         Debug.Log("디버그 모드: P1 기지 생성 완료 (Tag: BaseP1, Layer: P1Base)");
 
+
         // P2 기지 생성 및 등록
         Vector3 p2SpawnPosition = p2_spawnPoint.position - (p2_spawnPoint.right * offsetDistance);
         GameObject p2BaseObject = Instantiate(basePrefab, p2SpawnPosition, Quaternion.identity);
@@ -110,11 +111,11 @@ public class InGameSpawnManager : MonoBehaviourPunCallbacks
             {
                 // P2 기지 뒤집기 (네트워크 환경에서도 localScale을 사용)
                 PhotonView pv = p2BaseObject.GetComponent<PhotonView>();
-                if (pv != null)
-                {
-                    // RPC를 통해 모든 클라이언트에서 P2 기지를 뒤집도록 합니다.
-                    pv.RPC("FlipObjectX", RpcTarget.AllBuffered);
-                }
+              //  if (pv != null)
+              //  {
+              //      // RPC를 통해 모든 클라이언트에서 P2 기지를 뒤집도록 합니다.
+              //      pv.RPC("FlipObjectX", RpcTarget.AllBuffered);
+              //  }
 
                 pv.TransferOwnership(players[1]);
                 Debug.Log($"P2 기지의 소유권을 {players[1].NickName}에게 이전했습니다.");

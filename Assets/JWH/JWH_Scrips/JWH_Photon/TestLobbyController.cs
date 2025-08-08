@@ -1,9 +1,13 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using System.Linq;
+using ExitGames.Client.Photon;
+using Firebase.Database;
+using Firebase.Extensions;
 using Photon.Pun;
 using Photon.Realtime;
-using ExitGames.Client.Photon;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+//using System.Collections;
 
 public class TestLobbyController : MonoBehaviourPunCallbacks
 {
@@ -18,28 +22,28 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        
         if (leftPlayerNameText == null || rightPlayerNameText == null ||
             readyButton == null || readyText == null || startButton == null)
         {
-            Debug.LogError("RoomSceneUIController: Some UI elements are not assigned in the Inspector.");
-            enabled = false; // 스크립트 비활성화
+            Debug.LogError("TestLobbyController: UI 요소가 빠졌습니다.");
+            enabled = false;
             return;
         }
 
-        
         readyButton.onClick.AddListener(OnReadyButtonClicked);
         startButton.onClick.AddListener(OnStartButtonClicked);
     }
 
     void Start()
     {
-        //UpdateAllLobbyUI();
+        
     }
 
     public override void OnJoinedRoom()
     {
         Debug.Log("방 입장 완료");
+        PhotonManager.Instance.SetUID(); // 내 uid 설정
+        UIManager.Instance.ShowRoomPanel();
         UpdateAllLobbyUI();
     }
 
@@ -57,29 +61,67 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
+        Debug.Log("2p 들어옴");
+        GameObject obj = GameObject.Find("P2PlayerInfo");
+        if (obj != null)
+        {
+            obj.SetActive(true);
+            Debug.Log("P2PlayerInfo 오브젝트를 활성화");
+        }
+        else
+        {
+            Debug.LogWarning("P2PlayerInfo 오브젝트 null");
+        }
+        if (PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("uid", out object uid))//룸에서 uid 호출 한번더
+        {
+            ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable { { "uid", uid } };
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props); // 다시 전파
+            Debug.Log($"[uid 재전파] {PhotonNetwork.LocalPlayer.NickName} → {uid}");
+        }
         UpdateAllLobbyUI(); // 플레이어 입장
+        FindObjectOfType<TestStateUI>()?.UpdateOpponentStateUI();//상대전적표시
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        UpdateAllLobbyUI(); // 플레이어 퇴장
+        Debug.Log($"{otherPlayer.NickName} 퇴장 → 상대 전적 클리어");
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                player.SetCustomProperties(new Hashtable { { "Ready", false } });
+            }
+        }
+
+        UpdateAllLobbyUI();
+        FindObjectOfType<TestStateUI>()?.UpdateOpponentStateUI(); // 상대 클리어
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
     {
-        if (changedProps.ContainsKey("Ready"))
+        // 상대방 uid 수신 시 전적 UI 갱신
+        if (changedProps.ContainsKey("uid"))
         {
-         
-            if (targetPlayer == PhotonNetwork.LocalPlayer)
+            Debug.Log($"[UID 수신됨] {targetPlayer.NickName} → 전적 UI 갱신 시도");
+            if (targetPlayer != PhotonNetwork.LocalPlayer)
             {
-                isLocalPlayerReady = (bool)changedProps["Ready"];
-                UpdateReadyUI(isLocalPlayerReady);
+                FindObjectOfType<TestStateUI>()?.UpdateOpponentStateUI();
             }
-            
-            if (PhotonNetwork.IsMasterClient)
-            {
-                startButton.interactable = PhotonManager.Instance.AreAllPlayersReady();
-            }
+        }
+
+        // Ready 상태 UI 갱신
+        if (changedProps.ContainsKey("Ready") && targetPlayer == PhotonNetwork.LocalPlayer)
+        {
+            isLocalPlayerReady = (bool)changedProps["Ready"];
+            UpdateReadyUI(isLocalPlayerReady);
+        }
+
+        UpdateAllLobbyUI();
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startButton.interactable = PhotonManager.Instance.AreAllPlayersReady();
         }
     }
 
@@ -115,7 +157,7 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
         rightPlayerNameText.gameObject.SetActive(inRoom);
         readyButton.gameObject.SetActive(inRoom);
         readyText.gameObject.SetActive(inRoom);
-        startButton.gameObject.SetActive(inRoom && isMaster); // 방에 있고 마스터일 때만 시작 버튼 활성화
+        startButton.gameObject.SetActive(inRoom && isMaster);
 
         if (inRoom)
         {
@@ -127,11 +169,9 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
             UpdateReadyUI(isLocalPlayerReady);
 
             if (isMaster)
-            {
                 startButton.interactable = PhotonManager.Instance.AreAllPlayersReady();
-            }
         }
-        else // 방에 없을 때 (로비 상태)
+        else
         {
             leftPlayerNameText.text = PhotonNetwork.IsConnectedAndReady ? PhotonNetwork.NickName : "Disconnected";
             rightPlayerNameText.text = "Waiting for room...";
@@ -170,10 +210,4 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
         readyText.text = ready ? "Ready" : "Not Ready";
         readyText.color = ready ? Color.green : Color.red;
     }
-
-    //public override void OnJoinedRoom()
-    //{
-    //    Debug.Log("방 입장 완료");
-    //    UpdateAllLobbyUI();
-    //}
 }
