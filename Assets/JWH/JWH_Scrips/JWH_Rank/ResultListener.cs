@@ -16,6 +16,6 @@ public class ResultListener : MonoBehaviour
         InGameManager.Instance.OnGameLost -= ListenLoss;
     }
 
-    void ListenWin() => UserRank.Instance.UpdateMatchResult(true);
-    void ListenLoss() => UserRank.Instance.UpdateMatchResult(false);
+    void ListenWin() => UserRank.Instance?.UpdateMatchResult(true);
+    void ListenLoss() => UserRank.Instance?.UpdateMatchResult(false);
 }
