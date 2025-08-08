@@ -285,6 +285,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentHealth <= 0) return; // 이미 죽었으면 중복 실행 방지
 
+        SoundManager.Instance.PlayUnitHitSound(transform.position);
         currentHealth -= amount;
         if (currentHealth <= 0 && PhotonNetwork.IsMasterClient)
         {
@@ -295,6 +296,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void RpcDie()
     {
+        SoundManager.Instance.PlayUnitDeadSound(transform.position);
         string GiveExpTag = CompareTag("P1") ? "P2" : "P1";
         if (currentHealth > 0 && currentHealth != -1) // 아직 살아있으면 return (중복 실행 방지용)
         {

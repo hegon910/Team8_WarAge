@@ -18,12 +18,13 @@ public class SoundManager : MonoBehaviour
     public AudioClip backgroundMusic;
     public AudioClip uiClickSound;
     public AudioClip evolveSuccessSound;
+    public AudioClip addTurretSlot;
     // --- RPC 동기화가 필요한 사운드 ---
     public AudioClip unitHitSound;
     public AudioClip ultimateSkillSound;
     public AudioClip unitDeadSound;
 
-    public float worldSfxVolume = 5f;
+    public float worldSfxVolume = 1f;
 
     private void Awake()
     {
@@ -75,6 +76,13 @@ public class SoundManager : MonoBehaviour
         if (evolveSuccessSound != null && sfxSource != null)
         {
             sfxSource.PlayOneShot(evolveSuccessSound);
+        }
+    }
+    public void PlayAddSlotSound()
+    {
+        if(addTurretSlot != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(addTurretSlot);
         }
     }
 

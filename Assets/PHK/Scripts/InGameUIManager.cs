@@ -392,8 +392,7 @@ public class InGameUIManager : MonoBehaviour
 
     public void OnClick_AddTurretSlotButton()
     {
-        SoundManager.Instance.PlayEvolveSound();
-        SoundManager.Instance.PlayUIClick();
+        SoundManager.Instance.PlayAddSlotSound();
         int slotCost = 100;
         var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
 
