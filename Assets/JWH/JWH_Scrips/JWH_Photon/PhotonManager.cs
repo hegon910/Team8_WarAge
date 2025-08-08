@@ -107,15 +107,28 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        if (UIManager.Instance != null)
+        //if (UIManager.Instance != null)
+        //{
+        //    UIManager.Instance.ShowLobbyPanel(); // 로비 패널을 보여줍니다.
+        //    Debug.Log("로비에 입장했습니다.");
+        //}
+        //else
+        //{
+        //    Debug.LogWarning("UIManager가 초기화되지 않았습니다. 로비 패널을 표시할 수 없습니다.");
+        //}
+        StartCoroutine(ShowLobbyPanelWhenReady());
+    }
+    private System.Collections.IEnumerator ShowLobbyPanelWhenReady()
+    {
+        // UIManager.Instance가 null이 아닐 때까지 (준비될 때까지) 매 프레임 기다립니다.
+        while (UIManager.Instance == null)
         {
-            UIManager.Instance.ShowLobbyPanel(); // 로비 패널을 보여줍니다.
-            Debug.Log("로비에 입장했습니다.");
+            yield return null;
         }
-        else
-        {
-            Debug.LogWarning("UIManager가 초기화되지 않았습니다. 로비 패널을 표시할 수 없습니다.");
-        }
+
+        // UIManager가 준비되었으므로, 이제 안전하게 로비 패널을 표시합니다.
+        UIManager.Instance.ShowLobbyPanel();
+        Debug.Log("로비에 입장했으며, UIManager가 준비되어 패널을 표시합니다.");
     }
 
 
@@ -168,6 +181,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient && AreAllPlayersReady())
         {
             PhotonNetwork.LoadLevel(gameSceneName);
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
         }
         else if (!PhotonNetwork.IsMasterClient)
         {

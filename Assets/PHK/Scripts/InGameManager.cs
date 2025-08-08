@@ -146,6 +146,21 @@ public class InGameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        if (isDebugMode || isGameOver) return;
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            string losingTeamTag = (otherPlayer.ActorNumber == 1) ? "P1" : "P2";
+            GameOver(losingTeamTag);
+
+        }
+
+
+    }
+
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) AddGold(50000);
@@ -384,6 +399,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPC_ShowResultPanels(string losingTeamTag)
     {
+        isGameOver = true;
         Time.timeScale = 0f;
         OnInfoMessage?.Invoke("게임 오버");
 
