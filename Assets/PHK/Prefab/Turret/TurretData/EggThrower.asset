@@ -16,9 +16,9 @@ MonoBehaviour:
   turretPrefab: {fileID: 3473580489661804204, guid: 244764d61c2b20c40a4d821bc6ca6746, type: 3}
   cost: 200
   sellPrice: 130
-  attackRange: 15
-  attackDelay: 0.1
-  attackDamage: 2
+  attackRange: 8
+  attackDelay: 0.15
+  attackDamage: 5
   icon: {fileID: 0}
-  projectilePrefab: {fileID: 2603175800963303953, guid: 05a6ac748dc0dfd459ae79be0902ae14, type: 3}
+  projectilePrefab: {fileID: 2603175800963303953, guid: 75b576ae01263e94092745658f658815, type: 3}
   projectileSpeed: 20

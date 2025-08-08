@@ -249,6 +249,7 @@ MonoBehaviour:
   unitdata: {fileID: 11400000, guid: 2c894bc8a657f3a45831c5460a4acb47, type: 2}
   rb: {fileID: 791923214781674568}
   animator: {fileID: 9206588200099173294}
+  arrowSpawnPoint: {fileID: 0}
   currentHealth: 0
   meleeSwitchRange: 1.5
   unitLayer:

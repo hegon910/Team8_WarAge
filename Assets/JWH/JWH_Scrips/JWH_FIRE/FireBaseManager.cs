@@ -56,6 +56,7 @@ public class UserAuthService : MonoBehaviour
                 else
                 {
                     Debug.Log("회원가입 성공");
+                    UserRank.Instance?.InitializeNewUser();//전적초기화
                     callback?.Invoke(true);
                 }
             });

@@ -1,4 +1,4 @@
-using Photon.Pun;
+ï»¿using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,13 +9,13 @@ public class UnitSpawnManager : MonoBehaviour
     public static UnitSpawnManager Instance { get; private set; }
     public InGameManager InGameManager => InGameManager.Instance;
 
-    [Header("À¯´Ö »ı¼º °ü·Ã")]
+    [Header("ìœ ë‹› ìƒì„± ê´€ë ¨")]
     [SerializeField] Transform p1_spawnPoint;
     [SerializeField] Transform p2_spawnPoint;
 
-    //´ë±â¿­
+    //ëŒ€ê¸°ì—´
     private Queue<(GameObject prefab, string ownerTag)> productionQueue = new Queue<(GameObject prefab, string ownerTag)>();
-    //ÇöÀç »ı»ê ¶óÀÎÀÌ °¡µ¿ ÁßÀÎÁö
+    //í˜„ì¬ ìƒì‚° ë¼ì¸ì´ ê°€ë™ ì¤‘ì¸ì§€
     private bool isProducing = false;
 
     public event Action<int> OnQueueChanged;
@@ -33,28 +33,31 @@ public class UnitSpawnManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    #region À¯´Ö »ı»ê ·ÎÁ÷
+    #region ìœ ë‹› ìƒì‚° ë¡œì§
     ///<summary>
-    ///ÇÁ¸®ÆÕÀ» »ı»ê Å¥¿¡ Ãß°¡ÇÏ´Â ÇÔ¼ö
+    ///í”„ë¦¬íŒ¹ì„ ìƒì‚° íì— ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
     /// 
     public void RequestUnitProduction(GameObject unitPrefab, string ownerTag)
     {
-        // ¿äÃ»ÀÚ°¡ AI("P2")ÀÌ°í µğ¹ö±× ¸ğµåÀÏ °æ¿ì, º°µµÀÇ AI »ı»ê ·ÎÁ÷À» Áï½Ã ½ÇÇà
+        // ìš”ì²­ìê°€ AI("P2")ì´ê³  ë””ë²„ê·¸ ëª¨ë“œì¼ ê²½ìš°, ë³„ë„ì˜ AI ìƒì‚° ë¡œì§ì„ ì¦‰ì‹œ ì‹¤í–‰
         if (ownerTag == "P2" && InGameManager.isDebugMode)
         {
             SpawnAIUnit(unitPrefab);
-            return; // AI »ı»ê ·ÎÁ÷À» ½ÇÇàÇßÀ¸¹Ç·Î ¾Æ·¡ ÇÃ·¹ÀÌ¾î ·ÎÁ÷Àº °Ç³Ê¶İ´Ï´Ù.
+            return; // AI ìƒì‚° ë¡œì§ì„ ì‹¤í–‰í–ˆìœ¼ë¯€ë¡œ ì•„ë˜ í”Œë ˆì´ì–´ ë¡œì§ì€ ê±´ë„ˆëœë‹ˆë‹¤.
         }
 
-        bool isPlayerRequest = (ownerTag == "P1");
+        // [ìˆ˜ì •] "ì´ ìš”ì²­ì´ ë‚´ ì»´í“¨í„°ì—ì„œ ë³´ë‚¸ ìš”ì²­ì¸ê°€?"ë¥¼ í™•ì¸í•©ë‹ˆë‹¤.
+        string myOwnerTag = InGameManager.isDebugMode ? "P1" : (PhotonNetwork.LocalPlayer.IsMasterClient ? "P1" : "P2");
+        bool isMyRequest = (ownerTag == myOwnerTag);
 
         if (isProducing)
         {
             if (productionQueue.Count < 5)
             {
                 productionQueue.Enqueue((unitPrefab, ownerTag));
-                if (isPlayerRequest)
+                // [ìˆ˜ì •] P1ì´ë“  P2ë“  ìì‹ ì˜ ìš”ì²­ì´ë©´ UIë¥¼ ì—…ë°ì´íŠ¸í•©ë‹ˆë‹¤.
+                if (isMyRequest)
                 {
                     OnQueueChanged?.Invoke(productionQueue.Count);
                     InGameUIManager.Instance.UnitInfoText.text = $"{unitPrefab.name} added to queue.";
@@ -62,7 +65,8 @@ public class UnitSpawnManager : MonoBehaviour
             }
             else
             {
-                if (isPlayerRequest)
+                // [ìˆ˜ì •] P1ì´ë“  P2ë“  ìì‹ ì˜ ìš”ì²­ì´ë©´ UIë¥¼ ì—…ë°ì´íŠ¸í•©ë‹ˆë‹¤.
+                if (isMyRequest)
                 {
                     InGameUIManager.Instance.inGameInfoText.text = "Production Queue is Full!";
                 }
@@ -70,7 +74,8 @@ public class UnitSpawnManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag, isPlayerRequest));
+            // [ìˆ˜ì •] isMyRequest ë³€ìˆ˜ë¥¼ ì½”ë£¨í‹´ì— ì „ë‹¬í•©ë‹ˆë‹¤.
+            StartCoroutine(ProcessSingleUnit(unitPrefab, ownerTag, isMyRequest));
         }
     }
     private void SpawnAIUnit(GameObject prefabToProduce)
@@ -78,8 +83,10 @@ public class UnitSpawnManager : MonoBehaviour
         Transform spawnPoint = p2_spawnPoint;
         if (spawnPoint == null) return;
 
-        Quaternion initialRotation = Quaternion.Euler(0, 180, 0); // P2 À¯´ÖÀº Ç×»ó µÚÁı¾î¼­ »ı¼º
+        Quaternion initialRotation = Quaternion.Euler(0, 180, 0); // P2 ìœ ë‹›ì€ í•­ìƒ ë’¤ì§‘ì–´ì„œ ìƒì„±
         GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, initialRotation);
+
+
 
         newUnit.tag = "P2";
         newUnit.layer = LayerMask.NameToLayer("P2Unit");
@@ -91,17 +98,20 @@ public class UnitSpawnManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// À¯´Ö 'ÇÑ °³'¸¦ »ı»êÇÏ°í, ¿Ï·áµÇ¸é ´ë±â¿­¿¡¼­ ´ÙÀ½ À¯´ÖÀ» °¡Á®¿Í ´Ù½Ã ÀÌ ÄÚ·çÆ¾À» ½ÇÇà
+    /// ìœ ë‹› 'í•œ ê°œ'ë¥¼ ìƒì‚°í•˜ê³ , ì™„ë£Œë˜ë©´ ëŒ€ê¸°ì—´ì—ì„œ ë‹¤ìŒ ìœ ë‹›ì„ ê°€ì ¸ì™€ ë‹¤ì‹œ ì´ ì½”ë£¨í‹´ì„ ì‹¤í–‰
     /// </summary>
-    private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag, bool isPlayerRequest)
+    // [ìˆ˜ì •] isPlayerRequest ë§¤ê°œë³€ìˆ˜ ì´ë¦„ì„ isMyRequestë¡œ ëª…í™•í•˜ê²Œ ë³€ê²½
+    private IEnumerator ProcessSingleUnit(GameObject prefabToProduce, string ownerTag, bool isMyRequest)
     {
 
         Vector3 initialMoveDirection = (ownerTag == "P1") ? Vector3.right : Vector3.left;
         isProducing = true;
-        string myOwnerTag = InGameManager.isDebugMode ? "P1" : (PhotonNetwork.LocalPlayer.ActorNumber == 1 ? "P1" : "P2");
-        bool isMyRequest = (ownerTag == myOwnerTag);
 
-        if (isMyRequest) 
+        // [ìˆ˜ì •] "ì´ ìš”ì²­ì´ ë‚´ ì»´í“¨í„°ì—ì„œ ë³´ë‚¸ ìš”ì²­ì¸ê°€?"ë¥¼ í™•ì¸í•˜ëŠ” ë¡œì§ (ì½”ë£¨í‹´ ë‚´ë¶€ì—ì„œ ì¬í™•ì¸)
+        string myOwnerTag = InGameManager.isDebugMode ? "P1" : (PhotonNetwork.LocalPlayer.IsMasterClient ? "P1" : "P2");
+        bool isMyCurrentRequest = (ownerTag == myOwnerTag);
+
+        if (isMyCurrentRequest)
         {
             OnProductionStatusChanged?.Invoke(true);
             OnProductionProgress?.Invoke(0f);
@@ -115,7 +125,7 @@ public class UnitSpawnManager : MonoBehaviour
             while (timer < unitData.SpawnTime)
             {
                 timer += Time.deltaTime;
-                if (isMyRequest) 
+                if (isMyCurrentRequest)
                 {
                     OnProductionProgress?.Invoke(Mathf.Clamp01(timer / unitData.SpawnTime));
                     int percent = (int)((timer / unitData.SpawnTime) * 100f);
@@ -124,14 +134,14 @@ public class UnitSpawnManager : MonoBehaviour
                 yield return null;
             }
         }
-        if (isMyRequest) OnProductionProgress?.Invoke(1f);
+        if (isMyCurrentRequest) OnProductionProgress?.Invoke(1f);
 
         Transform spawnPoint = (ownerTag == "P1") ? p1_spawnPoint : p2_spawnPoint;
         if (spawnPoint != null)
         {
             if (InGameManager.isDebugMode)
             {
-                // µğ¹ö±× ¸ğµå¿¡¼­ P2 À¯´ÖÀÇ ¹æÇâÀ» Á÷Á¢ ¼³Á¤ÇÕ´Ï´Ù.
+                // ë””ë²„ê·¸ ëª¨ë“œì—ì„œ P2 ìœ ë‹›ì˜ ë°©í–¥ì„ ì§ì ‘ ì„¤ì •í•©ë‹ˆë‹¤.
                 Quaternion initialRotation = (ownerTag == "P2") ? Quaternion.Euler(0, 180, 0) : spawnPoint.rotation;
                 GameObject newUnit = Instantiate(prefabToProduce, spawnPoint.position, initialRotation);
 
@@ -147,31 +157,33 @@ public class UnitSpawnManager : MonoBehaviour
             else
             {
                 object[] data = new object[] { ownerTag, initialMoveDirection };
+                // PhotonNetwork.InstantiateëŠ” ë§ˆìŠ¤í„° í´ë¼ì´ì–¸íŠ¸ì—ì„œë§Œ í˜¸ì¶œí•˜ëŠ” ê²ƒì´ ì•ˆì •ì ì´ì§€ë§Œ, ê¸°ì¡´ ë¡œì§ì„ ìœ ì§€í•©ë‹ˆë‹¤.
                 GameObject newUnit = PhotonNetwork.Instantiate(prefabToProduce.name, spawnPoint.position, spawnPoint.rotation, 0, data);
 
-                // »ı¼ºµÈ À¯´ÖÀÇ PhotonView¸¦ °¡Á®¿É´Ï´Ù.
+
                 PhotonView newUnitPV = newUnit.GetComponent<PhotonView>();
-                if (newUnitPV != null)
+                if (newUnitPV != null && GetComponent<PhotonView>() != null)
                 {
-                    // ¸ğµç Å¬¶óÀÌ¾ğÆ®¿¡°Ô ÅÂ±×¿Í ·¹ÀÌ¾î¸¦ ¼³Á¤ÇÏ¶ó´Â RPC¸¦ È£ÃâÇÕ´Ï´Ù.
-                    //    (UnitSpawnManager ÀÚ½ÅÀÇ PhotonView¸¦ ÀÌ¿ëÇØ RPC¸¦ Àü¼Û)
                     GetComponent<PhotonView>().RPC("RPC_SetUnitTag", RpcTarget.AllBuffered, newUnitPV.ViewID, ownerTag);
                 }
             }
         }
 
-        // --- ÈÄ¼Ó Ã³¸®: ´ë±â¿­¿¡ ´ÙÀ½ À¯´ÖÀÌ ÀÖ´ÂÁö È®ÀÎ ---
+        // --- í›„ì† ì²˜ë¦¬: ëŒ€ê¸°ì—´ì— ë‹¤ìŒ ìœ ë‹›ì´ ìˆëŠ”ì§€ í™•ì¸ ---
         if (productionQueue.Count > 0)
         {
             var nextUnit = productionQueue.Dequeue();
-            bool isNextPlayerRequest = (nextUnit.ownerTag == "P1");
-            if (isNextPlayerRequest) OnQueueChanged?.Invoke(productionQueue.Count);
-            StartCoroutine(ProcessSingleUnit(nextUnit.prefab, nextUnit.ownerTag, isNextPlayerRequest));
+
+            // [ìˆ˜ì •] ë‹¤ìŒ ìœ ë‹›ì´ ë‚´ ìš”ì²­ì¸ì§€ í™•ì¸í•©ë‹ˆë‹¤.
+            bool isNextMyRequest = (nextUnit.ownerTag == myOwnerTag);
+            if (isNextMyRequest) OnQueueChanged?.Invoke(productionQueue.Count);
+
+            StartCoroutine(ProcessSingleUnit(nextUnit.prefab, nextUnit.ownerTag, isNextMyRequest));
         }
         else
         {
             isProducing = false;
-            if (isMyRequest) 
+            if (isMyCurrentRequest)
             {
                 OnProductionStatusChanged?.Invoke(false);
                 OnProductionProgress?.Invoke(0f);
@@ -179,10 +191,11 @@ public class UnitSpawnManager : MonoBehaviour
             }
         }
 
-        InGameUIManager.Instance.UnitInfoText.text = $"{prefabToProduce.name} has Spawned!!";
+        // ì´ ë¼ì¸ì€ ë‹¤ìŒ ìœ ë‹› ìƒì‚°ì´ ì‹œì‘ë  ë•Œ ë®ì–´ì“°ì—¬ì„œ, ë§ˆì§€ë§‰ ìœ ë‹› ì •ë³´ë§Œ ë‚¨ëŠ” ê²ƒì´ ì˜ë„ëœ ë™ì‘ìœ¼ë¡œ ë³´ì…ë‹ˆë‹¤.
+        // InGameUIManager.Instance.UnitInfoText.text = $"{prefabToProduce.name} has Spawned!!";
     }
     ///<summary>
-    ///¸ğµç Å¬¶óÀÌ¾ğÆ®¿¡¼­ Æ¯Á¤ À¯´ÖÀÇ ÅÂ±×¸¦ ¼³Á¤ÇÔ
+    ///ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì—ì„œ íŠ¹ì • ìœ ë‹›ì˜ íƒœê·¸ë¥¼ ì„¤ì •í•¨
     /// </summary>
     [PunRPC]
     private void RPC_SetUnitTag(int viewID, string tag)
@@ -191,7 +204,6 @@ public class UnitSpawnManager : MonoBehaviour
         if (targetPV != null)
         {
             targetPV.gameObject.tag = tag;
-            // *** START: ¿äÃ»¿¡ µû¸¥ ·¹ÀÌ¾î ¼³Á¤ Ãß°¡ ***
             if (tag == "P1")
             {
                 targetPV.gameObject.layer = LayerMask.NameToLayer("P1Unit");
@@ -207,6 +219,4 @@ public class UnitSpawnManager : MonoBehaviour
         }
     }
     #endregion
-
-
 }

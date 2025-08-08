@@ -21,7 +21,7 @@ MonoBehaviour:
   rangedrange: 0
   attackSpeed: 1
   SpawnTime: 3
-  moveSpeed: 1
+  moveSpeed: 3
   goldCost: 50
   unitSprite: {fileID: 0}
   description: MedievalSword

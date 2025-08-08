@@ -1,9 +1,8 @@
-using PHK;
+using KYG;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using KYG;
-using System.Collections;
 
 // 인게임의 전반적인 UI를 관리하는 스크립트.
 // 다른 매니저로부터 이벤트를 받아 UI를 변경하고, UI 버튼 입력을 받아 다른 매니저에 요청.
@@ -83,6 +82,7 @@ public class InGameUIManager : MonoBehaviour
             InGameManager.Instance.OnGameWon += ShowWinnerPanel;
             InGameManager.Instance.OnGameLost += ShowLoserPanel;
             InGameManager.Instance.OnUltimateSkillUsed += StartUltimateCooldownVisual;
+            InGameManager.Instance.OnInfoMessage += ShowInfoText;
         }
 
         // UI 초기화
@@ -148,11 +148,33 @@ public class InGameUIManager : MonoBehaviour
         if (currentState != PlayerActionState.None)
         {
             // 우클릭 또는 ESC 키로 행동을 취소합니다.
-            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetMouseButtonDown(1))
             {
                 CancelPlayerAction();
             }
+        
         }
+        //esc 누를 때 옵션 패널 열기
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("ESC 키 입력 감지! OptionManager.Instance는? " + (OptionManager.Instance != null));
+            // [조건 1] 옵션 패널이 이미 화면에 나와있다면?
+            if (OptionManager.Instance != null && OptionManager.Instance.optionPanel.activeInHierarchy)
+            {
+                //
+                OptionManager.Instance.OnClickedOptionCancel();
+            }
+            else
+            {
+                CancelPlayerAction();
+
+                if (OptionManager.Instance != null)
+                {
+                    OptionManager.Instance.ShowOptionPanel();
+                }
+            }
+        }
+
     }
     private void HandleAgeEvolvedUI(KYG.AgeData newAgeData)
     {
@@ -194,9 +216,6 @@ public class InGameUIManager : MonoBehaviour
     {
         if (playerBase != null)
         {
-            // 내 HP 슬라이더는 '내 베이스'의 체력 변경 이벤트를 구독
-            // playerBase.OnHpChanged += UpdateBaseHpUI;
-            // UI 초기화를 위해 현재 체력으로 한번 업데이트
             playerBase.OnHpChanged += UpdateBaseHpUI;
             UpdateBaseHpUI(playerBase.CurrentHP, playerBase.MaxHP);
         }
@@ -205,10 +224,7 @@ public class InGameUIManager : MonoBehaviour
     {
         if (opponentBase != null)
         {
-            // 상대 HP 슬라이더는 '상대 베이스'의 체력 변경 이벤트를 직접 구독 (주석 해제)
             opponentBase.OnHpChanged += UpdateGuestBaseUI;
-
-            // UI 초기화를 위해 현재 체력으로 한번 업데이트
             UpdateGuestBaseUI(opponentBase.CurrentHP, opponentBase.MaxHP);
         }
     }
@@ -244,9 +260,16 @@ public class InGameUIManager : MonoBehaviour
         {
             inGameInfoText.text = message;
             inGameInfoText.gameObject.SetActive(true);
-            // 필요하다면 몇 초 뒤에 자동으로 사라지는 기능 추가 가능
+            StartCoroutine(FadeOutInfoText(2.0f));
         }
     }
+
+    private IEnumerator FadeOutInfoText(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HideInfoText();
+    }
+
 
     public void HideInfoText()
     {
@@ -268,20 +291,16 @@ public class InGameUIManager : MonoBehaviour
     #region 궁극기 UI (추가된 부분)
     public void OnUltimateSkillButtonClicked()
     {
-        // 1. "InGameManager야, 지금 내 시대가 뭐야?" 라고 물어봅니다.
+        SoundManager.Instance.PlayUltimateSkillSound();
         AgeType currentAge = InGameManager.Instance.GetLocalPlayerCurrentAge();
-
-        // 2. "AgeManager야, 방금 알아낸 시대의 데이터를 줘" 라고 요청합니다.
         AgeData currentAgeData = AgeManager.Instance.GetAgeData(currentAge);
 
-        // 에러 방지용 확인 코드
         if (currentAgeData == null || currentAgeData.ultimateSkill == null)
         {
             Debug.LogError("현재 시대의 UltimateSkillData를 찾을 수 없습니다. AgeData 에셋에 궁극기 데이터가 할당되었는지 확인해주세요.");
             return;
         }
 
-        // 3. "UltimateSkillManager야, 이 스킬 데이터 가지고 스킬 사용해줘!" 라고 최종 요청합니다.
         UltimateSkillManager.Instance.TryCastUltimate(currentAgeData.ultimateSkill);
     }
 
@@ -297,7 +316,7 @@ public class InGameUIManager : MonoBehaviour
 
     private IEnumerator UltimateCooldownCoroutine(float cooldownTime)
     {
-        ultimateSkillButton.interactable = false; // 버튼 비활성화
+        ultimateSkillButton.interactable = false;
 
         float timer = 0f;
         ultimateSkillCooldownImage.fillAmount = 1;
@@ -305,13 +324,12 @@ public class InGameUIManager : MonoBehaviour
         while (timer < cooldownTime)
         {
             timer += Time.deltaTime;
-            // 이미지가 서서히 투명해지는 것이 아니라, 채워진 부분이 줄어드는 방식입니다.
             ultimateSkillCooldownImage.fillAmount = 1 - (timer / cooldownTime);
             yield return null;
         }
 
-        ultimateSkillCooldownImage.fillAmount = 0; // 쿨타임 UI 초기화
-        ultimateSkillButton.interactable = true; // 버튼 활성화
+        ultimateSkillCooldownImage.fillAmount = 0;
+        ultimateSkillButton.interactable = true;
     }
     #endregion
 
@@ -347,23 +365,24 @@ public class InGameUIManager : MonoBehaviour
     #endregion
 
     #region 터렛 관련 UI 및 상태 관리
-    // 터렛 배치 버튼에서 호출
     public void EnterTurretPlaceMode(TurretData data)
     {
+        SoundManager.Instance.PlayUIClick();
         currentState = PlayerActionState.PlacingTurret;
         turretDataToPlace = data;
-        ShowInfoText("Click on a turret slot to build. (Right-click to cancel)");
+        // --- 영문으로 변경 ---
+        ShowInfoText("Click a slot to build a turret. (Right-click to cancel)");
     }
 
-    // 터렛 판매 버튼에서 호출
     public void EnterTurretSellMode()
     {
+        SoundManager.Instance.PlayUIClick();
         currentState = PlayerActionState.SellingTurret;
         turretPrefabToPlace = null;
+        // --- 영문으로 변경 ---
         ShowInfoText("Select a turret to sell. (Right-click to cancel)");
     }
 
-    // 터렛 배치/판매 상태 취소 또는 완료 시 호출
     public void CancelPlayerAction()
     {
         currentState = PlayerActionState.None;
@@ -371,24 +390,32 @@ public class InGameUIManager : MonoBehaviour
         HideInfoText();
     }
 
-    // 터렛 슬롯 추가 버튼에서 호출
     public void OnClick_AddTurretSlotButton()
     {
-        /*int slotCost = 100; // 비용은 InGameManager나 다른 곳에서 컨트롤하는 것이 더 좋음
+        SoundManager.Instance.PlayEvolveSound();
+        SoundManager.Instance.PlayUIClick();
+        int slotCost = 100;
+        var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
+
+        if (baseCtrl == null || InGameManager.Instance == null)
+        {
+            Debug.LogError("플레이어 기지 또는 게임 매니저를 찾을 수 없습니다!");
+            return;
+        }
+
         if (InGameManager.Instance.SpendGold(slotCost))
         {
-            ShowInfoText("Turret Slot Added!");
-            // TODO: BaseController에 슬롯 추가를 요청하는 기능
-            // 예: InGameManager.Instance.GetPlayerBase().AddNewSlot();
+            baseCtrl.UnlockNextTurretSlot(slotCost);
+            // --- 영문으로 변경 ---
+            ShowInfoText("Turret slot added!");
         }
         else
         {
-            ShowInfoText("Not Enough Gold to Add Turret Slot!");
-        }*/
-        var baseCtrl = InGameManager.Instance.GetLocalPlayerBase();
-        if (baseCtrl != null)
-            baseCtrl.UnlockNextTurretSlot(100); // 슬롯 해금 비용 100
+            // --- 영문으로 변경 ---
+            ShowInfoText("Not enough gold to add a slot!");
+        }
     }
+
     private void HideAllInGameUI()
     {
         if (inGameInfoText != null) inGameInfoText.gameObject.SetActive(false);
@@ -399,7 +426,7 @@ public class InGameUIManager : MonoBehaviour
         if (GuestBaseHpSlider != null) GuestBaseHpSlider.gameObject.SetActive(false);
         if (evolveButton != null) evolveButton.gameObject.SetActive(false);
         if (ultimateSkillButton != null) ultimateSkillButton.gameObject.SetActive(false);
-        // 유닛 생산 관련 UI
+
         if (productionSlider != null) productionSlider.gameObject.SetActive(false);
         if (queueSlots != null)
         {
@@ -414,7 +441,7 @@ public class InGameUIManager : MonoBehaviour
     {
         if (winnerPanel != null)
         {
-            HideAllInGameUI(); // 다른 인게임 UI 숨김
+            HideAllInGameUI();
             winnerPanel.SetActive(true);
         }
     }
@@ -422,41 +449,37 @@ public class InGameUIManager : MonoBehaviour
     {
         if (loserPanel != null)
         {
-            HideAllInGameUI(); // 다른 인게임 UI 숨김
+            HideAllInGameUI();
             loserPanel.SetActive(true);
         }
     }
 
     public void ReturnToLobby()
     {
-        // 게임오버 상태로 멈췄을 수 있으므로 시간을 다시 흐르게 합니다.
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopBGM();
+        }
+
         Time.timeScale = 1f;
 
-        // 승리/패배 모든 패널을 비활성화합니다.
         if (winnerPanel != null) winnerPanel.SetActive(false);
         if (loserPanel != null) loserPanel.SetActive(false);
 
-        // --- 수정된 로직 ---
-
-        // 1. 디버그 모드인지 먼저 확인
         if (InGameManager.Instance != null && InGameManager.Instance.isDebugMode)
         {
             Debug.Log("디버그 모드: 로비 씬을 직접 로드합니다.");
-            // "LobbyScene"은 실제 로비 씬 이름으로 맞춰야 합니다.
             UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
         }
-        // 2. 네트워크 모드일 경우
         else
         {
             Debug.Log("네트워크 모드: 포톤을 통해 로비로 돌아갑니다.");
             if (PhotonManager.Instance != null)
             {
-                // PhotonManager의 함수를 호출 (PhotonManager 내부에서 안전장치를 마련할 것)
                 PhotonManager.Instance.LeaveRoomAndLoadLobby();
             }
             else
             {
-                // PhotonManager가 없는 비상상황에서는 씬을 직접 로드
                 Debug.LogError("PhotonManager를 찾을 수 없습니다! 안전하게 LobbyScene을 직접 로드합니다.");
                 UnityEngine.SceneManagement.SceneManager.LoadScene("LobbyScene");
             }
