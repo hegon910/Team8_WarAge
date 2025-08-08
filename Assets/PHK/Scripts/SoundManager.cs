@@ -49,14 +49,48 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        // 로비 씬에 진입했을 때 UI 요소를 찾아서 연결
+        if (scene.name == "LobbyScene") // 
+        {
+            // FindObjectOfType을 사용하여 씬에 있는 슬라이더를 찾습니다.
+            // 이 방법은 씬에 해당 컴포넌트가 하나만 있을 때 유용합니다.
+            bgmSlider = FindObjectOfType<Slider>(); // 씬에 여러 슬라이더가 있다면 태그나 이름을 사용해야 합니다.
+                                                    // TODO: SFX 슬라이더도 동일하게 찾아 할당해야 합니다.
+
+            // 슬라이더가 제대로 찾아졌는지 확인합니다.
+            if (bgmSlider != null)
+            {
+                Debug.Log("LobbyScene에서 BGM 슬라이더를 찾았습니다.");
+                bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+                // 슬라이더의 현재 값을 저장된 볼륨 값으로 초기화합니다.
+                bgmSlider.value = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, 1f);
+            }
+            else
+            {
+                Debug.LogWarning("LobbyScene에서 BGM 슬라이더를 찾을 수 없습니다.");
+            }
+        }
+    }
 
     private void Start()
     {
         ApplySavedVolumesToAudio();
-        if (bgmSlider) bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+       // if (bgmSlider) bgmSlider.onValueChanged.AddListener(SetBGMVolume);
         PlayLobbyBGM();
     }
+
 
     private void ApplySavedVolumesToAudio()
     {
