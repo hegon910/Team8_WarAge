@@ -57,10 +57,9 @@ MonoBehaviour:
   unitHitSound: {fileID: 8300000, guid: 14862860d7d7ef14084d6533e52bc08c, type: 3}
   ultimateSkillSound: {fileID: 8300000, guid: 17e0a596585d9a84781f5cb44b70b083, type: 3}
   unitDeadSound: {fileID: 8300000, guid: 19a34e5036875eb49962baeffd7c87f0, type: 3}
-  worldSfxVolume: 0
-  bgmSlider: {fileID: 917500975220390572, guid: c7f82a1c918b5ee4594bddbe87d3fba5, type: 3}
-  sfxSlider: {fileID: 4627916079641211399, guid: 7f7f47409651c2848baa46ce6809caa8, type: 3}
-  confirmButton: {fileID: 0}
+  worldSfxVolume: 1
+  bgmSlider: {fileID: 0}
+  sfxSlider: {fileID: 0}
 --- !u!114 &1750679080682973671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,7 +185,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 273000504991818645}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}

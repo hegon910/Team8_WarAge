@@ -73,6 +73,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         SceneManager.LoadScene("LobbyScene"); // 로비 씬을 로드합니다.
         PhotonNetwork.JoinLobby();
         //   UIManager.Instance.ShowLobbyPanel();
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayLobbyBGM(); // 로비 BGM 재생
+        }
+        else
+        {
+            Debug.LogWarning("SoundManager 인스턴스가 존재하지 않습니다.");
+        }
 
         Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
