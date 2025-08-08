@@ -21,7 +21,7 @@ MonoBehaviour:
   rangedrange: 7
   attackSpeed: 1
   SpawnTime: 3
-  moveSpeed: 1
+  moveSpeed: 3
   goldCost: 75
   unitSprite: {fileID: 0}
   description: MedievalArcher

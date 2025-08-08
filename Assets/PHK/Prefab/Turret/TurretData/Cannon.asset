@@ -17,8 +17,8 @@ MonoBehaviour:
   cost: 800
   sellPrice: 670
   attackRange: 12
-  attackDelay: 3
-  attackDamage: 30
+  attackDelay: 5
+  attackDamage: 150
   icon: {fileID: 0}
   projectilePrefab: {fileID: 2603175800963303953, guid: d3d1cd3fe5ef6b045932179fe74f9978, type: 3}
-  projectileSpeed: 8
+  projectileSpeed: 25

@@ -22,27 +22,45 @@ namespace LHE
         private float holdTime = 0f; // 접근된 시간 체크
         private int moveDirection = 0; // -1: 왼쪽, 1: 오른쪽, 0: 정지
 
+        private PhotonView photonView;
+
         private void Awake()
         {
-            // 마우스 화면 가두기
-            Cursor.lockState = CursorLockMode.Confined;
+            photonView = GetComponent<PhotonView>();
 
-            Transform targetSpawnPoint = PhotonNetwork.IsMasterClient ? spawnPointP1 : spawnPointP2;
+            // '내' 카메라가 맞는지 확인
+            if (photonView != null && photonView.IsMine)
+            {
+                // 내 것이 맞으면, 기존의 초기화 로직을 그대로 수행
+                Cursor.lockState = CursorLockMode.Confined;
 
-            //카메라의 새위치 설정
-            transform.position = new Vector3(targetSpawnPoint.position.x, transform.position.y, transform.position.z);
+                // IsMasterClient가 아닌 ActorNumber를 사용하는 것이 더 안정적입니다.
+                Transform targetSpawnPoint = (PhotonNetwork.LocalPlayer.ActorNumber == 1) ? spawnPointP1 : spawnPointP2;
 
-            // if (PhotonNetwork.IsMasterClient)
-            // {
-            //     transform.position = spawnPointP1.position;
-            // }
-            // else
-            // {
-            //     transform.position = spawnPointP2.position;
-            // }
+                // 스폰 포인트가 할당되어 있을 경우에만 위치 설정
+                if (targetSpawnPoint != null)
+                {
+                    transform.position = new Vector3(targetSpawnPoint.position.x, transform.position.y, transform.position.z);
+                }
 
-            // 화면 제한 설정
-            SetXLimits(minX, maxX);
+                SetXLimits(minX, maxX);
+            }
+            else
+            {
+                // '내' 카메라가 아니면, 카메라와 오디오 리스너를 모두 비활성화
+                GetComponent<Camera>().enabled = false;
+
+                AudioListener listener = GetComponent<AudioListener>();
+                if (listener != null)
+                {
+                    listener.enabled = false;
+                }
+            }
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayBGM();
+            }
+
         }
 
         private void Update()

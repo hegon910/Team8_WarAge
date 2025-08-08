@@ -19,7 +19,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     public float meleeSwitchRange = 1.5f;
     public LayerMask unitLayer;
     public float stopDistance = 1f;
-
+    public string TeamTag { get; private set; }
     public Vector3 moveDirection = Vector3.right;
     public bool IsMine => photonView.IsMine;
     private InGameManager gm;
@@ -38,6 +38,9 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         if (photonView.InstantiationData != null && photonView.InstantiationData.Length > 1)
         {
             this.gameObject.tag = (string)photonView.InstantiationData[0];
+            this.moveDirection = (Vector3)photonView.InstantiationData[1];
+            this.TeamTag = (string)photonView.InstantiationData[0];
+            this.gameObject.tag = this.TeamTag;
             this.moveDirection = (Vector3)photonView.InstantiationData[1];
         }
     }
@@ -128,7 +131,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            currentHealth = (int)stream.ReceiveNext();
+            int receivedHealth = (int)stream.ReceiveNext();
             int targetViewID = (int)stream.ReceiveNext();
             if (targetViewID != -1)
             {
@@ -142,7 +145,8 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
 
             if (animator != null)
             {
-                if (stream.Count >= 3) 
+                // 스트림에 데이터가 충분한지 확인하는 방어 코드 추가
+                if (stream.Count >= 3)
                 {
                     animator.SetBool(IsMoving, (bool)stream.ReceiveNext());
                     animator.SetBool(IsAttack, (bool)stream.ReceiveNext());
@@ -281,6 +285,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (currentHealth <= 0) return; // 이미 죽었으면 중복 실행 방지
 
+        SoundManager.Instance.PlayUnitHitSound(transform.position);
         currentHealth -= amount;
         if (currentHealth <= 0 && PhotonNetwork.IsMasterClient)
         {
@@ -291,6 +296,7 @@ public class UnitController : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     private void RpcDie()
     {
+        SoundManager.Instance.PlayUnitDeadSound(transform.position);
         string GiveExpTag = CompareTag("P1") ? "P2" : "P1";
         if (currentHealth > 0 && currentHealth != -1) // 아직 살아있으면 return (중복 실행 방지용)
         {

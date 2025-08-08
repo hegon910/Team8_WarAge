@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Medieval
   m_EditorClassIdentifier: 
   ageType: 1
-  maxHP: 500
+  maxHP: 1500
   requiredExp: 500
   baseSprite: {fileID: 21300000, guid: 2c7d6707811222343a993bba5225af95, type: 3}
   baseModelPrefab: {fileID: 1469811286971181456, guid: bba62fc7ac7df4d4e9734f340dcfecf6, type: 3}
@@ -26,4 +26,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38beaa5295a7af4459561165ae14adfe, type: 2}
   - {fileID: 11400000, guid: d54f11cfd8ebb7a49ba6d389acfb53b1, type: 2}
   ultimateSkill: {fileID: 11400000, guid: c95fd87269e81524d93ece1b35c94f10, type: 2}
-

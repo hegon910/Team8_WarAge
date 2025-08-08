@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); // 게임 오브젝트를 파괴하지 않고 유지
         }
 
         else if (Instance != this)
@@ -61,12 +62,15 @@ public class UIManager : MonoBehaviour
     #region 함수
     public void OnClickedLoginFirst()
     {
+        SoundManager.Instance.PlayEvolveSound();
         emailPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedLogin()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         lobbyPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
@@ -74,29 +78,36 @@ public class UIManager : MonoBehaviour
     public void OnClickedCancelBackMain()
     {
 
+        SoundManager.Instance.PlayUIClick();
         mainPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedEmailBack()
     {
+
+        SoundManager.Instance.PlayUIClick();
         signUpPanel.SetActive(true);
         emailPanel.SetActive(false);
     }
 
     public void OnClickedNicknameConfirm(string nickname)
     {
+        SoundManager.Instance.PlayEvolveSound();
         PhotonManager.Instance.ConnectToServer(nickname);
     }
 
     public void OnClickedNicknameBack()
     {
+
+        SoundManager.Instance.PlayUIClick();
         loginPanel.SetActive(true);
         nicknamePanel.SetActive(false);
     }
 
     public void Connect()
     {
+        SoundManager.Instance.PlayUIClick();
         lobbyPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
@@ -104,24 +115,30 @@ public class UIManager : MonoBehaviour
     public void OnClickedSignup()
     {
 
+        SoundManager.Instance.PlayEvolveSound();
         signUpPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedSignupConfrim()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         loginPanel.SetActive(true);
         signUpPanel.SetActive(false);
     }
 
     public void OnClickedSignupCancel()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         loginPanel.SetActive(true);
         signUpPanel.SetActive(false);
     }
  
     public void OnClickedCreateRoom()
     {
+        SoundManager.Instance.PlayEvolveSound();
         PhotonManager.Instance.CreateOrJoinLobby();
         PhotonManager.Instance.OnJoinedRoom();
         Debug.Log("클릭");
@@ -130,14 +147,16 @@ public class UIManager : MonoBehaviour
 
     public void CreateRoom()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         roomPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
     // 새로 추가된 로비 패널 활성화 메서드 (OnLeftRoom 콜백에서 호출)
     public void ShowLobbyPanel()
     {
+        HideAllPanels();
         lobbyPanel.SetActive(true);
-        roomPanel.SetActive(false);
     }
     //추가
     public void UpdateRoomList(List<RoomInfo> roomList)
@@ -175,12 +194,14 @@ public class UIManager : MonoBehaviour
     //---------------
     public void OnClickedLobbyCancel()
     {
+        SoundManager.Instance.PlayUIClick();
         loginPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }    
 
     public void OnClickedStartInGame()
     {
+        SoundManager.Instance.PlayEvolveSound();
         //인게임 연결
         //loginPanel.SetActive(true);
         roomPanel.SetActive(false);
@@ -192,11 +213,23 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedLeave()
     {
+        SoundManager.Instance.PlayUIClick();
         Debug.Log("방 떠남");
         lobbyPanel.SetActive(true);
         roomPanel.SetActive(false);
         PhotonManager.Instance.OnLeftRoom();
         PhotonNetwork.LeaveRoom();
+    }
+    public void HideAllPanels()
+    {
+        mainPanel.SetActive(false);
+        loginPanel.SetActive(false);
+        nicknamePanel.SetActive(false);
+        signUpPanel.SetActive(false);
+        emailPanel.SetActive(false);
+        lobbyPanel.SetActive(false);
+        roomPanel.SetActive(false);
+        // 게임 내 UI는 이 스크립트에서 관리되지 않으므로, 이외의 패널은 별도로 처리
     }
 
 

@@ -20,8 +20,8 @@ MonoBehaviour:
   MeleeRange: 1
   rangedrange: 20
   attackSpeed: 1
-  SpawnTime: 3
-  moveSpeed: 1
+  SpawnTime: 15
+  moveSpeed: 4
   goldCost: 1000
   unitSprite: {fileID: 0}
   description: IndustrialCaoneer

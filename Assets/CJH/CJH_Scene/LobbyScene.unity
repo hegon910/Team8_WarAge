@@ -1196,6 +1196,31 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559588941}
   m_CullTransparentMesh: 1
+--- !u!1 &560163611 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8312490223473774623, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+  m_PrefabInstance: {fileID: 657007053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &560163614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 560163611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ee7485cd510c4c4c949d1a7b7c7c18d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftRankText: {fileID: 1779873243}
+  leftTotalText: {fileID: 465762084}
+  leftWinsText: {fileID: 744509545}
+  leftLossesText: {fileID: 403045261}
+  rightRankText: {fileID: 112152685}
+  rightTotalText: {fileID: 1126470007}
+  rightWinsText: {fileID: 1777831454}
+  rightLossesText: {fileID: 1993034469}
 --- !u!1 &594591889 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4620245181191059529, guid: ba3a4bb1a1d7aaf4daae918e738a95d6, type: 3}
@@ -3499,6 +3524,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6114059030756356889, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1645570669}
+    - targetCorrespondingSourceObject: {fileID: 8312490223473774623, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 560163614}
     - targetCorrespondingSourceObject: {fileID: 6301561888136265743, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 705730245}
@@ -3655,8 +3683,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23e2b8689c2810b4790c4443a2afdb2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loginSceneName: JWH_LoginScene
+  soundManagerPrefab: {fileID: 273000504991818645, guid: 108cb19111c0a9147850bce20eca86a1, type: 3}
   gameSceneName: PHG_NetWorkInGameTest
+  roomNameInputField: {fileID: 1847256866}
 --- !u!4 &742731340
 Transform:
   m_ObjectHideFlags: 0
@@ -5436,7 +5465,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1144694366
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7184,6 +7213,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8025978441192869684, guid: ba3a4bb1a1d7aaf4daae918e738a95d6, type: 3}
   m_PrefabInstance: {fileID: 918362174}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1847256866 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 270289126465349914, guid: 9249d199ccd6cca42b29b8ff87e5d5f8, type: 3}
+  m_PrefabInstance: {fileID: 657007053}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1857451362
 GameObject:
   m_ObjectHideFlags: 0
@@ -7701,7 +7741,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2144170559
 Transform:
   m_ObjectHideFlags: 0
