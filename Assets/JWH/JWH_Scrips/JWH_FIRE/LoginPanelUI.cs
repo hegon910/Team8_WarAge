@@ -31,12 +31,14 @@ public class LoginPanel : MonoBehaviour
 
     private void Login()
     {
-        Login(idInput.text);
-    }    
+        //Login(idInput.text);
+        string cleanedId = idInput.text.Replace(" ", ""); // 스페이스 제거
+        Login(cleanedId);
+    }
 
     private void Login(string nickname)
     {
-        UserAuthService.Instance.Login(idInput.text, passInput.text, (success, user) =>
+        UserAuthService.Instance.Login(nickname, passInput.text, (success, user) =>
         {
             if (!success) return;
 
@@ -48,23 +50,13 @@ public class LoginPanel : MonoBehaviour
                 }
                 else
                 {
-                   UIManager.Instance.OnClickedNicknameConfirm(nickname);
+                    UIManager.Instance.OnClickedNicknameConfirm(nickname);
                 }
             }
             else
             {
                 emailPanel.SetActive(true);
             }
-
         });
     }
-
-    //private void ResetPass()
-    //{
-    //    UserAuthService.Instance.ResetPassword(idInput.text, success =>
-    //    {
-    //        if (success)
-    //            Debug.Log("비밀번호 재설정 성공");
-    //    });
-    //}
 }
