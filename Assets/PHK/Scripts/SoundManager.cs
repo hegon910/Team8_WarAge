@@ -61,13 +61,18 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayBGM()
     {
-        if (bgmSource != null && !bgmSource.isPlaying)
-        {
-            bgmSource.Play();
-        }
+        // 인게임 BGM 클립으로 교체하는 로직
+        if (bgmSource == null || backgroundMusic == null) return;
+        if (bgmSource.isPlaying && bgmSource.clip == backgroundMusic) return;
+
+        bgmSource.Stop();
+        bgmSource.clip = backgroundMusic;
+        bgmSource.loop = true;
+        bgmSource.Play();
     }
     public void StopBGM()
     {
+        // 불필요한 조건 제거
         if (bgmSource != null && bgmSource.isPlaying)
         {
             bgmSource.Stop();
@@ -105,22 +110,30 @@ public class SoundManager : MonoBehaviour
     // 3. 궁극기 사용 시 호출 (모든 플레이어가 들음)
     public void PlayUltimateSkillSound()
     {
-        // 모든 클라이언트에서 RPC_PlaySound가 실행되도록 요청
-        photonView.RPC("RPC_PlaySound", RpcTarget.All, "ultimate");
+        // UI 효과음 소스에서 로컬로 바로 재생
+        if (ultimateSkillSound != null && sfxSource != null)
+        {
+            sfxSource.PlayOneShot(ultimateSkillSound);
+        }
     }
 
     // 4. 유닛 피격 시 호출 (모든 플레이어가 들음)
     public void PlayUnitHitSound(Vector3 position)
     {
-        // 모든 클라이언트에서 RPC_PlaySoundAtPoint가 실행되도록 요청
-        photonView.RPC("RPC_PlaySoundAtPoint", RpcTarget.All, "hit", position);
+        // 해당 위치에서 로컬로 바로 재생
+        if (unitHitSound != null)
+        {
+            AudioSource.PlayClipAtPoint(unitHitSound, position, worldSfxVolume);
+        }
     }
     public void PlayUnitDeadSound(Vector3 position)
     {
-        // 사망 사운드도 위치값을 전달하도록 수정합니다.
-        photonView.RPC(nameof(RPC_PlaySoundAtPoint), RpcTarget.All, "dead", position);
+        // 해당 위치에서 로컬로 바로 재생
+        if (unitDeadSound != null)
+        {
+            AudioSource.PlayClipAtPoint(unitDeadSound, position, worldSfxVolume);
+        }
     }
-
 
     [PunRPC]
     private void RPC_PlaySound(string soundType)

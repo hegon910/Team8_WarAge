@@ -1620,7 +1620,7 @@ GameObject:
   - component: {fileID: 1250975931}
   - component: {fileID: 1250975933}
   m_Layer: 5
-  m_Name: LaunchBoxgelion
+  m_Name: LaunchEBoxgelion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1702,7 +1702,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1e3b8a96eb05d3d4c84e2e71eb276649, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4bcec5aca9c9f2740b6e269cefd55cd2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2299,7 +2299,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -27.6, y: 14.3}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1452268624
@@ -2322,7 +2322,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: EBoxgelion
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2331,8 +2331,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2385,7 +2385,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -50.49713, w: 15.97031}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2467,6 +2467,14 @@ PrefabInstance:
       propertyPath: m_FillOrigin
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1906107719261375332, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2238036903825962805, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300006, guid: 13af95a1dca0fa44c8abd54d2eb48cb7, type: 3}
     - target: {fileID: 2425754976818654107, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_Name
       value: InGameUI_Canvas
@@ -2478,6 +2486,10 @@ PrefabInstance:
     - target: {fileID: 2563980110572191287, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3324978539903059597, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3690383794839696459, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_Color.a
@@ -2607,8 +2619,16 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 155092050}
+    - target: {fileID: 7889290603563892317, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8270159425243501197, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
       propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8334964017935309813, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8823937797521067830, guid: 76611c43756d4944d9a0b603f0f72e4c, type: 3}

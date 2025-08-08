@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: ClubMan
   unitExp: 30
   health: 55
-  attackDamage: 16
+  attackDamage: 14
   rangedDamage: 0
   MeleeRange: 2
   rangedrange: 0
