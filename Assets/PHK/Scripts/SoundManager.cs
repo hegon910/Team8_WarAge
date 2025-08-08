@@ -86,7 +86,7 @@ public class SoundManager : MonoBehaviour
     public void SetBGMVolume(float v)
     {
         v = Mathf.Clamp01(v);
-        AudioListener.volume = v;                 // 전역(전체) 볼륨
+        if (bgmSource) bgmSource.volume = v;            
         PlayerPrefs.SetFloat(BGM_VOLUME_KEY, v);
     }
 
@@ -94,7 +94,7 @@ public class SoundManager : MonoBehaviour
     {
         v = Mathf.Clamp01(v);
         if (sfxSource) sfxSource.volume = v;
-        worldSfxVolume = v;
+        PlayerPrefs.SetFloat(SFX_VOLUME_KEY, v);
     }
 
     public void PlayLobbyBGM()
