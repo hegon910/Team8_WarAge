@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance;
-    [SerializeField] private GameObject soundManagerPrefab;
+    [SerializeField] public GameObject soundManagerPrefab;
 
     [Header("Input")]
     [SerializeField] private string gameSceneName = "PHG_NetWorkInGameTest";

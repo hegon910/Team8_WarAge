@@ -1,7 +1,7 @@
 // SoundManager.cs
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using Unity.VisualScripting;
 
 public class SoundManager : MonoBehaviour
@@ -25,7 +25,15 @@ public class SoundManager : MonoBehaviour
     public AudioClip ultimateSkillSound;
     public AudioClip unitDeadSound;
 
-    public float worldSfxVolume = 1f;
+    [Range(0f, 1f)] public float worldSfxVolume = 1f;
+
+    [Header("볼륨 조절")]
+    [SerializeField] private Slider bgmSlider;    // BGM 볼륨 조절 슬라이더
+    [SerializeField] private Slider sfxSlider;    // SFX 볼륨 조절 슬라이더
+    [SerializeField] private Button confirmButton;
+
+    private const string BGM_VOLUME_KEY = "BGMVolume";
+    private const string SFX_VOLUME_KEY = "SFXVolume";
 
     private void Awake()
     {
@@ -41,11 +49,54 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+
+
     private void Start()
     {
+        ApplySavedVolumesToAudio();
+        if (bgmSlider) bgmSlider.onValueChanged.AddListener(SetBGMVolume);
         PlayLobbyBGM();
-
     }
+
+    private void ApplySavedVolumesToAudio()
+    {
+        float bgm = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, 1f);
+        float sfx = PlayerPrefs.GetFloat(SFX_VOLUME_KEY, 1f);
+        if (bgm > 1f) bgm *= 0.01f;  // 옛 0~100 보정
+        if (sfx > 1f) sfx *= 0.01f;
+
+        SetBGMVolume(bgm);
+        SetSFXVolume(sfx);
+    }
+
+    // '확인' 버튼에서 호출: 슬라이더 값 → 실제 적용 + 저장
+    public void ApplyAudioSettings()
+    {
+        float bgm = bgmSlider ? Mathf.Clamp01(bgmSlider.value) : 1f;
+        float sfx = sfxSlider ? Mathf.Clamp01(sfxSlider.value) : 1f;
+
+        SetBGMVolume(bgm); 
+        SetSFXVolume(sfx);
+
+        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, bgm);
+        PlayerPrefs.SetFloat(SFX_VOLUME_KEY, sfx);
+        PlayerPrefs.Save();
+    }
+
+    public void SetBGMVolume(float v)
+    {
+        v = Mathf.Clamp01(v);
+        AudioListener.volume = v;                 // 전역(전체) 볼륨
+        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, v);
+    }
+
+    public void SetSFXVolume(float v)
+    {
+        v = Mathf.Clamp01(v);
+        if (sfxSource) sfxSource.volume = v;
+        worldSfxVolume = v;
+    }
+
     public void PlayLobbyBGM()
     {
         // bgmSource나 lobbyBGM 클립이 없으면 실행하지 않습니다.
@@ -94,7 +145,7 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayAddSlotSound()
     {
-        if(addTurretSlot != null && sfxSource != null)
+        if (addTurretSlot != null && sfxSource != null)
         {
             sfxSource.PlayOneShot(addTurretSlot);
         }
