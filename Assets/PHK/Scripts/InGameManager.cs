@@ -51,6 +51,7 @@ public class InGameManager : MonoBehaviourPunCallbacks
     #region 초기화 및 Update()
     private void Awake()
     {
+        UIManager.Instance.HideAllPanels();
         if (Instance == null)
         {
             Instance = this;
@@ -343,16 +344,16 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
     private IEnumerator PassiveGoldGeneration()
     {
-        var fiveSecondWait = new WaitForSeconds(5f);
+        var fiveSecondWait = new WaitForSeconds(3f);
         while (true)
         {
             yield return fiveSecondWait;
             int goldToAdd = 0;
             switch (p2_currentAge) // 시대에 따라 골드량이 변함
             {
-                case AgeType.Ancient: goldToAdd = 15; break;
-                case AgeType.Medieval: goldToAdd = 40; break;
-                case AgeType.Modern: goldToAdd = 100; break;
+                case AgeType.Ancient: goldToAdd = 35; break;
+                case AgeType.Medieval: goldToAdd = 75; break;
+                case AgeType.Modern: goldToAdd = 160; break;
             }
             AddGold(goldToAdd);
         }

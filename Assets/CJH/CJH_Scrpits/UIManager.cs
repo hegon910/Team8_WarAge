@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); // 게임 오브젝트를 파괴하지 않고 유지
         }
 
         else if (Instance != this)
@@ -136,8 +137,8 @@ public class UIManager : MonoBehaviour
     // 새로 추가된 로비 패널 활성화 메서드 (OnLeftRoom 콜백에서 호출)
     public void ShowLobbyPanel()
     {
+        HideAllPanels();
         lobbyPanel.SetActive(true);
-        roomPanel.SetActive(false);
     }
     //추가
     public void UpdateRoomList(List<RoomInfo> roomList)
@@ -197,6 +198,17 @@ public class UIManager : MonoBehaviour
         roomPanel.SetActive(false);
         PhotonManager.Instance.OnLeftRoom();
         PhotonNetwork.LeaveRoom();
+    }
+    public void HideAllPanels()
+    {
+        mainPanel.SetActive(false);
+        loginPanel.SetActive(false);
+        nicknamePanel.SetActive(false);
+        signUpPanel.SetActive(false);
+        emailPanel.SetActive(false);
+        lobbyPanel.SetActive(false);
+        roomPanel.SetActive(false);
+        // 게임 내 UI는 이 스크립트에서 관리되지 않으므로, 이외의 패널은 별도로 처리
     }
 
 

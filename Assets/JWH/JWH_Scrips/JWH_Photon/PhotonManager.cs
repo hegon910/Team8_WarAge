@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using ExitGames.Client.Photon;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,6 +12,7 @@ using UnityEngine.SceneManagement;
 public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance;
+    [SerializeField] private GameObject soundManagerPrefab;
 
     [Header("Input")]
     [SerializeField] private string gameSceneName = "PHG_NetWorkInGameTest";
@@ -30,6 +29,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         else if (Instance != this)
         {
             Destroy(gameObject);
+        }
+        if (SoundManager.Instance == null && soundManagerPrefab != null)
+        {
+            Instantiate(soundManagerPrefab);
         }
     }
 
@@ -65,11 +68,11 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         base.OnLeftRoom(); // PUN의 기본 로직을 실행합니다.
-
         // [핵심] UIManager를 호출하는 대신, LobbyScene을 로드합니다.
         // "LobbyScene"은 CJH 님이 작업하신 로비 씬의 실제 파일 이름이어야 합니다.
+        SceneManager.LoadScene("LobbyScene"); // 로비 씬을 로드합니다.
         PhotonNetwork.JoinLobby();
-        UIManager.Instance.ShowLobbyPanel();
+        //   UIManager.Instance.ShowLobbyPanel();
 
         Debug.Log("방을 나갔으며, LobbyScene을 로드합니다.");
     }
@@ -82,7 +85,8 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
         {
-        { "uid", firebaseUid }
+        { "uid", firebaseUid },
+               { "Ready", false }
         };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
 
@@ -100,15 +104,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
                 FindObjectOfType<TestStateUI>()?.UpdateMyStateUI();
             });
     }
-    //추가 PHG : 주석처리
-    //public override void OnJoinedLobby()
-    //{
-    //    // 방 제목 null 아닐 때
-    //    // 채팅 활성화
-    //    // 전적 활성화
-    //    // 방 목록 활성화
-    //}
-    //추가 PHG
+
+    public override void OnJoinedLobby()
+    {
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowLobbyPanel(); // 로비 패널을 보여줍니다.
+            Debug.Log("로비에 입장했습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("UIManager가 초기화되지 않았습니다. 로비 패널을 표시할 수 없습니다.");
+        }
+    }
 
 
     public void CreateOrJoinLobby()
@@ -132,11 +140,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks
         RoomOptions options = new RoomOptions { MaxPlayers = 2 };
         PhotonNetwork.CreateRoom(roomName, options, TypedLobby.Default);
         Debug.Log($"CreateRoom 호출됨: {roomName}");
-    }
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("로비에 입장했습니다.");
-        //CreateOrJoinLobby(); // 자동으로 로비에서 룸으로 넘어감
     }
 
 
@@ -221,11 +224,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void LeaveRoomAndLoadLobby()
     {
-        // ★★★ 가장 중요한 안전장치 ★★★
-        // 현재 게임 룸 안에 있을 때만 LeaveRoom을 호출합니다.
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
+        props["Ready"] = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props); // 로비로 돌아갈 때 플레이어의 준비 상태를 초기화합니다.
         if (PhotonNetwork.InRoom)
         {
             Debug.Log("게임 룸을 나갑니다...");
+
             PhotonNetwork.LeaveRoom(); // 이 함수는 성공 시 OnLeftRoom 콜백을 자동으로 호출합니다.
         }
         else
