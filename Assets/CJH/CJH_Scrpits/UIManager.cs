@@ -62,12 +62,15 @@ public class UIManager : MonoBehaviour
     #region 함수
     public void OnClickedLoginFirst()
     {
+        SoundManager.Instance.PlayEvolveSound();
         emailPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedLogin()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         lobbyPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
@@ -75,29 +78,36 @@ public class UIManager : MonoBehaviour
     public void OnClickedCancelBackMain()
     {
 
+        SoundManager.Instance.PlayUIClick();
         mainPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedEmailBack()
     {
+
+        SoundManager.Instance.PlayUIClick();
         signUpPanel.SetActive(true);
         emailPanel.SetActive(false);
     }
 
     public void OnClickedNicknameConfirm(string nickname)
     {
+        SoundManager.Instance.PlayEvolveSound();
         PhotonManager.Instance.ConnectToServer(nickname);
     }
 
     public void OnClickedNicknameBack()
     {
+
+        SoundManager.Instance.PlayUIClick();
         loginPanel.SetActive(true);
         nicknamePanel.SetActive(false);
     }
 
     public void Connect()
     {
+        SoundManager.Instance.PlayUIClick();
         lobbyPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
@@ -105,24 +115,30 @@ public class UIManager : MonoBehaviour
     public void OnClickedSignup()
     {
 
+        SoundManager.Instance.PlayEvolveSound();
         signUpPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
 
     public void OnClickedSignupConfrim()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         loginPanel.SetActive(true);
         signUpPanel.SetActive(false);
     }
 
     public void OnClickedSignupCancel()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         loginPanel.SetActive(true);
         signUpPanel.SetActive(false);
     }
  
     public void OnClickedCreateRoom()
     {
+        SoundManager.Instance.PlayEvolveSound();
         PhotonManager.Instance.CreateOrJoinLobby();
         PhotonManager.Instance.OnJoinedRoom();
         Debug.Log("클릭");
@@ -131,6 +147,8 @@ public class UIManager : MonoBehaviour
 
     public void CreateRoom()
     {
+
+        SoundManager.Instance.PlayEvolveSound();
         roomPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
@@ -176,12 +194,14 @@ public class UIManager : MonoBehaviour
     //---------------
     public void OnClickedLobbyCancel()
     {
+        SoundManager.Instance.PlayUIClick();
         loginPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }    
 
     public void OnClickedStartInGame()
     {
+        SoundManager.Instance.PlayEvolveSound();
         //인게임 연결
         //loginPanel.SetActive(true);
         roomPanel.SetActive(false);
@@ -193,6 +213,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickedLeave()
     {
+        SoundManager.Instance.PlayUIClick();
         Debug.Log("방 떠남");
         lobbyPanel.SetActive(true);
         roomPanel.SetActive(false);

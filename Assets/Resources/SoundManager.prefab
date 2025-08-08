@@ -49,7 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bgmSource: {fileID: 6675225416816708957}
   sfxSource: {fileID: 1171120370761591803}
-  backgroundMusic: {fileID: 0}
+  lobbyBGM: {fileID: 8300000, guid: 132a60089237392488f64eea5198b68f, type: 3}
+  backgroundMusic: {fileID: 8300000, guid: 2b9a06e22b5dcc844885671abd24d695, type: 3}
   uiClickSound: {fileID: 8300000, guid: 2e77a370ed9462c4baf4cb20efb9cf9e, type: 3}
   evolveSuccessSound: {fileID: 8300000, guid: 5c06daec28af4824c9e432c20e7325bb, type: 3}
   addTurretSlot: {fileID: 0}

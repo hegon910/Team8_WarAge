@@ -158,12 +158,14 @@ public class PhotonManager : MonoBehaviourPunCallbacks
 
     public void SetLocalPlayerReady(bool ready)
     {
+
         Hashtable props = new Hashtable { { "Ready", ready } };
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
     }
 
     public bool AreAllPlayersReady()
     {
+        SoundManager.Instance.PlayEvolveSound();
         if (!PhotonNetwork.InRoom) return false; // �濡 ������ �غ� ���¸� Ȯ���� �� ����
 
         foreach (Player p in PhotonNetwork.PlayerList)

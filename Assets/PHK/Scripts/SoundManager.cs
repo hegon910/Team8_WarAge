@@ -15,6 +15,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource sfxSource; // UI 효과음용 (로컬)
 
     [Header("오디오 클립")]
+    public AudioClip lobbyBGM;
     public AudioClip backgroundMusic;
     public AudioClip uiClickSound;
     public AudioClip evolveSuccessSound;
@@ -42,8 +43,21 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-    
+        PlayLobbyBGM();
 
+    }
+    public void PlayLobbyBGM()
+    {
+        // bgmSource나 lobbyBGM 클립이 없으면 실행하지 않습니다.
+        if (bgmSource == null || lobbyBGM == null) return;
+
+        // 이미 같은 곡이 재생 중이면 바꾸지 않습니다.
+        if (bgmSource.isPlaying && bgmSource.clip == lobbyBGM) return;
+
+        bgmSource.Stop();
+        bgmSource.clip = lobbyBGM;
+        bgmSource.loop = true; // BGM은 보통 반복재생합니다.
+        bgmSource.Play();
     }
     public void PlayBGM()
     {

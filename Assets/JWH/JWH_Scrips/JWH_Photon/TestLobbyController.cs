@@ -182,6 +182,7 @@ public class TestLobbyController : MonoBehaviourPunCallbacks
 
     void OnReadyButtonClicked()
     {
+        SoundManager.Instance.PlayUIClick();
         if (PhotonNetwork.InRoom) // 방에 있을 때만 레디 가능
         {
             isLocalPlayerReady = !isLocalPlayerReady;

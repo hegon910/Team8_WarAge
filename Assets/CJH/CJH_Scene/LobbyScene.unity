@@ -3683,6 +3683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23e2b8689c2810b4790c4443a2afdb2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundManagerPrefab: {fileID: 273000504991818645, guid: 108cb19111c0a9147850bce20eca86a1, type: 3}
   gameSceneName: PHG_NetWorkInGameTest
   roomNameInputField: {fileID: 1847256866}
 --- !u!4 &742731340
