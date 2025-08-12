@@ -48,6 +48,8 @@ public class OptionManager : MonoBehaviour
             resolutionManager.ApplyCurrentResolution();
             Debug.Log("해상도 설정 확인");
         }
+        SoundManager.Instance.ApplyAudioSettings(); // 적용 + 저장
+        Debug.Log("사운드 설정 확인");
         // 옵션 패널 닫기
         optionPanel.SetActive(false);
     }

@@ -53,11 +53,13 @@ MonoBehaviour:
   backgroundMusic: {fileID: 8300000, guid: 2b9a06e22b5dcc844885671abd24d695, type: 3}
   uiClickSound: {fileID: 8300000, guid: 2e77a370ed9462c4baf4cb20efb9cf9e, type: 3}
   evolveSuccessSound: {fileID: 8300000, guid: 5c06daec28af4824c9e432c20e7325bb, type: 3}
-  addTurretSlot: {fileID: 0}
+  addTurretSlot: {fileID: 8300000, guid: 19a34e5036875eb49962baeffd7c87f0, type: 3}
   unitHitSound: {fileID: 8300000, guid: 14862860d7d7ef14084d6533e52bc08c, type: 3}
   ultimateSkillSound: {fileID: 8300000, guid: 17e0a596585d9a84781f5cb44b70b083, type: 3}
   unitDeadSound: {fileID: 8300000, guid: 19a34e5036875eb49962baeffd7c87f0, type: 3}
   worldSfxVolume: 1
+  bgmSlider: {fileID: 0}
+  sfxSlider: {fileID: 0}
 --- !u!114 &1750679080682973671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +190,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 0
   Mute: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   unitName: slingshotman
   unitExp: 50
   health: 42
-  attackDamage: 8
+  attackDamage: 15
   rangedDamage: 8
   MeleeRange: 1
   rangedrange: 5

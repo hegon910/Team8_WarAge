@@ -1,4 +1,5 @@
 using Firebase.Auth;
+using Firebase.Database;
 using KYG;
 using Photon.Pun;
 using Photon.Realtime;
@@ -366,9 +367,9 @@ public class InGameManager : MonoBehaviourPunCallbacks
             int goldToAdd = 0;
             switch (p2_currentAge) // 시대에 따라 골드량이 변함
             {
-                case AgeType.Ancient: goldToAdd = 35; break;
-                case AgeType.Medieval: goldToAdd = 75; break;
-                case AgeType.Modern: goldToAdd = 160; break;
+                case AgeType.Ancient: goldToAdd = 25; break;
+                case AgeType.Medieval: goldToAdd = 55; break;
+                case AgeType.Modern: goldToAdd = 130; break;
             }
             AddGold(goldToAdd);
         }
@@ -443,9 +444,20 @@ public class InGameManager : MonoBehaviourPunCallbacks
 
         FirebaseUser user = UserAuthService.Auth?.CurrentUser;
         if (user == null) return;
-
-        string resultLog = isWinner ? "승리" : "패배";
-        Debug.Log($"[게임 결과] 플레이어: {user.DisplayName}, 결과: {resultLog}");
+        DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+        string userId = user.UserId;
+        string result = isWinner ? "Win" : "Loss";
+        reference.Child("users").Child(userId).Child("matchHistory").Push().SetValueAsync(result).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log($"[전적 기록 성공] 사용자: {user.DisplayName}, 결과: {result}");
+            }
+            else
+            {
+                Debug.LogError($"[전적 기록 실패] {task.Exception}");
+            }
+        });
     }
 
     #endregion
