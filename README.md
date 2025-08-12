@@ -1,66 +1,70 @@
 # Team8_WarAge
 
-1.³×Æ®¿öÅ© ¹× ¹é¿£µå ´ã´ç - Á¶¿øÈÄ
+1.ë„¤íŠ¸ì›Œí¬ ë° ë°±ì—”ë“œ ë‹´ë‹¹ - ì¡°ì›í›„
 
 
-2.°ÔÀÓÇÃ·¹ÀÌ ½Ã½ºÅÛ ´ã´ç &ÀüÅõ ½Ã½ºÅÛ ´ã´çÀÚ (2ÀÎ) - ÀÌÃ¢¹Î, ÀÌÈ¿ÀÍ
+2.ê²Œìž„í”Œë ˆì´ ì‹œìŠ¤í…œ ë‹´ë‹¹ &ì „íˆ¬ ì‹œìŠ¤í…œ ë‹´ë‹¹ìž (2ì¸) - ì´ì°½ë¯¼, ì´íš¨ìµ
 
 
-3.UI/UX ¹× »ç¿ëÀÚ ÀÔ·Â ´ã´ç ÀÎ°ÔÀÓ/³×Æ®¿öÅ© (2ÀÎ) - ¹ÚÈñ°Ç, ÃµÁöÇõ
+3.UI/UX ë° ì‚¬ìš©ìž ìž…ë ¥ ë‹´ë‹¹ ì¸ê²Œìž„/ë„¤íŠ¸ì›Œí¬ (2ì¸) - ë°•í¬ê±´, ì²œì§€í˜
 
 
-4.±âÁö, °Ç¹°& Æ¯¼ö´É·Â(¾ÆÀÌÅÛ?) - ±è¿µ±Ù
+4.ê¸°ì§€, ê±´ë¬¼& íŠ¹ìˆ˜ëŠ¥ë ¥(ì•„ì´í…œ?) - ê¹€ì˜ê·¼
 
 
-ÆÀ °³¹ß ±×¶ó¿îµå·ê (Team Development Ground Rules)
+íŒ€ ê°œë°œ ê·¸ë¼ìš´ë“œë£° (Team Development Ground Rules)
 
-1. Git Ä¿¹Ô ¸Þ½ÃÁö ±ÔÄ¢
-¸ðµç Ä¿¹Ô ¸Þ½ÃÁö´Â Conventional Commits ¾ç½ÄÀ» µû¸¨´Ï´Ù. ÀÌ´Â º¯°æ »çÇ×À» ¸íÈ®È÷ ÇÏ°í, ·Î±× ÃßÀûÀ» ¿ëÀÌÇÏ°Ô ÇÕ´Ï´Ù.
+1. Git ì»¤ë°‹ ë©”ì‹œì§€ ê·œì¹™
+ëª¨ë“  ì»¤ë°‹ ë©”ì‹œì§€ëŠ” Conventional Commits ì–‘ì‹ì„ ë”°ë¦…ë‹ˆë‹¤. ì´ëŠ” ë³€ê²½ ì‚¬í•­ì„ ëª…í™•ížˆ í•˜ê³ , ë¡œê·¸ ì¶”ì ì„ ìš©ì´í•˜ê²Œ í•©ë‹ˆë‹¤.
 
-Çü½Ä: Å¸ÀÔ(½ºÄÚÇÁ): Á¦¸ñ
+í˜•ì‹: íƒ€ìž…(ìŠ¤ì½”í”„): ì œëª©
 
-Å¸ÀÔ (Type): Ä¿¹ÔÀÇ ¼º°ÝÀ» ³ªÅ¸³À´Ï´Ù. (¾Æ·¡ Áß ÇÏ³ª ¼±ÅÃ)
+íƒ€ìž… (Type): ì»¤ë°‹ì˜ ì„±ê²©ì„ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤. (ì•„ëž˜ ì¤‘ í•˜ë‚˜ ì„ íƒ)
 
-feat: »õ·Î¿î ±â´É Ãß°¡ (Feature)
+feat: ìƒˆë¡œìš´ ê¸°ëŠ¥ ì¶”ê°€ (Feature)
 
-fix: ¹ö±× ¼öÁ¤ (Bug fix)
+fix: ë²„ê·¸ ìˆ˜ì • (Bug fix)
 
-refactor: ±â´É º¯°æ ¾ø´Â ÄÚµå ³»ºÎ ±¸Á¶ °³¼± (Refactoring)
+refactor: ê¸°ëŠ¥ ë³€ê²½ ì—†ëŠ” ì½”ë“œ ë‚´ë¶€ êµ¬ì¡° ê°œì„  (Refactoring)
 
-style: ÄÚµå Æ÷¸Ë, ¼¼¹ÌÄÝ·Ð µî ½ºÅ¸ÀÏ °ü·Ã ¼öÁ¤ (¿ÀÅ¸ ¼öÁ¤ Æ÷ÇÔ)
+style: ì½”ë“œ í¬ë§·, ì„¸ë¯¸ì½œë¡  ë“± ìŠ¤íƒ€ì¼ ê´€ë ¨ ìˆ˜ì • (ì˜¤íƒ€ ìˆ˜ì • í¬í•¨)
 
-docs: ¹®¼­ Ãß°¡ ¶Ç´Â ¼öÁ¤ (Documentation)
+docs: ë¬¸ì„œ ì¶”ê°€ ë˜ëŠ” ìˆ˜ì • (Documentation)
 
-chore: ºôµå, ÆÐÅ°Áö ¸Å´ÏÀú ¼³Á¤ µî °³¹ß È¯°æ °ü·Ã ÀÛ¾÷ (±× ¿Ü ÀâÀÏ)
+chore: ë¹Œë“œ, íŒ¨í‚¤ì§€ ë§¤ë‹ˆì € ì„¤ì • ë“± ê°œë°œ í™˜ê²½ ê´€ë ¨ ìž‘ì—… (ê·¸ ì™¸ ìž¡ì¼)
 
-½ºÄÚÇÁ (Scope): º¯°æµÈ ÄÚµåÀÇ ¹üÀ§¸¦ ³ªÅ¸³À´Ï´Ù. (¼±ÅÃ»çÇ×, ´ã´ç ÆÄÆ® ±âÀÔ)
+ìŠ¤ì½”í”„ (Scope): ë³€ê²½ëœ ì½”ë“œì˜ ë²”ìœ„ë¥¼ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤. (ì„ íƒì‚¬í•­, ë‹´ë‹¹ íŒŒíŠ¸ ê¸°ìž…)
 
-UI, Input, Lobby, Core, Unit, Network µî
+UI, Input, Lobby, Core, Unit, Network ë“±
 
-Á¦¸ñ (Subject): 50ÀÚ ³»¿ÜÀÇ ¸íÈ®ÇÏ°í °£°áÇÑ ¼³¸í
+ì œëª© (Subject): 50ìž ë‚´ì™¸ì˜ ëª…í™•í•˜ê³  ê°„ê²°í•œ ì„¤ëª…
 
-¿¹½Ã)
+ì˜ˆì‹œ)
 
-feat(UI): ÀÎ°ÔÀÓ ÇÃ·¹ÀÌ¾î ÀÚ¿ø HUD Ãß°¡
+feat(UI): ì¸ê²Œìž„ í”Œë ˆì´ì–´ ìžì› HUD ì¶”ê°€
 
-fix(Input): À¯´Ö ¼±ÅÃ ½Ã °£ÇæÀû Ãæµ¹ ¿À·ù ¼öÁ¤
+fix(Input): ìœ ë‹› ì„ íƒ ì‹œ ê°„í—ì  ì¶©ëŒ ì˜¤ë¥˜ ìˆ˜ì •
 
-refactor(Lobby): ·Îºñ ÇÃ·¹ÀÌ¾î ¸ñ·Ï °»½Å ·ÎÁ÷ ÃÖÀûÈ­
+refactor(Lobby): ë¡œë¹„ í”Œë ˆì´ì–´ ëª©ë¡ ê°±ì‹  ë¡œì§ ìµœì í™”
 
-style(Core): GameManager.cs ÄÚµå Æ÷¸ËÆÃ Á¤¸®
+style(Core): GameManager.cs ì½”ë“œ í¬ë§·íŒ… ì •ë¦¬
 
-docs(All): ÆÀ ±×¶ó¿îµå·ê ¹®¼­ Ãß°¡
+docs(All): íŒ€ ê·¸ë¼ìš´ë“œë£° ë¬¸ì„œ ì¶”ê°€
 
-chore: Unity ÇÁ·ÎÁ§Æ® ¹öÀü 2022.3.15f1À¸·Î ¾÷µ¥ÀÌÆ®
-
-
-2. ³×ÀÓ½ºÆäÀÌ½º (Namespace) ±ÔÄ¢
-¸ðµç C# ½ºÅ©¸³Æ®´Â ÀÚ½ÅÀÇ ´ã´ç ÆÄÆ®¿Í ÀÌ¸§À» Æ÷ÇÔÇÏ´Â ³×ÀÓ½ºÆäÀÌ½º·Î °¨½Î¾ß ÇÕ´Ï´Ù. ÀÌ´Â Å¬·¡½º ÀÌ¸§ Ãæµ¹À» ¹æÁöÇÏ°í ÄÚµåÀÇ ¼ÒÀ¯±ÇÀ» ¸íÈ®È÷ ÇÕ´Ï´Ù.
+chore: Unity í”„ë¡œì íŠ¸ ë²„ì „ 2022.3.15f1ìœ¼ë¡œ ì—…ë°ì´íŠ¸
 
 
-3. Æú´õ ±¸Á¶ ±ÔÄ¢
-¸ðµç ÀÛ¾÷Àº Unity Assets Æú´õ ³»¿¡¼­ °¢ÀÚ¿¡°Ô ÇÒ´çµÈ Æú´õ ¾È¿¡¼­ ÁøÇàÇÏ´Â °ÍÀ» ¿øÄ¢À¸·Î ÇÕ´Ï´Ù. ÀÌ´Â ÆÄÀÏ °ü¸®¸¦ ¿ëÀÌÇÏ°Ô ÇÏ°í, ´Ù¸¥ ÆÀ¿øÀÇ ÀÛ¾÷¿¡ ½Ç¼ö·Î ¿µÇâÀ» ÁÖ´Â °ÍÀ» ¹æÁöÇÕ´Ï´Ù.
-1. 
+2. ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ (Namespace) ê·œì¹™
+ëª¨ë“  C# ìŠ¤í¬ë¦½íŠ¸ëŠ” ìžì‹ ì˜ ë‹´ë‹¹ íŒŒíŠ¸ì™€ ì´ë¦„ì„ í¬í•¨í•˜ëŠ” ë„¤ìž„ìŠ¤íŽ˜ì´ìŠ¤ë¡œ ê°ì‹¸ì•¼ í•©ë‹ˆë‹¤. ì´ëŠ” í´ëž˜ìŠ¤ ì´ë¦„ ì¶©ëŒì„ ë°©ì§€í•˜ê³  ì½”ë“œì˜ ì†Œìœ ê¶Œì„ ëª…í™•ížˆ í•©ë‹ˆë‹¤.
+
+
+3. í´ë” êµ¬ì¡° ê·œì¹™
+ëª¨ë“  ìž‘ì—…ì€ Unity Assets í´ë” ë‚´ì—ì„œ ê°ìžì—ê²Œ í• ë‹¹ëœ í´ë” ì•ˆì—ì„œ ì§„í–‰í•˜ëŠ” ê²ƒì„ ì›ì¹™ìœ¼ë¡œ í•©ë‹ˆë‹¤. ì´ëŠ” íŒŒì¼ ê´€ë¦¬ë¥¼ ìš©ì´í•˜ê²Œ í•˜ê³ , ë‹¤ë¥¸ íŒ€ì›ì˜ ìž‘ì—…ì— ì‹¤ìˆ˜ë¡œ ì˜í–¥ì„ ì£¼ëŠ” ê²ƒì„ ë°©ì§€í•©ë‹ˆë‹¤.
+
+
+
+
+https://github.com/user-attachments/assets/64676c05-4a7b-49ec-a363-83898b2f06a4
 
 
 
